@@ -9,7 +9,7 @@ Social_Norms_meta <- read_excel("Google Drive/Il mio Drive/Meta-analysis beliefs
 df <- Social_Norms_meta %>%
   group_by(Game_type) %>%
   subset.data.frame(subset = Game_type %in% c("DG","UG", "PGG", "TG", "BG", "GEG", "PDG") & 
-                      Environment %in% c("Classroom", "Lab") & 
+                      Environment %in% c("Classroom", "Lab", "Online") & 
                       Method_elicitation=="KW"
                     ) %>%
 
