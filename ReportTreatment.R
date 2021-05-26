@@ -2,6 +2,11 @@ library(tidyverse)
 library(readxl)
 rm(list = ls())
 
+
+#-----------------------------------------------------------------------------
+#ricordiamoci di aggiungere una statistica dei dati disponibili per game type
+#-----------------------------------------------------------------------------
+
 #inserire percorso del file excel
 Social_Norms_meta <- read_excel("Google Drive/Il mio Drive/Meta-analysis beliefs/Social Norms meta.xlsx", 
                                 sheet = "ALL")
@@ -31,7 +36,8 @@ df <- Social_Norms_meta %>%
     N_Treatments = n(),
     N_Separate_beliefs = sum(Separate_sample_beliefs=="Y"),
     N_OneShot_Treatments = sum(One_Shot_Repeated=="OneShot"),
-    N_Monetary_Incentivized_experiment = sum(Monetary_Incentivized_experiment=="Y")
+    N_Monetary_Incentivized_experiment = sum(Monetary_Incentivized_experiment=="Y"),
+    N_Available_Data = sum(Available_Dataset=="Y")
   ) %>%
   arrange(-N_Treatments)
 
