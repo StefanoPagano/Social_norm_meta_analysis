@@ -1,4 +1,4 @@
-## CIAO SUCA Read in packages
+## Read in packages
 library(Hmisc)
 library(foreign)
 library(tidyverse)
