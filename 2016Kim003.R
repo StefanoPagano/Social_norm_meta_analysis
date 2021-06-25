@@ -14,6 +14,12 @@ dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms1=read.csv("Norm_Elicitation_Data.csv")
 
+
+# DG -----------------
+# get information on treatment
+
+# read -> select colonne --> create database of info treatment
+
 # cleaning DG
 ## exp_id : date and time of experiment
 ## exp_num : unique number of the experiment
@@ -43,11 +49,26 @@ label_col = as.character(seq(0,16,2))
 dg_columns <- c(1, 3, 4, 11:19)
 ## compute norm 
 dg_appropriateness_sum <- norms1[, dg_columns] %>% summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) 
+# endowment is 16
 dg_norm <- as.integer(label_col[which.max(dg_appropriateness_sum)])
 
 ## compute variance norm
 dg_norms_var <- norms1[, dg_columns] %>% summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% 
   subset.data.frame(select = which.max(dg_appropriateness_sum))
+
+# produce individual-level datasets
+
+
+
+
+
+# print csv ------
+
+## treatment table
+#--> usi le info acquisite all'inizio'
+## choice table
+
+## belief table
 
 
 
