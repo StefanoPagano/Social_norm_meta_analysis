@@ -2,7 +2,7 @@
 library(Hmisc)
 library(foreign)
 library(tidyverse)
-# no suca tu
+# Andrea suca
 rm(list = ls())
 # set wd
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
