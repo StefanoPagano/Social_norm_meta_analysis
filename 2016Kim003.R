@@ -16,7 +16,7 @@ dg=read.csv("DG_Data.csv", sep="\t")
 norms1=read.csv("Norm_Elicitation_Data.csv")
 
 # basic dataset
-meta_dataset <- read_xlsx(path = "G:/My Drive/Meta-analysis beliefs/Social Norms meta.xlsx") ## STEFANO : TO BE CHANGED // need to create a main folder with other files ##
+meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") ## STEFANO : TO BE CHANGED // need to create a main folder with other files ##
 
 # DG -----------------
 # get information on treatment
