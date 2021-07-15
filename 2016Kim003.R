@@ -2,6 +2,7 @@
 library(Hmisc)
 library(foreign)
 library(tidyverse)
+library(readxl)
 rm(list = ls())
 
 # set wd 
@@ -14,6 +15,8 @@ dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms1=read.csv("Norm_Elicitation_Data.csv")
 
+# basic dataset
+meta_dataset <- read_xlsx(path = "G:/My Drive/Meta-analysis beliefs/Social Norms meta.xlsx") ## STEFANO : TO BE CHANGED // need to create a main folder with other files ##
 
 # DG -----------------
 # get information on treatment
