@@ -3,12 +3,13 @@ library(Hmisc)
 library(foreign)
 library(tidyverse)
 rm(list = ls())
-# set wd Andrea
+
+# set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
-#stefano
-pgs=read.csv("PG_Data_bysubj.txt", sep="\t")
-tgs=read.csv("TG_Data_bysubj.csv", sep="\t")
-ug=read.csv("UG_Data.txt", sep="\t")
+
+#pgs=read.csv("PG_Data_bysubj.txt", sep="\t")
+#tgs=read.csv("TG_Data_bysubj.csv", sep="\t")
+#ug=read.csv("UG_Data.txt", sep="\t")
 dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms1=read.csv("Norm_Elicitation_Data.csv")
@@ -16,8 +17,6 @@ norms1=read.csv("Norm_Elicitation_Data.csv")
 
 # DG -----------------
 # get information on treatment
-
-# read -> select colonne --> create database of info treatment
 
 # cleaning DG
 ## exp_id : date and time of experiment
