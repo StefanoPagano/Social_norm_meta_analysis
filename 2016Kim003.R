@@ -9,7 +9,7 @@ rm(list = ls())
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
 
 #pgs=read.csv("PG_Data_bysubj.txt", sep="\t")
-tgs=read.csv("TG_Data_bysubj.csv", sep="\t")
+tgs=read.table("TG_Data_byperiod.txt", header = T)
 #ug=read.csv("UG_Data.txt", sep="\t")
 dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
@@ -66,6 +66,46 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine datasets
-finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, all.x=T) %>% merge.data.frame(final_norms, all.x=T)
+finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 # TG ---------------------
+## only first round, only proposer action
+
+coltg = c("exp_id","exp_num","prop_id","sent","per")
+
+# 1. Choice dataframe ----
+tg_dta_coop <- tgs %>% subset.data.frame(select = coltg, subset = per== 1) %>% 
+  mutate(endowment = 80, cooperation = sent/endowment) %>% 
+  summarise(mean_cooperation = mean(cooperation, na.rm =T),
+            var_cooperation = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2016Kim003", TreatmentCode = 6)
+
+norms1[,44:52]
+
+# 2. Beliefs dataframe ----
+## answers[34-42] : kw appropriateness
+## actions: send 0;10;20;...;80
+## exp_id
+## session
+## subject
+## KW scale: 1: VI; 2: I; 3: A; 4: VA
+label_col = as.character(seq(0,80,10))
+tg_columns <- c(1, 3, 4, 44:52)
+## compute norm 
+tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>% 
+  summarise_at(vars(answers.34.:answers.42.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+
+## compute variance norm
+tg_norms_var <- norms1[, tg_columns] %>% 
+  summarise_at(vars(answers.34.:answers.42.), var, na.rm=T) %>% t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
+                                                         TreatmentCode = 6, 
+                                                         avg_NE = as.integer(donation)/80,
+                                                         var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine datasets
+finaldf <- finaldf %>% merge.data.frame(tg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
