@@ -2,15 +2,6 @@
 library(Hmisc)
 library(foreign)
 library(tidyverse)
-<<<<<<< HEAD
-<<<<<<< HEAD
-#stefano bvla andrea
-=======
-#stefano bvla 2
->>>>>>> da6b6bc7fb8de151235ca5bf1ffdb04af5a7b1e9
-=======
-#stefano bvla
->>>>>>> parent of 5369d75 (Update 2016Kim003.R)
 rm(list = ls())
 # set wd
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
