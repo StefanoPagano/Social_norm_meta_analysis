@@ -108,4 +108,4 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine datasets
-finaldf <- finaldf %>% merge.data.frame(tg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+finaldf <- meta_dataset %>% merge.data.frame(tg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(finaldf, all = T)
