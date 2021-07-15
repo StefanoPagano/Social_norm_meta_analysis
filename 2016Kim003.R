@@ -16,7 +16,7 @@ dg=read.csv("DG_Data.csv", sep="\t")
 norms1=read.csv("Norm_Elicitation_Data.csv")
 
 # meta-information dataset
-meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2016Kim003", select = c(n_Paper, PaperID, TreatmentCode, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma))
+meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2016Kim003", select = c(n_Paper, PaperID, TreatmentCode, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
 
 # DG -----------------
 # get information on treatment
@@ -66,7 +66,7 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine datasets
-finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 # TG ---------------------
 ## only first round, only proposer action
@@ -79,8 +79,6 @@ tg_dta_coop <- tgs %>% subset.data.frame(select = coltg, subset = per== 1) %>%
   summarise(mean_cooperation = mean(cooperation, na.rm =T),
             var_cooperation = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2016Kim003", TreatmentCode = 6)
-
-norms1[,44:52]
 
 # 2. Beliefs dataframe ----
 ## answers[34-42] : kw appropriateness
@@ -108,4 +106,10 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine datasets
-finaldf <- meta_dataset %>% merge.data.frame(tg_dta_coop, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(finaldf, all.x = T)
+finaldf =  meta_dataset %>% 
+  merge.data.frame(tg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms) %>% rbind.data.frame(finaldf)
+  right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
+  mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
+         mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
+         var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
+         var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
