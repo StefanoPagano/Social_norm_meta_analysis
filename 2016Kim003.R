@@ -9,7 +9,7 @@ rm(list = ls())
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
 
 #pgs=read.csv("PG_Data_bysubj.txt", sep="\t")
-#tgs=read.csv("TG_Data_bysubj.csv", sep="\t")
+tgs=read.csv("TG_Data_bysubj.csv", sep="\t")
 #ug=read.csv("UG_Data.txt", sep="\t")
 dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
@@ -31,15 +31,14 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 ## sent : amount sent; -1 if not applicable
 coldg = c("exp_id","exp_num","subj_id","subj", "role", "sent")
 
-## compute average donation
+# 1. Choice dataframe ----
 dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>% 
   mutate(endowment = 16, cooperation = sent/endowment) %>% 
-  summarise(mean_cooperation = mean(cooperation))
-## compute variance donations
-dg_dta_var <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>% 
-  mutate(endowment = 16, cooperation = sent/endowment) %>% 
-  summarise(var_cooperation = var(cooperation))
+  summarise(mean_cooperation = mean(cooperation, na.rm =T),
+            var_cooperation = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2016Kim003", TreatmentCode = 7)
 
+# 2. Beliefs dataframe ----
 ## answers[1-9] : kw appropriateness
 ## actions: send 16/0; 14/2; 12/4; ...; 0/16
 ## exp_id
@@ -49,46 +48,24 @@ dg_dta_var <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 label_col = as.character(seq(0,16,2))
 dg_columns <- c(1, 3, 4, 11:19)
 ## compute norm 
-dg_appropriateness_sum <- norms1[, dg_columns] %>% summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) 
+dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>% 
+  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
 # endowment is 16
-dg_norm <- as.integer(label_col[which.max(dg_appropriateness_sum)])
+dg_norm <- as.integer(label_col[which.max(dg_appropriateness_sum)])/16
 
 ## compute variance norm
-dg_norms_var <- norms1[, dg_columns] %>% summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% 
-  subset.data.frame(select = which.max(dg_appropriateness_sum))
+dg_norms_var <- norms1[, dg_columns] %>% 
+  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
-# produce individual-level datasets
+dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
+                                                         TreatmentCode = 7, 
+                                                         avg_NE = as.integer(donation)/16,
+                                                         var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
 
+# 3. combine datasets
+finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, all.x=T) %>% merge.data.frame(final_norms, all.x=T)
 
-
-
-
-# print csv ------
-
-## treatment table
-#--> usi le info acquisite all'inizio'
-## choice table
-
-## belief table
-
-
-
-##############################
-label_count = 1
-
-for (i in 1:8) {
-  Norms_col_sum_i = 11 + i
-  Norms_col_sum_j = Norms_col_sum_i-1
-  
-  answer_i <- norms1[, c(1, 3, 4, 11:19)] %>% summarise(sum(norms1[,Norms_col_sum_i]))
-  answer_j <- norms1[, c(1, 3, 4, 11:19)] %>% summarise(sum(norms1[,Norms_col_sum_j]))
-  
-  if (answer_i > answer_j){
-  dg_norms <- answer_i
-  label_col = paste("answer.",label_count+1,".", sep = "")
-  }
-  label_count = label_count + 1
-}
-
-Answer_appropriate = paste(dg_norms, label_col)
-Answer_appropriate
+# TG ---------------------
