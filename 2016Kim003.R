@@ -3,7 +3,7 @@ library(Hmisc)
 library(foreign)
 library(tidyverse)
 rm(list = ls())
-# set wd
+# set wd Andrea
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
 #stefano
 pgs=read.csv("PG_Data_bysubj.txt", sep="\t")
