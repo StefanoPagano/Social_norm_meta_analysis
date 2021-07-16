@@ -185,7 +185,7 @@ finaldf =  meta_dataset %>%
 ### treat = 9: PG 10 periods, then  RF task with "no rule"
 ## gr_id : unique group id in the dataset
 ## putin1 : amount put in group account by subject in period 1 of PG
-colpgg = c("exp_id","exp_num","subj_id","subj","treat", "putin1")
+#colpgg = c("exp_id","exp_num","subj_id","subj","treat", "putin1")
 
 # 1. Choice dataframe, no choice for this experiment, that matches norm elicitation ----
 # pgg_dta_coop <- pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
@@ -221,4 +221,4 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
-  merge.data.frame(pgg_final_norms) %>% rbind.data.frame(finaldf)
+  merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(pgg_final_norms) %>% rbind.data.frame(finaldf)
