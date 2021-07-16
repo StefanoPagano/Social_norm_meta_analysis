@@ -16,7 +16,7 @@ dg=read.csv("DG_Data.csv", sep="\t")
 norms1=read.csv("Norm_Elicitation_Data.csv")
 
 # meta-information dataset
-meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2016Kim003", select = c(n_Paper, PaperID, TreatmentCode, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
+meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2016Kim003", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
 
 # DG -----------------
 # get information on treatment
@@ -106,11 +106,11 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(tg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms) %>% rbind.data.frame(finaldf)
-  right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
-  mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
-         mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
-         var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
-         var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
+  # right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
+  # mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
+  #        mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
+  #        var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
+  #        var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
 
 
 
@@ -162,11 +162,11 @@ ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "d
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(ug_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(ug_final_norms) %>% rbind.data.frame(finaldf)
-right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
-  mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
-         mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
-         var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
-         var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
+# right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
+#   mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
+#          mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
+#          var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
+#          var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
 
 
 # PGG (1:Sort_PG)-----------------
@@ -187,43 +187,38 @@ right_join(finaldf, by = c("PaperID","TreatmentCode")) %>%
 ## putin1 : amount put in group account by subject in period 1 of PG
 colpgg = c("exp_id","exp_num","subj_id","subj","treat", "putin1")
 
-# 1. Choice dataframe ----
-pgg_dta_coop <- pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
-  mutate(endowment = 50, cooperation = sent/endowment) %>% 
-  summarise(mean_cooperation = mean(cooperation, na.rm =T),
-            var_cooperation = var(cooperation, na.rm = T)) %>% 
-  mutate(PaperID = "2016Kim003", TreatmentCode = 1)
+# 1. Choice dataframe, no choice for this experiment, that matches norm elicitation ----
+# pgg_dta_coop <- pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
+#   mutate(endowment = 50, cooperation = sent/endowment) %>% 
+#   summarise(mean_cooperation = mean(cooperation, na.rm =T),
+#             var_cooperation = var(cooperation, na.rm = T)) %>% 
+#   mutate(PaperID = "2016Kim003", TreatmentCode = 1)
 
 # 2. Beliefs dataframe ----
-## answers[23-31] : kw appropriateness
+## answers[12-21] : kw appropriateness
 ## actions: send 16/0; 14/2; 12/4; ...; 0/16
 ## exp_id
 ## session
 ## subject
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
-label_col = as.character(seq(0,16,2))
-ug_columns <- c(1, 3, 4, 33:41)
+label_col = as.character(seq(0,50,5))
+pgg_columns <- c(1, 3, 4, 22:32)
 ### compute norm 
-ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>% 
-  summarise_at(vars(answers.23.:answers.31.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>% 
+  summarise_at(vars(answers.12.:answers.22.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
 
 ### compute variance norm
-ug_norms_var <- norms1[, ug_columns] %>% 
-  summarise_at(vars(answers.23.:answers.31.), var, na.rm=T) %>% t.data.frame() %>% 
+pgg_norms_var <- norms1[, pgg_columns] %>% 
+  summarise_at(vars(answers.12.:answers.22.), var, na.rm=T) %>% t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "donation") %>% 
+pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                         TreatmentCode = 8, 
-                                                         avg_NE = as.integer(donation)/16,
-                                                         var_NE = ..y) %>% 
-  subset.data.frame(select = -c(..x, ..y, donation))
+                                                          TreatmentCode = 9, 
+                                                          avg_NE = as.integer(donation)/50,
+                                                          var_NE = ..y) %>% 
+                                                          subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
-  merge.data.frame(ug_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(ug_final_norms) %>% rbind.data.frame(finaldf)
-right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
-  mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
-         mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
-         var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
-         var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
+  merge.data.frame(pgg_final_norms) %>% rbind.data.frame(finaldf)
