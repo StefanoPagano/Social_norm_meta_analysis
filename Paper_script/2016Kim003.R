@@ -8,6 +8,8 @@ rm(list = ls())
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
 
+csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv"
+
 pgg=read.csv("PG_Data_bysubj.txt", sep="\t")
 tgs=read.table("TG_Data_byperiod.txt", header = T)
 ug=read.table("UG_Data.txt", header = T)
@@ -188,11 +190,13 @@ finaldf =  meta_dataset %>%
 #colpgg = c("exp_id","exp_num","subj_id","subj","treat", "putin1")
 
 # 1. Choice dataframe, no choice for this experiment, that matches norm elicitation ----
-# pgg_dta_coop <- pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
+pgg_dta_coop <- data.frame(mean_cooperation = NA, var_cooperation = NA) %>% 
+  
+# pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
 #   mutate(endowment = 50, cooperation = sent/endowment) %>% 
 #   summarise(mean_cooperation = mean(cooperation, na.rm =T),
 #             var_cooperation = var(cooperation, na.rm = T)) %>% 
-#   mutate(PaperID = "2016Kim003", TreatmentCode = 1)
+mutate(PaperID = "2016Kim003", TreatmentCode = 9)
 
 # 2. Beliefs dataframe ----
 ## answers[12-21] : kw appropriateness
@@ -222,3 +226,6 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(pgg_final_norms) %>% rbind.data.frame(finaldf)
+
+
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID, "_finaldf.csv")))
