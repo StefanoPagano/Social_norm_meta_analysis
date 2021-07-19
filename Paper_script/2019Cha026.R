@@ -44,21 +44,26 @@ label_col = as.character(seq(0,16,2))
 dg_columns <- c(1, 3, 4, 11:19)
 ## compute norm 
 dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>% 
-  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 dg_norms_var <- norms1[, dg_columns] %>% 
-  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% 
+  t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
-  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                         TreatmentCode = 7, 
-                                                         avg_NE = as.integer(donation)/endowment,
-                                                         var_NE = ..y) %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2016Kim003", 
+    TreatmentCode = 7, 
+    avg_NE = as.integer(donation)/endowment,
+    var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
-finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 write.csv(finaldf, file = paste(finaldf$PaperID, "_finaldf.csv"))

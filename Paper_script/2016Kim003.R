@@ -51,7 +51,9 @@ label_col = as.character(seq(0,16,2))
 dg_columns <- c(1, 3, 4, 11:19)
 ## compute norm 
 dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>% 
-  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 dg_norms_var <- norms1[, dg_columns] %>% 
@@ -59,14 +61,16 @@ dg_norms_var <- norms1[, dg_columns] %>%
   cbind.data.frame(donation=label_col)
 
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
-  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                          TreatmentCode = 7, 
-                                                          avg_NE = as.integer(donation)/16,
-                                                          var_NE = ..y) %>% 
-                                                          subset.data.frame(select = -c(..x, ..y, donation))
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2016Kim003", 
+    TreatmentCode = 7, 
+    avg_NE = as.integer(donation)/16,
+    var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
-finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 # TG ---------------------
 ## only first round, only proposer action
@@ -91,7 +95,9 @@ label_col = as.character(seq(0,80,10))
 tg_columns <- c(1, 3, 4, 44:52)
 ## compute norm 
 tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>% 
-  summarise_at(vars(answers.34.:answers.42.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+  summarise_at(vars(answers.34.:answers.42.), sum, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 tg_norms_var <- norms1[, tg_columns] %>% 
@@ -99,22 +105,19 @@ tg_norms_var <- norms1[, tg_columns] %>%
   cbind.data.frame(donation=label_col)
 
 tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "donation") %>% 
-  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                          TreatmentCode = 6, 
-                                                          avg_NE = as.integer(donation)/80,
-                                                          var_NE = ..y) %>% 
-                                                          subset.data.frame(select = -c(..x, ..y, donation))
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2016Kim003", 
+    TreatmentCode = 6, 
+    avg_NE = as.integer(donation)/80,
+    var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
-  merge.data.frame(tg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(tg_final_norms) %>% rbind.data.frame(finaldf)
-  # right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
-  # mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
-  #        mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
-  #        var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
-  #        var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
-
-
+  merge.data.frame(tg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(tg_final_norms) %>% 
+  rbind.data.frame(finaldf)
+  
 
 # UG -----------------
 # get information on treatment
@@ -158,9 +161,9 @@ ug_norms_var <- norms1[, ug_columns] %>%
 ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2016Kim003",
-         TreatmentCode = 8, 
-         avg_NE = as.integer(donation)/16, 
-         var_NE = ..y) %>% 
+    TreatmentCode = 8, 
+    avg_NE = as.integer(donation)/16, 
+    var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -203,23 +206,28 @@ label_col = as.character(seq(0,50,5))
 pgg_columns <- c(1, 3, 4, 22:32)
 ### compute norm 
 pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>% 
-  summarise_at(vars(answers.12.:answers.22.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+  summarise_at(vars(answers.12.:answers.22.), sum, na.rm=T) %>% t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
 ### compute variance norm
 pgg_norms_var <- norms1[, pgg_columns] %>% 
-  summarise_at(vars(answers.12.:answers.22.), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(answers.12.:answers.22.), var, na.rm=T) %>% 
+  t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by = "donation") %>% 
-  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                          TreatmentCode = 9, 
-                                                          avg_NE = as.integer(donation)/50,
-                                                          var_NE = ..y) %>% 
-                                                          subset.data.frame(select = -c(..x, ..y, donation))
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2016Kim003", 
+    TreatmentCode = 9, 
+    avg_NE = as.integer(donation)/50,
+    var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
-  merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(pgg_final_norms) %>% rbind.data.frame(finaldf)
+  merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(pgg_final_norms) %>% 
+  rbind.data.frame(finaldf)
 
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID, "_finaldf.csv")))
