@@ -17,7 +17,6 @@ norms <- dg %>%
   subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, norm), 
                     subset = elicit_norms == 1) %>%
   subset.data.frame(subset = endowment == 10)
-#c(elicit_norms == 1, endowment == 10))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2019Cha026", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -45,24 +44,26 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 0)
   mutate(PaperID = "2019Cha026", TreatmentCode = 1)
 
 # 2. Beliefs dataframe ----
-## answers[1-9] : kw appropriateness
-## actions: send 16/0; 14/2; 12/4; ...; 0/16
-## exp_id
-## session
 ## subject
-## KW scale: 1: VI; 2: I; 3: A; 4: VA
-label_col = as.character(seq(0,16,2))
+## elicit_norms
+## frame_tax
+## endowment
+## action : for subjects in the norm elicitation experiment the keep action being rated.
+## norm: for subjects in the norm elicitation experiment, the norm rating. 
+## KW scale: -1 = VI, -0.6 = I, -0.2 = SI, 0.2 = SA, 0.6 = A, 1 = VA.
+# label_col = as.character(seq(0,10,5))
 dg_columns <- c(1, 3, 4, 11:19)
 ## compute norm 
-dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>% 
-  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>% 
-  t.data.frame() %>% 
+dg_appropriateness_sum <- norms %>% 
+  # subset.data.frame(select = dg_columns, subset = ) %>%
+  group_by(action) %>%
+  summarise(sum(norm)) %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
-dg_norms_var <- norms1[, dg_columns] %>% 
-  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% 
-  t.data.frame() %>% 
+dg_norms_var <- norm %>%
+  group_by(action) %>%
+  summarise(var(norm)) %>% 
   cbind.data.frame(donation=label_col)
 
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
