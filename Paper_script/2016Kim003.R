@@ -145,6 +145,7 @@ ug_dta_coop <- ug %>% subset.data.frame(select = colug, subset = role == 1) %>%
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,16,2))
 ug_columns <- c(1, 3, 4, 33:41)
+
 ## compute norm 
 ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>% 
   summarise_at(vars(answers.23.:answers.31.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
@@ -155,20 +156,18 @@ ug_norms_var <- norms1[, ug_columns] %>%
   cbind.data.frame(donation=label_col)
 
 ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "donation") %>% 
-  subset.data.frame(subset = ..x == max(..x)) %>% mutate(PaperID = "2016Kim003", 
-                                                          TreatmentCode = 8, 
-                                                          avg_NE = as.integer(donation)/16,
-                                                          var_NE = ..y) %>% 
-                                                          subset.data.frame(select = -c(..x, ..y, donation))
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2016Kim003",
+         TreatmentCode = 8, 
+         avg_NE = as.integer(donation)/16, 
+         var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
-  merge.data.frame(ug_dta_coop, by = c("PaperID","TreatmentCode")) %>% merge.data.frame(ug_final_norms) %>% rbind.data.frame(finaldf)
-# right_join(finaldf, by = c("PaperID","TreatmentCode")) %>% 
-#   mutate(avg_NE = coalesce(.[["avg_NE.x"]],  .[["avg_NE.y"]]), 
-#          mean_cooperation = coalesce(.[["mean_cooperation.x"]], .[["mean_cooperation.y"]]),
-#          var_NE = coalesce(.[["var_NE.x"]], .[["var_NE.y"]]),
-#          var_cooperation = coalesce(.[["var_cooperation.x"]], .[["var_cooperation.y"]]))
+  merge.data.frame(ug_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(ug_final_norms) %>% 
+  rbind.data.frame(finaldf)
 
 
 # PGG (1:Sort_PG)-----------------
@@ -191,12 +190,7 @@ finaldf =  meta_dataset %>%
 
 # 1. Choice dataframe, no choice for this experiment, that matches norm elicitation ----
 pgg_dta_coop <- data.frame(mean_cooperation = NA, var_cooperation = NA) %>% 
-  
-# pgg %>% subset.data.frame(select = colpgg, subset = treat == 1) %>% 
-#   mutate(endowment = 50, cooperation = sent/endowment) %>% 
-#   summarise(mean_cooperation = mean(cooperation, na.rm =T),
-#             var_cooperation = var(cooperation, na.rm = T)) %>% 
-mutate(PaperID = "2016Kim003", TreatmentCode = 9)
+  mutate(PaperID = "2016Kim003", TreatmentCode = 9)
 
 # 2. Beliefs dataframe ----
 ## answers[12-21] : kw appropriateness
