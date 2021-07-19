@@ -5,10 +5,19 @@ rm(list = ls())
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
 
-dg=read_excel("data.xls")
+dg=read_excel("data.xls", sheet = "Sheet1", 
+              col_types = c("numeric", "numeric", "numeric", 
+                            "numeric", "numeric", "numeric", 
+                            "numeric", "numeric", "numeric", 
+                            "numeric", "numeric", "numeric", 
+                            "numeric", "numeric", "numeric"))
 
 ## the next file contains all data except the conditional PG elicitations, which we did later
-norms <- dg %>% subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, norm), subset = c(elicit_norms == 1, endowment == 10))
+norms <- dg %>% 
+  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, norm), 
+                    subset = elicit_norms == 1) %>%
+  subset.data.frame(subset = endowment == 10)
+#c(elicit_norms == 1, endowment == 10))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2019Cha026", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -27,8 +36,10 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 coldg = c("subject","elicit_norms","frame_tax","endowment", "keep")
 
 # 1. Choice dataframe ----
-dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = c(frame_tax == 0, elicit_norms == 0, endowment == 10)) %>% 
-  mutate(cooperation = (endowment - keep)/endowment) %>% 
+dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
+  subset.data.frame(subset = elicit_norms == 0) %>%
+  subset.data.frame(subset = endowment == 10) %>%
+  mutate(cooperation = (endowment - as.integer(keep))/endowment) %>% 
   summarise(mean_cooperation = mean(cooperation, na.rm =T),
             var_cooperation = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2019Cha026", TreatmentCode = 1)
