@@ -100,7 +100,7 @@ coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent
 
 # 1. Choice dataframe ----
 dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
-  #subset.data.frame(subset = decider == 1) %>%
+  subset.data.frame(subset = decider == 1) %>%
   subset.data.frame(subset = treat == 2) %>%
   mutate(endowment = 20, cooperation = sent/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
