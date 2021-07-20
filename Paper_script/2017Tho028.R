@@ -56,6 +56,7 @@ dg_columns <- c(1:10, 28, 33, 34)
 ## compute norm 
 dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 1) %>%
+  subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
@@ -63,6 +64,7 @@ dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
 ## compute variance norm
 dg_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 1) %>%
+  subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
@@ -121,6 +123,7 @@ dg_columns <- c(1:10, 28, 33, 34)
 ## compute norm 
 dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 2) %>%
+  subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
@@ -128,6 +131,7 @@ dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
 ## compute variance norm
 dg_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 2) %>%
+  subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
