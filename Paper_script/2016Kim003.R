@@ -231,4 +231,5 @@ finaldf =  meta_dataset %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 
-write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID, "_finaldf.csv")))
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+

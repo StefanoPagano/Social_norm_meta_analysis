@@ -80,4 +80,5 @@ finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","Trea
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 
-write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID, "_finaldf.csv")))
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
