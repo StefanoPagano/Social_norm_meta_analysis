@@ -8,7 +8,7 @@ rm(list = ls())
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003/2016Kim003_data/Data_JEEA_MS_5107")
 
-csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv"
+csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 pgg=read.csv("PG_Data_bysubj.txt", sep="\t")
 tgs=read.table("TG_Data_byperiod.txt", header = T)
@@ -36,8 +36,8 @@ coldg = c("exp_id","exp_num","subj_id","subj", "role", "sent")
 # 1. Choice dataframe ----
 dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>% 
   mutate(endowment = 16, cooperation = sent/endowment) %>% 
-  summarise(mean_cooperation = mean(cooperation, na.rm =T),
-            var_cooperation = var(cooperation, na.rm = T)) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2016Kim003", TreatmentCode = 7)
 
 # 2. Beliefs dataframe ----
@@ -64,8 +64,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 7, 
-    avg_NE = as.integer(donation)/16,
-    var_NE = ..y) %>% 
+    Avg_NE = as.integer(donation)/16,
+    Var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -80,8 +80,8 @@ coltg = c("exp_id","exp_num","prop_id","sent","per")
 # 1. Choice dataframe ----
 tg_dta_coop <- tgs %>% subset.data.frame(select = coltg, subset = per== 1) %>% 
   mutate(endowment = 80, cooperation = sent/endowment) %>% 
-  summarise(mean_cooperation = mean(cooperation, na.rm =T),
-            var_cooperation = var(cooperation, na.rm = T)) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2016Kim003", TreatmentCode = 6)
 
 # 2. Beliefs dataframe ----
@@ -108,8 +108,8 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 6, 
-    avg_NE = as.integer(donation)/80,
-    var_NE = ..y) %>% 
+    Avg_NE = as.integer(donation)/80,
+    Var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -135,8 +135,8 @@ colug = c("exp_id","exp_num","subj_id","subj", "role", "sent")
 # 1. Choice dataframe ----
 ug_dta_coop <- ug %>% subset.data.frame(select = colug, subset = role == 1) %>% 
   mutate(endowment = 16, cooperation = sent/endowment) %>% 
-  summarise(mean_cooperation = mean(cooperation, na.rm =T),
-            var_cooperation = var(cooperation, na.rm = T)) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2016Kim003", TreatmentCode = 8)
 
 # 2. Beliefs dataframe ----
@@ -162,8 +162,8 @@ ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "d
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2016Kim003",
     TreatmentCode = 8, 
-    avg_NE = as.integer(donation)/16, 
-    var_NE = ..y) %>% 
+    Avg_NE = as.integer(donation)/16, 
+    Var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -192,7 +192,7 @@ finaldf =  meta_dataset %>%
 #colpgg = c("exp_id","exp_num","subj_id","subj","treat", "putin1")
 
 # 1. Choice dataframe, no choice for this experiment, that matches norm elicitation ----
-pgg_dta_coop <- data.frame(mean_cooperation = NA, var_cooperation = NA) %>% 
+pgg_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>% 
   mutate(PaperID = "2016Kim003", TreatmentCode = 9)
 
 # 2. Beliefs dataframe ----
@@ -219,15 +219,16 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 9, 
-    avg_NE = as.integer(donation)/50,
-    var_NE = ..y) %>% 
+    Avg_NE = as.integer(donation)/50,
+    Var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(pgg_final_norms) %>% 
-  rbind.data.frame(finaldf)
+  rbind.data.frame(finaldf) %>%
+  mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID, "_finaldf.csv")))

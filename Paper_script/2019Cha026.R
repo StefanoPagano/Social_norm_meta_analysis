@@ -5,6 +5,8 @@ rm(list = ls())
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
 
+csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
+
 dg=read_excel("data.xls", sheet = "Sheet1", 
               col_types = c("numeric", "numeric", "numeric", 
                             "numeric", "numeric", "numeric", 
@@ -144,4 +146,5 @@ finaldf <- meta_dataset %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
-write.csv(finaldf, file = paste(finaldf$PaperID[1], "_finaldf.csv", sep=""), row.names = F)
+#write.csv(finaldf, file = paste(finaldf$PaperID[1], "_finaldf.csv", sep=""), row.names = F)
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv"), row.names = F))
