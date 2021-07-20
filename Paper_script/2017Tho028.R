@@ -80,7 +80,7 @@ finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","Trea
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
 
-# DG Asym-----------------
+# DG Asym1-----------------
 # get information on treatment
 
 # cleaning DG
