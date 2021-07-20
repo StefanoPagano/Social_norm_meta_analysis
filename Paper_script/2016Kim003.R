@@ -224,7 +224,7 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
-finaldf =  meta_dataset %>% 
+finaldf <- meta_dataset %>% 
   merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(pgg_final_norms) %>% 
   rbind.data.frame(finaldf) %>%
