@@ -26,41 +26,90 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 
 # 1. Choice dataframe ----
 
+ug1_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
+  mutate(PaperID = "2015Ves034", TreatmentCode = 1)
 
 # 2. Beliefs dataframe ----
-## subject
-## elicit_norms
-## frame_tax
-## endowment
-## action : for subjects in the norm elicitation experiment the keep action being rated.
-## norm: for subjects in the norm elicitation experiment, the norm rating. 
-## KW scale: -1 = VI, -0.6 = I, -0.2 = SI, 0.2 = SA, 0.6 = A, 1 = VA.
+## Experiment condition : incentives + appropriateness first (1), incentives + fairness first (2), no incentives + appropriateness first (3), no incentives + fairness first (4)
+## TreatmentCode in database : KW_Incentivized_first (1) ; KW_Incentivized_last (4)
+## Endowment : 10
+## KW scale: 1: VI; 2: I; 3: A; 4: VA
 
 label_col = as.character(seq(0,10,1))
 
 ## compute norm 
-dg_appropriateness_sum <- norms %>%
-  subset.data.frame(subset = Condition == 0) %>%
-  group_by(action) %>%
-  summarise(coop = sum(norm))
-# cbind.data.frame(donation=label_col)
+ug1_appropriateness_sum <- norms %>%
+  subset.data.frame(subset = Condition == 1) %>%
+  summarise_at(vars(AR0:AR10), sum, na.rm=T) %>% 
+  t.data.frame() %>%
+  cbind.data.frame(donation=label_col)
 
 ## compute variance norm
-dg_norms_var <- norms %>%
-  subset.data.frame(subset = frame_tax == 0) %>%
-  group_by(action) %>%
-  summarise(var_coop = var(norm))
-# cbind.data.frame(donation=label_col)
+ug1_norms_var <- norms %>%
+  subset.data.frame(subset = Condition == 1) %>%
+  summarise_at(vars(AR0:AR10), var, na.rm=T) %>% 
+  t.data.frame() %>%
+  cbind.data.frame(donation=label_col)
 
-dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "action") %>% 
-  subset.data.frame(subset = coop == max(coop)) %>% 
-  mutate(PaperID = "2019Cha026", 
+ug1_final_norms <- merge.data.frame(ug1_appropriateness_sum, ug1_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2015Ves034", 
          TreatmentCode = 1, 
-         avg_NE = action/10,
-         var_NE = var_coop) %>%
-  subset.data.frame(select = -c(coop, var_coop, action))
+         Avg_NE = as.integer(donation)/10,
+         Var_NE = ..y) %>%
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
-  merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>%
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(ug1_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(ug1_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+
+# UG Incentivized-Appropriateness last ---------------
+# get information on treatment
+
+# cleaning UG
+## no choice experiment, only norm elicitation
+
+# 1. Choice dataframe ----
+
+ug2_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
+  mutate(PaperID = "2015Ves034", TreatmentCode = 4)
+
+# 2. Beliefs dataframe ----
+## Experiment condition : incentives + appropriateness first (1), incentives + fairness first (2), no incentives + appropriateness first (3), no incentives + fairness first (4)
+## TreatmentCode in database : KW_Incentivized_first (1) ; KW_Incentivized_last (4)
+## Endowment : 10
+## KW scale: 1: VI; 2: I; 3: A; 4: VA
+
+label_col = as.character(seq(0,10,1))
+
+## compute norm 
+ug2_appropriateness_sum <- norms %>%
+  subset.data.frame(subset = Condition == 2) %>%
+  summarise_at(vars(AR0:AR10), sum, na.rm=T) %>% 
+  t.data.frame() %>%
+  cbind.data.frame(donation=label_col)
+
+## compute variance norm
+ug2_norms_var <- norms %>%
+  subset.data.frame(subset = Condition == 2) %>%
+  summarise_at(vars(AR0:AR10), var, na.rm=T) %>% 
+  t.data.frame() %>%
+  cbind.data.frame(donation=label_col)
+
+ug2_final_norms <- merge.data.frame(ug2_appropriateness_sum, ug2_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2015Ves034", 
+         TreatmentCode = 4, 
+         Avg_NE = as.integer(donation)/10,
+         Var_NE = ..y) %>%
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(ug2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(ug2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf) %>%
+  mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
+
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)

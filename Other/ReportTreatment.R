@@ -8,8 +8,7 @@ rm(list = ls())
 #Insert excel file path
 #---------------------------------------------------------------------------------------
 
-Social_Norms_meta <- read_excel("Google Drive/Il mio Drive/Meta-analysis beliefs/Social Norms meta.xlsx", 
-                                sheet = "ALL")
+Social_Norms_meta <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
 
 #---------------------------------------------------------------------------------------
 #Inclusion Request of Working Papers

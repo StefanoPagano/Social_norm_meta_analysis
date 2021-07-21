@@ -74,8 +74,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "a
   subset.data.frame(subset = coop == max(coop)) %>% 
   mutate(PaperID = "2019Cha026", 
     TreatmentCode = 1, 
-    avg_NE = action/10,
-    var_NE = var_coop) %>%
+    Avg_NE = action/10,
+    Var_NE = var_coop) %>%
   subset.data.frame(select = -c(coop, var_coop, action))
 
 # 3. combine dataset ----
@@ -135,8 +135,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "a
   subset.data.frame(subset = coop == max(coop)) %>% 
   mutate(PaperID = "2019Cha026", 
          TreatmentCode = 2, 
-         avg_NE = action/10,
-         var_NE = var_coop) %>%
+         Avg_NE = action/10,
+         Var_NE = var_coop) %>%
   subset.data.frame(select = -c(coop, var_coop, action))
 
 # 3. combine dataset ----

@@ -57,7 +57,8 @@ dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>%
 
 ## compute variance norm
 dg_norms_var <- norms1[, dg_columns] %>% 
-  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>%
+  t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
