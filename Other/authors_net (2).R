@@ -1,0 +1,43 @@
+library(readr)
+library(igraph)
+library(visNetwork)
+library(dplyr)
+require(shiny)
+require(stringr)
+
+rm(list=ls())
+
+authors_net <- read_csv("authors_net.csv")
+authors_n <- authors_net[grep("--", authors_net$Authors), ]
+authors_n$numberoauthors <- (1+str_count(authors_n$Authors, "--"))
+authors_solo <- authors_net[-grep("--", authors_net$Authors), ]
+
+# data wrangling from https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
+SplitAuthors <- sapply(authors_n$Authors, strsplit, split = "--", fixed = TRUE)
+AuthorCombinations <- sapply(SplitAuthors,function(x){combn(unlist(x),m = 2)})
+AuthorEdges <- rapply(AuthorCombinations,unlist)
+names(AuthorEdges) <- NULL
+AuthorEdges <- trimws(AuthorEdges)
+AuthorGraph <- graph(AuthorEdges, directed = FALSE)
+
+# method KW
+l_method <- list()
+for(i in 1:length(authors_n$Method)){
+  l_method[[i]] <- data.frame(id=SplitAuthors[[i]], method=rep(authors_n$Method[i],authors_n$numberoauthors[i]))
+}
+l_method_sum <- do.call(rbind, l_method) %>% group_by(id) %>% summarise(n_KW=sum(method=="N"),
+                                                                            n_BX=sum(method=="R")) %>% mutate(d=(n_KW-n_BX)/(n_KW+n_BX))
+#plot(AuthorGraph,layout = layout_with_graphopt, edge.arrow.size = 0.2, vertex.cex = 0.7, mode = "circle")
+
+Nodes <- data.frame(id=as_ids(V(AuthorGraph)), label=as_ids(V(AuthorGraph))) %>%
+  merge.data.frame(l_method_sum) %>% 
+  mutate(color = ifelse(d < -.5, "blue",ifelse(d < -.01, "grey", ifelse(d < .5, "green", "red")))) %>% 
+  mutate(title = paste0("<p><b>", id,"</b><br>","Bicchieri = ", n_BX, "<br> Krupka = ", n_KW, "</p>"))
+
+Edges <- data.frame(matrix(AuthorEdges, ncol=2, byrow = T))
+colnames(Edges) <- c("from", "to")
+
+
+visNetwork(Nodes, Edges) %>% 
+  visIgraphLayout(layout = "layout_with_fr") %>% visOptions(highlightNearest = list(enabled = T, hover = T), 
+                                             nodesIdSelection = T) 

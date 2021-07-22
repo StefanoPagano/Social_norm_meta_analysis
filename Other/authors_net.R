@@ -8,13 +8,17 @@ library(visNetwork)
 rm(list=ls())
 
 #reading csv file
-authors_net <- read_csv("ShinyApp/authors_net.csv")
+authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
+  subset.data.frame(subset = Target =="Y") %>%
+  distinct(PaperID, .keep_all = T) %>%
+  mutate(New_authors = str_replace_all(Authors, ";", "--"))
+
 
 #subset -> take rows with this condition only
-authors_n <- authors_net[grep("--", authors_net$Authors), ]
+authors_n <- authors_net[grep("--", authors_net$New_authors), ]
 
 # data wrangling from https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
-SplitAuthors <- sapply(authors_n$Authors, strsplit, split = "--", fixed = TRUE)
+SplitAuthors <- sapply(authors_n$New_authors, strsplit, split = "--", fixed = TRUE)
 AuthorCombinations <- sapply(SplitAuthors,function(x){combn(unlist(x),m = 2)})
 AuthorEdges <- rapply(AuthorCombinations,unlist)
 names(AuthorEdges) <- NULL

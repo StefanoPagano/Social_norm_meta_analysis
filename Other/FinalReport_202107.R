@@ -41,16 +41,12 @@ group_by(Game_type) %>%
 
 write.csv(df_treat, file = paste(csv_path_output, paste("Treatments.csv", sep = ""), sep = ""), row.names = F)
 
-#### Dataset stats - don't use it ####
+#### Data collection status ####
 df_data <- Social_Norms_meta %>%
-  subset.data.frame(subset = TreatmentCode %in% c("1","1a","1aa")) %>%
-  group_by(PaperID, StatusTreatment_Roma) %>%
+  group_by(StatusTreatment_Roma) %>%
   summarise(
     N_Paper = n(),
-    ) %>%
-  group_by(StatusTreatment_Roma) %>%
-  summarise(N_Paper = n())
+  ) %>%
+  replace_na(list(StatusTreatment_Roma  = "Duplicates"))
 
 write.csv(df_treat, file = paste(csv_path_output, paste("Treatments.csv", sep = ""), sep = ""), row.names = F)
-
-df_tot <- df_data %>% summarise(sum(N_Paper))
