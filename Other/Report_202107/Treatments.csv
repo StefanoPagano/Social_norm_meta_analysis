@@ -1,12 +1,12 @@
-"Game_type","Treatments","Between_subjects_beliefs","KW","Bicchieri","KW_Bicchieri","Monetary_Punishment","Choice_Method_Direct","Choice_Method_Strategy","OnlyNorms","Choice_Method_Both","Available_Data"
-"DG",92,41,67,18,5,0,86,4,2,0,33
-"PGG",28,19,24,2,2,3,14,7,1,6,15
-"UG",17,15,5,12,0,12,17,0,0,0,3
-"TG",9,7,7,2,0,0,9,0,0,0,5
-"Tax Game",7,0,1,0,6,0,7,0,0,0,0
-"ToG",7,4,4,0,0,0,7,0,0,0,0
-"Investment game",6,0,0,4,0,3,6,0,0,0,0
-"GEG",5,3,5,0,0,2,2,2,0,1,4
-"Donation Game",4,3,4,0,0,0,3,0,1,0,4
-"PDG",3,0,0,3,0,0,3,0,0,0,0
-"BG",1,0,1,0,0,0,1,0,0,0,0
+Game type;Treatments;Choice Method Direct;Choice Method Strategy;OnlyNorms;Between subjects beliefs;KW;Bicchieri;KW & Bicchieri;Monetary Punishment;Choice Method Both;Available Data
+DG;92;86;4;2;41;67;18;5;0;0;33
+PGG;28;14;7;1;19;24;2;2;3;6;15
+UG;17;17;0;0;15;5;12;0;12;0;3
+TG;9;9;0;0;7;7;2;0;0;0;5
+Tax Game;7;7;0;0;0;1;0;6;0;0;0
+ToG;7;7;0;0;4;4;0;0;0;0;0
+Investment game;6;6;0;0;0;0;4;0;3;0;0
+GEG;5;2;2;0;3;5;0;0;2;1;4
+Donation Game;4;3;0;1;3;4;0;0;0;0;4
+PDG;3;3;0;0;0;0;3;0;0;0;0
+BG;1;1;0;0;0;1;0;0;0;0;0
