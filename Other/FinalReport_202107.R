@@ -31,12 +31,7 @@ length(levels(as.factor(T_treat_sel$TreatmentCode)))
 df_treat <- Social_Norms_meta %>%
   subset.data.frame(subset = Target == "Y") %>%
   subset.data.frame(subset = Game_type %in% ls_game) %>%
-  subset.data.frame(subset = 
-                      Environment %in% c("Classroom", 
-                                         "Lab", 
-                                         "Online", 
-                                         "Lab-in-the-field", 
-                                         "virtual Lab")) %>%
+  
 group_by(Game_type) %>%
   summarise(
     Treatments = n(),
