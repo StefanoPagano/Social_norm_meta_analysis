@@ -11,20 +11,11 @@ Social_Norms_meta <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Other/Report_202107/"
 #### List of Games ####
 
-ls_game <- c("DG", "DG Tax", "UG", "PGG", "TG", "BG", "GEG", "PDG", "Donation Game", "Investment game", "ToG", "Tax Game", "Reverse PGG", "Lying DG", "Third-Party Lying DG")
+ls_game <- c("DG", "DG Tax", "UG", "PGG", "TG", "BG", "GEG", "PDG", "Donation Game", "Investment game", "ToG", "Tax Game", "Reverse PGG", "Lying DG", "Third-Party Lying DG", "Charitable Giving", "CommResourceGame")
 
 #### Paper Search and Selection - (Slide 3) ####
-T_paper_col = Social_Norms_meta %>% subset.data.frame(subset)
-
-
 T_paper_sel=Social_Norms_meta %>% subset.data.frame(subset = Target == "Y")
 length(levels(as.factor(T_paper_sel$PaperID)))
-
-T_treat_sel=Social_Norms_meta %>% subset.data.frame(subset = Target == "Y")
-length(levels(as.factor(T_treat_sel$TreatmentCode)))
-
-
-
 
 
 #### Treatments stats ####
@@ -48,6 +39,10 @@ group_by(Game_type) %>%
   ) %>%
   arrange(-Treatments)
 
+df_treat %>%
+  summarise(sum(Treatments))
+  
+  
 write.csv(df_treat, file = paste(csv_path_output, paste("Treatments.csv", sep = ""), sep = ""), row.names = F)
 
 #### Data collection status ####
