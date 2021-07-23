@@ -13,6 +13,20 @@ csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysi
 
 ls_game <- c("DG", "DG Tax", "UG", "PGG", "TG", "BG", "GEG", "PDG", "Donation Game", "Investment game", "ToG", "Tax Game", "Reverse PGG", "Lying DG", "Third-Party Lying DG")
 
+#### Paper Search and Selection - (Slide 3) ####
+T_paper_col = Social_Norms_meta %>% subset.data.frame(subset)
+
+
+T_paper_sel=Social_Norms_meta %>% subset.data.frame(subset = Target == "Y")
+length(levels(as.factor(T_paper_sel$PaperID)))
+
+T_treat_sel=Social_Norms_meta %>% subset.data.frame(subset = Target == "Y")
+length(levels(as.factor(T_treat_sel$TreatmentCode)))
+
+
+
+
+
 #### Treatments stats ####
 df_treat <- Social_Norms_meta %>%
   subset.data.frame(subset = Target == "Y") %>%
@@ -49,4 +63,4 @@ df_data <- Social_Norms_meta %>%
   ) %>%
   replace_na(list(StatusTreatment_Roma  = "Duplicates"))
 
-write.csv(df_treat, file = paste(csv_path_output, paste("Treatments.csv", sep = ""), sep = ""), row.names = F)
+write.csv(df_data, file = paste(csv_path_output, paste("Data Collection.csv", sep = ""), sep = ""), row.names = F)
