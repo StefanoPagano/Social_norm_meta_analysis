@@ -43,6 +43,6 @@ colnames(Edges) <- c("from", "to")
 
 
 visNetwork(Nodes, Edges) %>% 
-  visIgraphLayout(layout = "layout_with_fr") %>% 
+#  visIgraphLayout(layout = "layout_with_fr") %>% 
   visOptions(highlightNearest = list(enabled = T, hover = T), 
                                              nodesIdSelection = T) 
