@@ -8,7 +8,9 @@ require(stringr)
 rm(list=ls())
 
 authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
-  subset.data.frame(subset = Target =="Y") %>%
+  subset.data.frame(subset = Method_elicitation =="KW" & 
+                      Method_elicitation =="Bicchieri" & 
+                      Method_elicitation =="Both") %>%
   distinct(PaperID, .keep_all = T) %>%
   mutate(New_authors = str_replace_all(Authors, ";", "--"))
 authors_n <- authors_net[grep("--", authors_net$New_authors), ]
@@ -35,7 +37,7 @@ l_method_sum <- do.call(rbind, l_method) %>% group_by(id) %>% summarise(n_KW=sum
 Nodes <- data.frame(id=as_ids(V(AuthorGraph)), label=as_ids(V(AuthorGraph))) %>%
   merge.data.frame(l_method_sum) %>% 
   mutate(color = ifelse(d < -.5, "blue",ifelse(d < -.01, "grey", ifelse(d < .5, "green", "red")))) %>% 
-  mutate(title = paste0("<p><b>", id,"</b><br>","Bicchieri = ", n_BX, "<br> Krupka = ", n_KW, "</p>"))
+  mutate(title = paste0("<p><b>", id,"</b><br>","Bicchieri = ", n_BX, "<br> Krupka = ", n_KW, "<br>","Both = ", n_BX, "</p>"))
 
 Edges <- data.frame(matrix(AuthorEdges, ncol=2, byrow = T))
 colnames(Edges) <- c("from", "to")
