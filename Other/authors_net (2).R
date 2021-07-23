@@ -16,7 +16,7 @@ authors_n$numberoauthors <- (1+str_count(authors_n$New_authors, "--"))
 authors_solo <- authors_net[-grep("--", authors_net$New_authors), ]
 
 # data wrangling from https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
-SplitAuthors <- sapply(authors_n$Authors, strsplit, split = "--", fixed = TRUE)
+SplitAuthors <- sapply(authors_n$New_authors, strsplit, split = "--", fixed = TRUE)
 AuthorCombinations <- sapply(SplitAuthors,function(x){combn(unlist(x),m = 2)})
 AuthorEdges <- rapply(AuthorCombinations,unlist)
 names(AuthorEdges) <- NULL
