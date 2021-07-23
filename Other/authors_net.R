@@ -1,7 +1,7 @@
 library(readr)
 library(igraph)
 library(tidyverse)
-library(writexl)
+#library(writexl)
 library(visNetwork)
 
 #remove environment objects
