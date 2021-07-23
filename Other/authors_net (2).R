@@ -7,10 +7,13 @@ require(stringr)
 
 rm(list=ls())
 
-authors_net <- read_csv("authors_net.csv")
-authors_n <- authors_net[grep("--", authors_net$Authors), ]
-authors_n$numberoauthors <- (1+str_count(authors_n$Authors, "--"))
-authors_solo <- authors_net[-grep("--", authors_net$Authors), ]
+authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
+  subset.data.frame(subset = Target =="Y") %>%
+  distinct(PaperID, .keep_all = T) %>%
+  mutate(New_authors = str_replace_all(Authors, ";", "--"))
+authors_n <- authors_net[grep("--", authors_net$New_authors), ]
+authors_n$numberoauthors <- (1+str_count(authors_n$New_authors, "--"))
+authors_solo <- authors_net[-grep("--", authors_net$New_authors), ]
 
 # data wrangling from https://stackoverflow.com/questions/57487704/how-to-split-a-string-of-author-names-by-comma-into-a-data-frame-and-generate-an
 SplitAuthors <- sapply(authors_n$Authors, strsplit, split = "--", fixed = TRUE)
@@ -22,8 +25,8 @@ AuthorGraph <- graph(AuthorEdges, directed = FALSE)
 
 # method KW
 l_method <- list()
-for(i in 1:length(authors_n$Method)){
-  l_method[[i]] <- data.frame(id=SplitAuthors[[i]], method=rep(authors_n$Method[i],authors_n$numberoauthors[i]))
+for(i in 1:length(authors_n$Method_elicitation)){
+  l_method[[i]] <- data.frame(id=SplitAuthors[[i]], method=rep(authors_n$Method_elicitation[i],authors_n$numberoauthors[i]))
 }
 l_method_sum <- do.call(rbind, l_method) %>% group_by(id) %>% summarise(n_KW=sum(method=="N"),
                                                                             n_BX=sum(method=="R")) %>% mutate(d=(n_KW-n_BX)/(n_KW+n_BX))
