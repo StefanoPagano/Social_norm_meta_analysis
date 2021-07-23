@@ -1,7 +1,6 @@
 ---
-title: "networkof authors"
-author: "Andrea Guido"
-date: "7/23/2021"
+title: "Network of Authors"
+date: "07/23/2021"
 output: html_document
 ---
 
@@ -17,8 +16,8 @@ require(readxl)
 rm(list=ls())
 
 authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
-  subset.data.frame(subset = Method_elicitation =="KW" & 
-                      Method_elicitation =="Bicchieri" & 
+  subset.data.frame(subset = Method_elicitation =="KW" | 
+                      Method_elicitation =="Bicchieri" | 
                       Method_elicitation =="Both") %>%
   distinct(PaperID, .keep_all = T) %>%
   mutate(New_authors = str_replace_all(Authors, ";", "--"))
@@ -39,8 +38,7 @@ l_method <- list()
 for(i in 1:length(authors_n$Method_elicitation)){
   l_method[[i]] <- data.frame(id=SplitAuthors[[i]], method=rep(authors_n$Method_elicitation[i],authors_n$numberoauthors[i]))
 }
-l_method_sum <- do.call(rbind, l_method) %>% group_by(id) %>% summarise(n_KW=sum(method=="KW"),
-                                                                            n_BX=sum(method=="Bicchieri")) %>% mutate(d=(n_KW-n_BX)/(n_KW+n_BX))
+l_method_sum <- do.call(rbind, l_method) %>% group_by(id) %>% summarise(n_KW=sum(method=="KW")+sum(method=="Both"),n_BX=sum(method=="Bicchieri")+sum(method=="Both")) %>% mutate(d=(n_KW-n_BX)/(n_KW+n_BX))
 #plot(AuthorGraph,layout = layout_with_graphopt, edge.arrow.size = 0.2, vertex.cex = 0.7, mode = "circle")
 
 Nodes <- data.frame(id=as_ids(V(AuthorGraph)), label=as_ids(V(AuthorGraph))) %>%
