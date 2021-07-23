@@ -8,8 +8,8 @@ require(stringr)
 rm(list=ls())
 
 authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
-  subset.data.frame(subset = Method_elicitation =="KW" & 
-                      Method_elicitation =="Bicchieri" & 
+  subset.data.frame(subset = Method_elicitation =="KW" | 
+                      Method_elicitation =="Bicchieri" | 
                       Method_elicitation =="Both") %>%
   distinct(PaperID, .keep_all = T) %>%
   mutate(New_authors = str_replace_all(Authors, ";", "--"))
