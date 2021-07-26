@@ -70,7 +70,6 @@ plot_year <- ggplot(df_year, aes(Year, n)) +
   geom_bar(stat="identity", fill = "#FF6666") +
   labs(x="Year", 
        y="Number of papers", 
-       title = "Papers per Year",
        caption = "Data from Social Norms meta.xlsx") 
 
 plot_year
