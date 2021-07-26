@@ -1,17 +1,16 @@
-Game type;Treatments;Between subjects beliefs;KW;Bicchieri;KW Bicchieri;Monetary Punishment;"Choice Method ""Direct""";"Choice Method ""Strategy""";Only Norms;"Choice Method ""Both""";Available Data
-DG;116;58;88;18;5;0;93;4;19;0;36
-PGG;29;20;25;2;2;3;14;7;2;6;16
-UG;22;18;10;12;0;12;20;0;2;0;5
-TG;12;8;8;4;0;0;11;0;1;0;6
-ToG;9;6;4;0;2;0;7;0;2;0;0
-Donation Game;8;7;8;0;0;0;4;0;3;1;6
-Tax Game;7;0;1;0;6;0;7;0;0;0;0
-Investment game;6;0;0;4;0;3;6;0;0;0;0
-CPR;5;0;0;5;0;3;5;0;0;0;0
-GEG;5;3;5;0;0;2;2;2;0;1;4
-PDG;3;0;0;3;0;0;3;0;0;0;0
-DG Tax;2;0;2;0;0;0;2;0;0;0;2
-BG;1;0;1;0;0;0;1;0;0;0;0
-Lying DG;1;0;1;0;0;0;0;1;0;0;1
-Third-Party Lying DG;1;0;1;0;0;0;0;1;0;0;1
-Tot;227;120;154;48;15;23;175;15;29;8;77
+"Game_type","Treatments","Between_subjects_beliefs","KW","Bicchieri","KW_Bicchieri","Monetary_Punishment","Choice_Method_Direct","Choice_Method_Strategy","OnlyNorms","Choice_Method_Both","Available_Data"
+"DG",116,58,88,18,5,0,93,4,19,0,36
+"PGG",29,20,25,2,2,3,14,7,2,6,16
+"UG",22,18,10,12,0,12,20,0,2,0,5
+"TG",12,8,8,4,0,0,11,0,1,0,6
+"ToG",9,6,4,0,2,0,7,0,2,0,0
+"Donation Game",8,7,8,0,0,0,4,0,3,1,6
+"Tax Game",7,0,1,0,6,0,7,0,0,0,0
+"Investment game",6,0,0,4,0,3,6,0,0,0,0
+"CPR",5,0,0,5,0,3,5,0,0,0,0
+"GEG",5,3,5,0,0,2,2,2,0,1,4
+"PDG",3,0,0,3,0,0,3,0,0,0,0
+"DG Tax",2,0,2,0,0,0,2,0,0,0,2
+"BG",1,0,1,0,0,0,1,0,0,0,0
+"Lying DG",1,0,1,0,0,0,0,1,0,0,1
+"Third-Party Lying DG",1,0,1,0,0,0,0,1,0,0,1

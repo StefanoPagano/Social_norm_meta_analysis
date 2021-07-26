@@ -1,5 +1,6 @@
 library(tidyverse)
 library(readxl)
+library(ggplot2)
 #library(writexl)
 rm(list = ls())
 
@@ -57,3 +58,19 @@ Tot_Treatment <- df_treat %>% summarise(sum(Treatments))
 
 paste("Total number of papers: ", N_Paper)
 paste("Total number of treatments: ", Tot_Treatment)
+
+
+#### Papers per year ####
+df_year <- Social_Norms_meta %>% subset.data.frame(select = c(PaperID, Year)) %>%
+  group_by(Year) %>%
+  distinct(PaperID, .keep_all = T) %>%
+  summarise(n = n())
+
+plot_year <- ggplot(df_year, aes(Year, n)) + 
+  geom_bar(stat="identity", fill = "#FF6666") +
+  labs(x="Year", 
+       y="Number of papers", 
+       title = "Papers per Year",
+       caption = "Data from Social Norms meta.xlsx") 
+
+plot_year
