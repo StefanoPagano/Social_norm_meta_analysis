@@ -1,9 +1,9 @@
 "Game_type","Treatments","Between_subjects_beliefs","KW","Bicchieri","KW_Bicchieri","Monetary_Punishment","Choice_Method_Direct","Choice_Method_Strategy","OnlyNorms","Choice_Method_Both","Available_Data"
-"DG",116,58,88,18,5,0,93,4,19,0,36
+"DG",114,56,86,18,5,0,89,6,19,0,45
 "PGG",29,20,25,2,2,3,14,7,2,6,16
 "UG",22,18,10,12,0,12,20,0,2,0,5
 "TG",12,8,8,4,0,0,11,0,1,0,6
-"ToG",9,6,4,0,2,0,7,0,2,0,0
+"ToG",11,8,6,0,2,0,7,2,2,0,2
 "Donation Game",8,7,8,0,0,0,4,0,3,1,6
 "Tax Game",7,0,1,0,6,0,7,0,0,0,0
 "Investment game",6,0,0,4,0,3,6,0,0,0,0

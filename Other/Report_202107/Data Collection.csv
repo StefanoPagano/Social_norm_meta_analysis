@@ -1,9 +1,10 @@
-"StatusTreatment_Roma","N_treatments"
-"1-Not eligible treatment",212
-"2-Treatment checked",4
-"3-Email to be sent",15
-"4-Email sent",115
-"5a-Positive feedback received",3
-"5b-Negative feedback received",13
-"6-Complete",77
-"Duplicates",8
+StatusTreatment_Roma;N_treatments
+1-Not eligible treatment;214
+2-Treatment checked;4
+3-Email to be sent;15
+4-Email sent;88
+5a-Positive feedback received;15
+5b-Negative feedback received;15
+6-Complete;88
+Duplicates;8
+;447
