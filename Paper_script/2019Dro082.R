@@ -7,7 +7,7 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
-dg=read.csv("Drouvelis-Isen-Marx donations experiment.csv", sep=",")
+dg=read.csv("Drouvelis-Isen-Marx donations experiment.csv", sep=";")
 
 ## the next file contains all data except the conditional DG elicitations, which we did later
 norms =read.csv("Drouvelis-Isen-Marx norms experiment.csv", sep=",")
@@ -70,3 +70,5 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
