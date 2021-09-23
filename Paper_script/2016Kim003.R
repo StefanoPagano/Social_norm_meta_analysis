@@ -152,11 +152,14 @@ ug_columns <- c(1, 3, 4, 33:41)
 
 ## compute norm 
 ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>% 
-  summarise_at(vars(answers.23.:answers.31.), sum, na.rm=T) %>% t.data.frame() %>% cbind.data.frame(donation=label_col)
+  summarise_at(vars(answers.23.:answers.31.), sum, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 ug_norms_var <- norms1[, ug_columns] %>% 
-  summarise_at(vars(answers.23.:answers.31.), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(answers.23.:answers.31.), var, na.rm=T) %>% 
+  t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "donation") %>% 
