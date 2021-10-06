@@ -67,7 +67,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
 
