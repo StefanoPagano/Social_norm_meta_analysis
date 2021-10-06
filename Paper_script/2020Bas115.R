@@ -265,10 +265,123 @@ dgtP_final_norms <- merge.data.frame(dgtP_appropriateness_sum, dgtP_norms_var, b
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
-finaldf <- meta_dataset %>% 
-  merge.data.frame(dgtP_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+finaldf <- meta_dataset %>% merge.data.frame(dgtP_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(dgtP_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf)
+
+# UG Social-----------------
+# get information on treatment
+
+# cleaning UG
+## code :  subject code
+## receive: amount of money given to other
+## role_UG: which role subject was assigned in UG (1 = proposer, 2 = responder)
+## social : treatment variable -> 1. social, 0. private
+
+coldg = c("code","receive","social")
+
+# 1. Choice dataframe ----
+ugS_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 1) %>%
+  mutate(endowment = 10, cooperation = receive/endowment) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2020Bas115", TreatmentCode = "1c")
+
+
+# 2. Beliefs dataframe ----
+## KW: send from 0 to 10, step 1
+## code
+## social
+## KW scale: 1: VI; 2: I; 3: RI; 4: RA; 5: A; 6: VA -> recoding done.
+
+label_col = as.character(seq(0,10,1))
+norms_columns <- c(1,2,63:73)
+
+## compute norm 
+ugS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 1) %>%
+  summarise_at(vars(UG_SN_1:UG_SN_11), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+## compute variance norm
+ugS_norms_var <- norms[, norms_columns] %>%
+  subset.data.frame(subset = social == 1) %>%
+  summarise_at(vars(UG_SN_1:UG_SN_11), var, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+ugS_final_norms <- merge.data.frame(ugS_appropriateness_sum, ugS_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2020Bas115", 
+         TreatmentCode = "1c", 
+         Avg_NE = as.integer(donation)/10,
+         Var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(ugS_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(ugS_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf)
+
+
+# UG Private-----------------
+# get information on treatment
+
+# cleaning UG
+## code :  subject code
+## receive: amount of money given to other
+## role_UG: which role subject was assigned in UG (1 = proposer, 2 = responder)
+## social : treatment variable -> 1. social, 0. private
+
+coldg = c("code","receive","social")
+
+# 1. Choice dataframe ----
+ugP_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 0) %>%
+  mutate(endowment = 10, cooperation = receive/endowment) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2020Bas115", TreatmentCode = "2c")
+
+
+# 2. Beliefs dataframe ----
+## KW: send from 0 to 10, step 1
+## code
+## social
+## KW scale: 1: VI; 2: I; 3: RI; 4: RA; 5: A; 6: VA -> recoding done.
+
+label_col = as.character(seq(0,10,1))
+norms_columns <- c(1,2,63:73)
+
+## compute norm 
+ugP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 0) %>%
+  summarise_at(vars(UG_SN_1:UG_SN_11), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+## compute variance norm
+ugP_norms_var <- norms[, norms_columns] %>%
+  subset.data.frame(subset = social == 0) %>%
+  summarise_at(vars(UG_SN_1:UG_SN_11), var, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+ugP_final_norms <- merge.data.frame(ugP_appropriateness_sum, ugP_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2020Bas115", 
+         TreatmentCode = "2c", 
+         Avg_NE = as.integer(donation)/10,
+         Var_NE = ..y) %>% 
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(ugP_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(ugP_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
