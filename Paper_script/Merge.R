@@ -38,6 +38,10 @@ source("2017Del037.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2017Sen116.R")
 
+# i trattamenti sono diversi in base alla nazione... mancano i dati sulle norme
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2018Kim038.R")
+
 
 # Create the master file -> merge all csv file
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
@@ -82,6 +86,10 @@ master <- Paper_037 %>%
 
 Paper_116=read.csv("2017Sen116_finaldf.csv", sep=",")
 master <- Paper_116 %>% 
+  rbind.data.frame(master)
+
+Paper_038=read.csv("2018Kim038_finaldf.csv", sep=",")
+master <- Paper_038 %>% 
   rbind.data.frame(master)
 
 # save master file as csv
