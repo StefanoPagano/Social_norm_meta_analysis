@@ -31,18 +31,18 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 # get information on treatment
 
 # cleaning DG
-## dictotors have different initial endowment related to real effort task
+## dictators have different initial endowment related to real effort task
 
 ## Subject : subject in the session
 ## Treatment : name of treatment -> IN, OUT, BASE
 ## earn_TOT : we take only rounds where the dictator had 10 tokens
 ## DICT_oth: the number of tokens they given to other.
-coldg = c("Subject","Treatment","earn_OTH","DICT_oth")
+coldg = c("Subject","Treatment","earn_TOT","DICT_oth")
 
 # 1. Choice dataframe ----
-dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 1) %>%
+dg_base_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "BASE") %>%
-  mutate(cooperation = DICT_oth/earn_OTH) %>% 
+  mutate(cooperation = DICT_oth/earn_TOT) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2017Del037", TreatmentCode = 1)
@@ -56,22 +56,22 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 1) 
 label_col = as.character(seq(6,0,-1))
 
 ## compute norm 
-dg_appropriateness_sum <- norms %>%
-  #subset.data.frame(subset = Dictator == 1) %>%
+dg_base_appropriateness_sum <- norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "BASE") %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
-dg_norms_var <- norms %>%
+dg_base_norms_var <- norms %>%
   subset.data.frame(subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "BASE") %>%
   summarise_at(vars(KW1:KW7), var, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
+dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 1, 
@@ -81,7 +81,126 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
-  merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>%
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(dg_base_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(dg_base_final_norms[1,], all.x=T, by = c("PaperID","TreatmentCode"))
 
+# DG IN treatment ---------------
+# get information on treatment
+
+# cleaning DG
+## dictators have different initial endowment related to real effort task
+
+## Subject : subject in the session
+## Treatment : name of treatment -> IN, OUT, BASE
+## earn_TOT : we take only rounds where the dictator had 10 tokens
+## DICT_oth: the number of tokens they given to other.
+coldg = c("Subject","Treatment","earn_TOT","DICT_oth")
+
+# 1. Choice dataframe ----
+dg_in_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "IN") %>%
+  mutate(cooperation = DICT_oth/earn_TOT) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2017Del037", TreatmentCode = 2)
+
+# 2. Beliefs dataframe ----
+## Subject
+## Treatment
+## earn_TOT
+## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
+
+label_col = as.character(seq(6,0,-1))
+
+## compute norm 
+dg_in_appropriateness_sum <- norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "IN") %>%
+  summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+## compute variance norm
+dg_in_norms_var <- norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "IN") %>%
+  summarise_at(vars(KW1:KW7), var, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+dg_in_final_norms <- merge.data.frame(dg_in_appropriateness_sum, dg_in_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2017Del037", 
+         TreatmentCode = 2, 
+         Avg_NE = as.integer(donation)/6,
+         Var_NE = ..y) %>%
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(dg_in_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(dg_in_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf)
+
+
+# DG OUT treatment ---------------
+# get information on treatment
+
+# cleaning DG
+## dictators have different initial endowment related to real effort task
+
+## Subject : subject in the session
+## Treatment : name of treatment -> IN, OUT, BASE
+## earn_TOT : we take only rounds where the dictator had 10 tokens
+## DICT_oth: the number of tokens they given to other.
+coldg = c("Subject","Treatment","earn_TOT","DICT_oth")
+
+# 1. Choice dataframe ----
+dg_out_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "OUT") %>%
+  mutate(cooperation = DICT_oth/earn_TOT) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2017Del037", TreatmentCode = 3)
+
+# 2. Beliefs dataframe ----
+## Subject
+## Treatment
+## earn_TOT
+## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
+
+label_col = as.character(seq(6,0,-1))
+
+## compute norm 
+dg_out_appropriateness_sum <- norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "OUT") %>%
+  summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+## compute variance norm
+dg_out_norms_var <- norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "IN") %>%
+  summarise_at(vars(KW1:KW7), var, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(donation=label_col)
+
+dg_out_final_norms <- merge.data.frame(dg_out_appropriateness_sum, dg_out_norms_var, by = "donation") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2017Del037", 
+         TreatmentCode = 3, 
+         Avg_NE = as.integer(donation)/6,
+         Var_NE = ..y) %>%
+  subset.data.frame(select = -c(..x, ..y, donation))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(dg_out_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(dg_out_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf) %>%
+  mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
+
+write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
 

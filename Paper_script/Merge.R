@@ -21,6 +21,9 @@ setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_scrip
 source("2020Bas115.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2021Kon127.R")
+#problema paper... forse la task iniziale influenza molto la norma... non è 50% ma 83%
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2017Del037.R")
 
 # Create the master file -> merge all csv file
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
@@ -57,6 +60,10 @@ master <- Paper_115 %>%
 
 Paper_127=read.csv("2021Kon127_finaldf.csv", sep=",")
 master <- Paper_127 %>% 
+  rbind.data.frame(master)
+
+Paper_037=read.csv("2017Del037_finaldf.csv", sep=",")
+master <- Paper_037 %>% 
   rbind.data.frame(master)
 
 
