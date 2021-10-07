@@ -5,25 +5,39 @@ rm(list = ls())
 # Run paper script
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2015Ves034.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2016Kim003.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2017Tho028.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2018Her061.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2019Cha026.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2019Tjo060.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2020And089.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2020Bas115.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2021Kon127.R")
+
 #problema paper... forse la task iniziale influenza molto la norma... non è 50% ma 83%
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2017Del037.R")
+
+# mancano i dati di kw, da richiedere
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2017Sen116.R")
+
 
 # Create the master file -> merge all csv file
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
@@ -66,6 +80,9 @@ Paper_037=read.csv("2017Del037_finaldf.csv", sep=",")
 master <- Paper_037 %>% 
   rbind.data.frame(master)
 
+Paper_116=read.csv("2017Sen116_finaldf.csv", sep=",")
+master <- Paper_116 %>% 
+  rbind.data.frame(master)
 
 # save master file as csv
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
