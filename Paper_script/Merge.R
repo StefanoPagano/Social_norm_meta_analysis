@@ -23,11 +23,18 @@ source("2017Del037.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2018Kim038.R")
 
+# media norma 100%
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2017Ves049.R")
+
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2019Tjo060.R")
 
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2018Her061.R")
+
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2019Dro082.R")
 
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2020And089.R")
@@ -50,11 +57,7 @@ rm(list = ls())
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
 
 Paper_003=read.csv("2016Kim003_finaldf.csv", sep=",")
-master <- Paper_003 %>% 
-  rbind.data.frame(master)
-
-Paper_034=read.csv("2015Ves034_finaldf.csv", sep=",")
-master <- Paper_034
+master <- Paper_003
 
 Paper_026=read.csv("2019Cha026_finaldf.csv", sep=",")
 master <- Paper_026 %>% 
@@ -62,6 +65,10 @@ master <- Paper_026 %>%
 
 Paper_028=read.csv("2017Tho028_finaldf.csv", sep=",")
 master <- Paper_028 %>% 
+  rbind.data.frame(master)
+
+Paper_034=read.csv("2015Ves034_finaldf.csv", sep=",")
+master <- Paper_034 %>% 
   rbind.data.frame(master)
 
 Paper_037=read.csv("2017Del037_finaldf.csv", sep=",")
@@ -72,12 +79,20 @@ Paper_038=read.csv("2018Kim038_finaldf.csv", sep=",")
 master <- Paper_038 %>% 
   rbind.data.frame(master)
 
+Paper_049=read.csv("2017Ves049_finaldf.csv", sep=",")
+master <- Paper_049 %>% 
+  rbind.data.frame(master)
+
 Paper_060=read.csv("2019Tjo060_finaldf.csv", sep=",")
 master <- Paper_060 %>% 
   rbind.data.frame(master)
 
 Paper_061=read.csv("2018Her061_finaldf.csv", sep=",")
 master <- Paper_061 %>% 
+  rbind.data.frame(master)
+
+Paper_082=read.csv("2019Dro082_finaldf.csv", sep=",")
+master <- Paper_082 %>% 
   rbind.data.frame(master)
 
 Paper_089=read.csv("2020And089_finaldf.csv", sep=",")
@@ -101,3 +116,4 @@ master <- Paper_127 %>%
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
 
 write.csv(master, file = "Master.csv", row.names = F)
+
