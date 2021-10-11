@@ -6,10 +6,10 @@ csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysi
 # choice file
 dg=read_excel("2020And089_data.xlsx", sheet = "public decisions data")
 # only columns needed
-dg <- dg %>% subset.data.frame(select = c(1,4,19:20))
+dg <- dg %>% subset.data.frame(select = c(1,4,5,19:20))
 
 # rename columns
-colnames(dg) <- c("Treatment", "sent", "Age", "Experiment")
+colnames(dg) <- c("Treatment", "sent", "contribution", "Age", "Experiment")
 
 # add id variable as a progressive numbers
 dg <- dg %>% mutate(id = c(1:374))
@@ -144,6 +144,62 @@ dg2_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf)
+
+# PGG Private-----------------
+# get information on treatment
+
+# cleaning PGG
+## Treatment :  1 if private; or 2 if public
+## id: progressive number created in script
+## contribution : How much money (SEK) player decide to contribute
+
+coldg = c("id","Treatment","contribution")
+
+# 1. Choice dataframe ----
+pgg_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 1) %>%
+  mutate(endowment = 50, cooperation = contribution/endowment) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2020And089", TreatmentCode = 3)
+
+
+# 2. Beliefs dataframe ----
+pgg_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA) %>%
+  mutate(PaperID = "2020And089", TreatmentCode = 3)
+
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(pgg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  rbind.data.frame(finaldf)
+
+# PGG Private-----------------
+# get information on treatment
+
+# cleaning PGG
+## Treatment :  1 if private; or 2 if public
+## id: progressive number created in script
+## contribution : How much money (SEK) player decide to contribute
+
+coldg = c("id","Treatment","contribution")
+
+# 1. Choice dataframe ----
+pgg2_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 2) %>%
+  mutate(endowment = 50, cooperation = contribution/endowment) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2020And089", TreatmentCode = 4)
+
+
+# 2. Beliefs dataframe ----
+pgg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA) %>%
+  mutate(PaperID = "2020And089", TreatmentCode = 4)
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(pgg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(pgg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
