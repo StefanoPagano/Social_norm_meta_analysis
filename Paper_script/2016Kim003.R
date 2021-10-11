@@ -8,7 +8,47 @@ tgs=read.table("TG_Data_byperiod.txt", header = T)
 ug=read.table("UG_Data.txt", header = T)
 dg=read.csv("DG_Data.csv", sep="\t")
 ## the next file contains all data except the conditional PG elicitations, which we did later
-norms1=read.csv("Norm_Elicitation_Data.csv")
+norms1=read.csv("Norm_Elicitation_Data.csv", sep = ",")
+
+norms1 <- norms1 %>% 
+mutate(ANSW01 = recode(answers.1., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW02 = recode(answers.2., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW03 = recode(answers.3., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW04 = recode(answers.4., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW05 = recode(answers.5., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW06 = recode(answers.6., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW07 = recode(answers.7., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW08 = recode(answers.8., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW09 = recode(answers.9., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW12 = recode(answers.12., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW13 = recode(answers.13., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW14 = recode(answers.14., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW15 = recode(answers.15., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW16 = recode(answers.16., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW17 = recode(answers.17., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW18 = recode(answers.18., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW19 = recode(answers.19., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW20 = recode(answers.20., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW21 = recode(answers.21., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW22 = recode(answers.22., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW23 = recode(answers.23., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW24 = recode(answers.24., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW25 = recode(answers.25., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW26 = recode(answers.26., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW27 = recode(answers.27., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW28 = recode(answers.28., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW29 = recode(answers.29., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW30 = recode(answers.30., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW31 = recode(answers.31., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW34 = recode(answers.34., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW35 = recode(answers.35., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW36 = recode(answers.36., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW37 = recode(answers.37., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW38 = recode(answers.38., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW39 = recode(answers.39., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW40 = recode(answers.40., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW41 = recode(answers.41., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+       ANSW42 = recode(answers.42., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2016Kim003", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -41,16 +81,16 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 ## subject
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,16,2))
-dg_columns <- c(1, 3, 4, 11:19)
+dg_columns <- c(1, 3, 4, 135:143)
 ## compute norm 
 dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>% 
-  summarise_at(vars(answers.1.:answers.9.), sum, na.rm=T) %>%
+  summarise_at(vars(ANSW01:ANSW09), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 dg_norms_var <- norms1[, dg_columns] %>% 
-  summarise_at(vars(answers.1.:answers.9.), var, na.rm=T) %>%
+  summarise_at(vars(ANSW01:ANSW09), var, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
@@ -86,16 +126,16 @@ tg_dta_coop <- tgs %>% subset.data.frame(select = coltg, subset = per== 1) %>%
 ## subject
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,80,10))
-tg_columns <- c(1, 3, 4, 44:52)
+tg_columns <- c(1, 3, 4, 164:172)
 ## compute norm 
 tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>% 
-  summarise_at(vars(answers.34.:answers.42.), sum, na.rm=T) %>% 
+  summarise_at(vars(ANSW34:ANSW42), sum, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 tg_norms_var <- norms1[, tg_columns] %>% 
-  summarise_at(vars(answers.34.:answers.42.), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(ANSW34:ANSW42), var, na.rm=T) %>% t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "donation") %>% 
@@ -141,17 +181,17 @@ ug_dta_coop <- ug %>% subset.data.frame(select = colug, subset = role == 1) %>%
 ## subject
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,16,2))
-ug_columns <- c(1, 3, 4, 33:41)
+ug_columns <- c(1, 3, 4, 155:163)
 
 ## compute norm 
 ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>% 
-  summarise_at(vars(answers.23.:answers.31.), sum, na.rm=T) %>% 
+  summarise_at(vars(ANSW23:ANSW31), sum, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 ug_norms_var <- norms1[, ug_columns] %>% 
-  summarise_at(vars(answers.23.:answers.31.), var, na.rm=T) %>% 
+  summarise_at(vars(ANSW23:ANSW31), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
@@ -200,15 +240,15 @@ pgg_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 ## subject
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,50,5))
-pgg_columns <- c(1, 3, 4, 22:32)
+pgg_columns <- c(1, 3, 4, 144:154)
 ### compute norm 
 pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>% 
-  summarise_at(vars(answers.12.:answers.22.), sum, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(ANSW12:ANSW22), sum, na.rm=T) %>% t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ### compute variance norm
 pgg_norms_var <- norms1[, pgg_columns] %>% 
-  summarise_at(vars(answers.12.:answers.22.), var, na.rm=T) %>% 
+  summarise_at(vars(ANSW12:ANSW22), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 

@@ -117,3 +117,4 @@ setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 write.csv(master, file = "Master.csv", row.names = F)
 
+test_correlazione <- cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
