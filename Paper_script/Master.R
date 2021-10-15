@@ -117,4 +117,7 @@ setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 write.csv(master, file = "Master.csv", row.names = F)
 
-test_correlazione <- cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
+master_individual <- master %>%
+  subset.data.frame(subset = Game_type =="DG") %>%
+  subset.data.frame(subset = Avg_coop > -1) %>%
+  subset.data.frame(subset = Avg_NE > -1)
