@@ -50,6 +50,8 @@ ex8_dg_final_norms <- merge.data.frame(ex8_dg_appropriateness_sum, ex8_dg_norms_
          Var_NE = ..y) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
+
+
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(ex8_dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(ex8_dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
