@@ -252,6 +252,35 @@ Cha026_sub_2 <- Cha026_sub_2 %>%
 Choice_DB <- Cha026_sub_2 %>%
   rbind.data.frame(Choice_DB)
 
+#### Paper: 2016Kim003 ----
+
+# set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
+
+# choice file
+Kim003=read.csv("DG_Data.csv", sep="\t")
+
+# Subject ID (treatment neutrally 106, tax 266, tot 372)
+coldg = c("subj_id", "role", "sent")
+
+# treatment neutrally
+# n_progr_1 <- c(1:227)
+Kim003_sub_1 <- Kim003 %>%
+  subset.data.frame(select = coldg, subset = role == 1) %>%
+  mutate(endowment = 16) %>%
+  mutate(coop = sent/endowment) %>%
+  mutate(subject_id = paste("2016Kim003", "7", subj_id, sep = "_")) %>%
+  mutate(treatment_id = paste("2016Kim003", "7", sep = "_"))
+
+colnames(Kim003_sub_1) <- c("subj_id", "role", "choice", "endowment", "cooperation", "subject_id", "treatment_id")
+
+Kim003_sub_1 <- Kim003_sub_1 %>%
+  subset.data.frame(select = -c(subj_id, role)) %>% 
+  relocate(subject_id, treatment_id, choice, endowment, cooperation) 
+
+Choice_DB <- Kim003_sub_1 %>%
+  rbind.data.frame(Choice_DB)
+
 # write csv file
 write.csv(Choice_DB, file = paste(csv_path_output, "Choices.csv", sep = ""), row.names = F)
 
