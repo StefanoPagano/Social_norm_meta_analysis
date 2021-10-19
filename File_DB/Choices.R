@@ -291,14 +291,14 @@ write.csv(Choice_DB, file = paste(csv_path_output, "Choices.csv", sep = ""), row
 #### BELIEFS DB ----
 
 # test
-for (ewt in Choice_DB$endowment) {if (is.na(d) == T) {print(is.na(d))} }
-for (ewt in Choice_DB$endowment) {if (is.nan(d) == T) {print(is.nan(d))} }
+# for (ewt in Choice_DB$endowment) {if (is.na(d) == T) {print(is.na(d))} }
+# for (ewt in Choice_DB$endowment) {if (is.nan(d) == T) {print(is.nan(d))} }
 # fine test
 
 Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA)
 dbbase <- Choice_DB %>%
-  mutate(n = c(1:length(Choice_DB$subject_id))) #%>%
-  #subset.data.frame(subset = endowment == 10)
+  mutate(n = c(1:length(Choice_DB$subject_id)))
+
 j = 1
 
 for (x in dbbase$n) {
