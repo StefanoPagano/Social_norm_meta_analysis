@@ -15,8 +15,28 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 # choice file
 Bas115=read.csv("Basic_Verrina_2021.csv", sep=",")
 
+# norms file
+ns_column = c(1,21:32)
+Bas115_norms <- Bas115 %>% subset.data.frame(select = ns_column)
+
+# recoding
+Bas115_norms <- Bas115_norms %>%
+  mutate(DG_SN_1 = recode(dg_sn_1, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_2 = recode(dg_sn_2, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_3 = recode(dg_sn_3, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_4 = recode(dg_sn_4, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_5 = recode(dg_sn_5, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_6 = recode(dg_sn_6, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_7 = recode(dg_sn_7, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_8 = recode(dg_sn_8, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_9 = recode(dg_sn_9, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_10 = recode(dg_sn_10, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         DG_SN_11 = recode(dg_sn_11, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1)) %>%
+  subset.data.frame(select = -c(dg_sn_1, dg_sn_2, dg_sn_3, dg_sn_4, dg_sn_5, dg_sn_6, dg_sn_7, dg_sn_8, dg_sn_9, dg_sn_10, dg_sn_11))
+
 # Subject ID (treatment social 123, private 127 subjects, tot 250)
 coldg = c("code","give","social")
+
 
 # treatment social
 # n_progr_1 <- c(1:123)
@@ -35,7 +55,14 @@ Bas115_sub_1 <- Bas115_sub_1 %>%
 
 Choice_DB <- Bas115_sub_1
 
-# treatment social
+Bas115_norms_1a <- Bas115_norms %>%
+  subset.data.frame(subset = social == 1) %>%
+  mutate(subject_id = paste("2020Bas115", "1a", code, sep = "_")) %>%
+  mutate(treatment_id = paste("2020Bas115", "1a", sep = "_")) %>% 
+  relocate(treatment_id) %>%
+  relocate(subject_id)
+
+# treatment private
 # n_progr_2 <- c(1:127)
 Bas115_sub_2 <- Bas115 %>%
   subset.data.frame(select = coldg, subset = social == 0) %>%
@@ -53,6 +80,16 @@ Bas115_sub_2 <- Bas115_sub_2 %>%
 Choice_DB <- Bas115_sub_2 %>%
   rbind.data.frame(Choice_DB)
 
+Bas115_norms_2a <- Bas115_norms %>%
+  subset.data.frame(subset = social == 0) %>%
+  mutate(subject_id = paste("2020Bas115", "2a", code, sep = "_")) %>%
+  mutate(treatment_id = paste("2020Bas115", "2a", sep = "_"))
+
+Parziale_norms <- rbind.data.frame(Bas115_norms_1a, Bas115_norms_2a)
+
+Parziale_norms <- Parziale_norms %>%
+  pivot_longer(!c(subject_id, treatment_id, code, social), names_to = "scenarios", values_to = "KW_score") %>%
+  mutate(scenarios = as.numeric(recode(scenarios, `DG_SN_1` = 0, `DG_SN_2` = 1, `DG_SN_3` = 2, `DG_SN_4` = 3, `DG_SN_5` = 4, `DG_SN_6` = 5, `DG_SN_7` = 6, `DG_SN_8` = 7, `DG_SN_9` = 8, `DG_SN_10` = 9, `DG_SN_11` = 10)))
 
 #### Paper: 2018Her061 ----
 
@@ -294,7 +331,7 @@ write.csv(Choice_DB, file = paste(csv_path_output, "Choices.csv", sep = ""), row
 # for (ewt in Choice_DB$endowment) {if (is.nan(d) == T) {print(is.nan(d))} }
 # fine test
 
-Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA)
+Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, scenarios = NA, choice = NA, endowment = NA, norms = NA, A = NA)
 dbbase <- Choice_DB %>%
   mutate(n = c(1:length(Choice_DB$subject_id)))
 
@@ -309,6 +346,7 @@ for (x in dbbase$n) {
                               scenarios = i, 
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
+                              norms = NA,
                               A = 0)
 
     Belief_DB <- new_line_DB %>% rbind.data.frame(Belief_DB) %>% arrange(p)
@@ -325,6 +363,13 @@ for (y in Belief_DB$p) {
   if (Belief_DB$choice[y] == Belief_DB$scenarios[y]) {Belief_DB$A[y] = 1}
   else {Belief_DB$A[y] = 0}
 }
+
+Verrina <- Belief_DB %>%
+  subset.data.frame(subset = treatment_id == "2020Bas115_1a")
+
+Verrina <- Verrina %>% merge.data.frame(Parziale_norms, by = c("subject_id", "scenarios", "treatment_id")) %>%
+  subset.data.frame(select = -c(code)) %>%
+  arrange(subject_id, scenarios)
 
 # write csv file
 write.csv(Belief_DB, file = paste(csv_path_output, "Beliefs.csv", sep = ""), row.names = F)
