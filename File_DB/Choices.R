@@ -6,6 +6,8 @@ rm(list = ls())
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
 
+#### CHOICES DB ----
+
 #### Paper: 2020Bas115 ----
 
 # set wd 
@@ -286,3 +288,44 @@ Choice_DB <- Kim003_sub_1 %>%
 # write csv file
 write.csv(Choice_DB, file = paste(csv_path_output, "Choices.csv", sep = ""), row.names = F)
 
+#### BELIEFS DB ----
+
+# test
+for (ewt in Choice_DB$endowment) {if (is.na(d) == T) {print(is.na(d))} }
+for (ewt in Choice_DB$endowment) {if (is.nan(d) == T) {print(is.nan(d))} }
+# fine test
+
+Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA)
+dbbase <- Choice_DB %>%
+  mutate(n = c(1:length(Choice_DB$subject_id))) #%>%
+  #subset.data.frame(subset = endowment == 10)
+j = 1
+
+for (x in dbbase$n) {
+  ewt = dbbase$endowment[x]
+  for (i in 0:ewt) {
+    new_line_DB <- data.frame(p = j,
+                              subject_id = dbbase$subject_id[x], 
+                              treatment_id = dbbase$treatment_id[x], 
+                              scenarios = i, 
+                              choice = dbbase$choice[x],
+                              endowment = dbbase$endowment[x],
+                              A = 0)
+
+    Belief_DB <- new_line_DB %>% rbind.data.frame(Belief_DB) %>% arrange(p)
+    j = j+1
+    
+  }
+
+}
+
+Belief_DB <- Belief_DB %>%
+  subset.data.frame(subset = endowment > 0)
+
+for (y in Belief_DB$p) {
+  if (Belief_DB$choice[y] == Belief_DB$scenarios[y]) {Belief_DB$A[y] = 1}
+  else {Belief_DB$A[y] = 0}
+}
+
+# write csv file
+write.csv(Belief_DB, file = paste(csv_path_output, "Beliefs.csv", sep = ""), row.names = F)
