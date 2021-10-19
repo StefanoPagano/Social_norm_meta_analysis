@@ -1,5 +1,3 @@
-# ONLY DG
-
 library(tidyverse)
 library(readxl)
 rm(list = ls())
@@ -7,7 +5,8 @@ rm(list = ls())
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
 
 #### CHOICES DB ----
-
+# paper: 2020Bas115, 2018Her061, 2017Del037, 2017Tho028, 2019Cha026, 2016Kim003
+# ONLY DG
 #### Paper: 2020Bas115 ----
 
 # set wd 
