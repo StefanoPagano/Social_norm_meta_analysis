@@ -114,13 +114,13 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 
 label_col = as.character(seq(0,10,2))
-dg_columns <- c(1:10, 28, 33, 34)
+dg_columns <- c(1:4, 11:16, 28, 33, 34)
 
 ## compute norm 
 dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
-  summarise_at(vars(base0:base5), sum, na.rm=T) %>%
+  summarise_at(vars(asym0:asym5), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
@@ -128,7 +128,7 @@ dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
 dg_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
-  summarise_at(vars(base0:base5), var, na.rm=T) %>% 
+  summarise_at(vars(asym0:asym5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
