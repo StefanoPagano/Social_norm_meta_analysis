@@ -320,7 +320,7 @@ Tho028_norms_all <- rbind.data.frame(Tho028_norms_base, Tho028_norms_asym)
 
 Tho028_norms_all <- Tho028_norms_all %>%
   pivot_longer(!c(subject_id, treatment_id, paper_id, subj, treat, role, decider), names_to = "scenarios", values_to = "KW_score") %>%
-  mutate(scenarios = as.numeric(recode(scenarios, `KW0` = 0, `KW1` = 1, `KW2` = 2, `KW3` = 3, `KW4` = 4, `KW5` = 5))) %>%
+  mutate(scenarios = as.numeric(recode(scenarios, `KW0` = 0, `KW1` = 2, `KW2` = 4, `KW3` = 6, `KW4` = 8, `KW5` = 10))) %>%
   subset.data.frame(select = -c(subj, treat, role, decider))
 
 #### BETWEEN SUBJECTS DESIGN ----
