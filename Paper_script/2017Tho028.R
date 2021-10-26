@@ -120,7 +120,7 @@ dg_columns <- c(1:4, 11:16, 28, 33, 34)
 dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
-  summarise_at(vars(asym0:asym5), sum, na.rm=T) %>%
+  summarise_at(vars(asym1_0:asym1_5), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
@@ -128,7 +128,7 @@ dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
 dg_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
-  summarise_at(vars(asym0:asym5), var, na.rm=T) %>% 
+  summarise_at(vars(asym1_0:asym1_5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 

@@ -58,7 +58,7 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 coldg = c("code","give","social")
 
 # 1. Choice dataframe ----
-dgS_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 1) %>%
+dgS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 1) %>%
   mutate(endowment = 10, cooperation = give/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
@@ -112,7 +112,7 @@ finaldf <- meta_dataset %>% merge.data.frame(dgS_dta_coop, by = c("PaperID","Tre
 coldg = c("code","give","social")
 
 # 1. Choice dataframe ----
-dgP_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 0) %>%
+dgP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 0) %>%
   mutate(endowment = 10, cooperation = give/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
@@ -167,7 +167,7 @@ finaldf <- meta_dataset %>%
 coldg = c("code","give_DG_tax","social")
 
 # 1. Choice dataframe ----
-dgtS_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 1) %>%
+dgtS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 1) %>%
   mutate(endowment = 12, cooperation = give_DG_tax/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
@@ -222,7 +222,7 @@ finaldf <- meta_dataset %>%
 coldg = c("code","give_DG_tax","social")
 
 # 1. Choice dataframe ----
-dgtP_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 0) %>%
+dgtP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 0) %>%
   mutate(endowment = 12, cooperation = give_DG_tax/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
@@ -274,11 +274,12 @@ finaldf <- meta_dataset %>% merge.data.frame(dgtP_dta_coop, by = c("PaperID","Tr
 ## role_UG: which role subject was assigned in UG (1 = proposer, 2 = responder)
 ## social : treatment variable -> 1. social, 0. private
 
-coldg = c("code","receive","social")
+coldg = c("code","give_UG","social", "role_UG")
 
 # 1. Choice dataframe ----
-ugS_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 1) %>%
-  mutate(endowment = 10, cooperation = receive/endowment) %>% 
+ugS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 1) %>%
+  subset.data.frame(subset = role_UG == 1) %>%
+  mutate(endowment = 10, cooperation = give_UG/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2020Bas115", TreatmentCode = "1c")
@@ -331,11 +332,12 @@ finaldf <- meta_dataset %>%
 ## role_UG: which role subject was assigned in UG (1 = proposer, 2 = responder)
 ## social : treatment variable -> 1. social, 0. private
 
-coldg = c("code","receive","social")
+coldg = c("code","give_UG","social", "role_UG")
 
 # 1. Choice dataframe ----
-ugP_dta_coop <- dg %>% subset.data.frame(select = coldg, social == 0) %>%
-  mutate(endowment = 10, cooperation = receive/endowment) %>% 
+ugP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset.data.frame = social == 0) %>%
+  subset.data.frame(subset = role_UG == 1) %>%
+  mutate(endowment = 10, cooperation = give_UG/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2020Bas115", TreatmentCode = "2c")

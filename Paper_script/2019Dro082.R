@@ -31,7 +31,7 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg) %>%
   mutate(cooperation = donation/earnings) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
-  mutate(PaperID = "2019Dro082", TreatmentCode = 1)
+  mutate(PaperID = "2019Dro082", TreatmentCode = "1a")
 
 # 2. Beliefs dataframe ----
 ## Subject
@@ -58,7 +58,7 @@ dg_norms_var <- norms %>%
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation_range") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2019Dro082", 
-         TreatmentCode = 1, 
+         TreatmentCode = "1a", 
          Avg_NE = as.integer(donation_range)/13,
          Var_NE = ..y) %>%
   subset.data.frame(select = -c(..x, ..y, donation_range))
