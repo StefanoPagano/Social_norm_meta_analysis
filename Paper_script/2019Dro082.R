@@ -39,7 +39,7 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg) %>%
 ## earn_TOT
 ## KW scale: -1 = VI, -0.6 = I, -0.2 = SI, 0.2 = SA, 0.6 = A, 1 = VA.
 
-label_col = as.character(0,0.1,0.25,0.50,1.00,1.50,2.00)
+label_col = as.character(c(0,0.1,0.25,0.50,1.00,1.50,2.00))
 col_treat = c(1:7,21:24)
 
 ## compute norm 

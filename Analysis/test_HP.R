@@ -3,6 +3,7 @@ library(tidyverse)
 library(mclogit)
 library(sjmisc)
 library(ggrepel)
+library(sjPlot)
 
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/")
 
@@ -53,6 +54,7 @@ ggplot(data=DG_UG, aes(x=Game_type, y=Avg_NE)) + geom_boxplot(outlier.shape = NA
 
 
 ## INDIVIDUAL-LEVEL ANALYSIS
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis")
 Tho028_output <- read.csv("File_DB/Tho028_output.csv", sep = ",")
 Bas115_output <- read.csv("File_DB/Bas115_output.csv", sep = ",")
 Del037_output <- read.csv("File_DB/Del037_output.csv", sep = ",")
@@ -99,5 +101,6 @@ plot_models(Tho028_model, Bas115_model, Del037_model)
 
 ## avg_coop bassi
 # read data 
-elenco <- c("2019Cha026", "2020Bas115", "2016Kim003", "2017Tho028", "2017Del037", "2018Her061")
-master_sub <- read.csv("Paper_csv/Master.csv") %>% mutate(norm_str = Avg_NE/Var_NE) %>% subset.data.frame(subset = PaperID %in% elenco) %>% subset.data.frame(subset = Avg_coop < 0.3)
+
+master_sub <- read.csv("Paper_csv/Master.csv") %>% mutate(norm_str = Avg_NE/Var_NE) %>% subset.data.frame(subset = Avg_coop < 0.3)
+
