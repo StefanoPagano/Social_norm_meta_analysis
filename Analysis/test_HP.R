@@ -8,10 +8,11 @@ library(sjPlot)
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("Paper_csv/Master.csv") %>% mutate(norm_str = Avg_NE/Var_NE)
+master <- read.csv("Paper_csv/Master.csv")
 DG <- master %>% subset.data.frame(Game_type=="DG")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
+
 # H1 : correlation between average cooperation and norm (NE)
 cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H1 : correlation between average cooperation and norm (NE)")
@@ -36,7 +37,7 @@ ggplot(data=DG, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method =
 
 # H2a : correlation between average cooperation and norm (NE)
 cor.test(DG$Avg_coop, DG$Var_NE, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + + ggtitle("H2a : correlation between average cooperation and norm (NE) \n DG only")
+ggplot(data=DG, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE) \n DG only")
 
 # H2b : correlation between variance cooperation and norm (NE)
 cor.test(DG$Var_coop, DG$Var_NE, method= "spearman", exact = F)

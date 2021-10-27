@@ -99,7 +99,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 7, 
     Avg_NE = as.integer(donation)/16,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
