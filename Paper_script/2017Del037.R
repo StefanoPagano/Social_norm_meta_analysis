@@ -76,7 +76,8 @@ dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_nor
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Strength_NE = sort(dg_base_appropriateness_sum$., decreasing = T)[1]/sort(dg_base_appropriateness_sum$., decreasing = T)[2]) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -133,7 +134,8 @@ dg_in_final_norms <- merge.data.frame(dg_in_appropriateness_sum, dg_in_norms_var
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Strength_NE = sort(dg_in_appropriateness_sum$., decreasing = T)[1]/sort(dg_in_appropriateness_sum$., decreasing = T)[2]) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -192,7 +194,8 @@ dg_out_final_norms <- merge.data.frame(dg_out_appropriateness_sum, dg_out_norms_
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Strength_NE = sort(dg_out_appropriateness_sum$., decreasing = T)[1]/sort(dg_out_appropriateness_sum$., decreasing = T)[2]) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

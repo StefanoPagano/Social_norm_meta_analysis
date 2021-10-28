@@ -52,7 +52,8 @@ ug1_final_norms <- merge.data.frame(ug1_appropriateness_sum, ug1_norms_var, by =
   mutate(PaperID = "2015Ves034", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Strength_NE = sort(ug1_appropriateness_sum$., decreasing = T)[1]/sort(ug1_appropriateness_sum$., decreasing = T)[2]) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -98,7 +99,8 @@ ug2_final_norms <- merge.data.frame(ug2_appropriateness_sum, ug2_norms_var, by =
   mutate(PaperID = "2015Ves034", 
          TreatmentCode = 4, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Strength_NE = sort(ug2_appropriateness_sum$., decreasing = T)[1]/sort(ug2_appropriateness_sum$., decreasing = T)[2]) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

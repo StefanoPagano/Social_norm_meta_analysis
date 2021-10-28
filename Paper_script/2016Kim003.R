@@ -136,7 +136,8 @@ tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>%
 
 ## compute variance norm
 tg_norms_var <- norms1[, tg_columns] %>% 
-  summarise_at(vars(ANSW34:ANSW42), var, na.rm=T) %>% t.data.frame() %>% 
+  summarise_at(vars(ANSW34:ANSW42), var, na.rm=T) %>% 
+  t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "donation") %>% 
@@ -144,7 +145,8 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 6, 
     Avg_NE = as.integer(donation)/80,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y, 
+    Strength_NE = sort(tg_appropriateness_sum$., decreasing = T)[1]/sort(tg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -201,7 +203,8 @@ ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "d
   mutate(PaperID = "2016Kim003",
     TreatmentCode = 8, 
     Avg_NE = as.integer(donation)/16, 
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Strength_NE = sort(ug_appropriateness_sum$., decreasing = T)[1]/sort(ug_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -258,7 +261,8 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 9, 
     Avg_NE = as.integer(donation)/50,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Strength_NE = sort(pgg_appropriateness_sum$., decreasing = T)[1]/sort(pgg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

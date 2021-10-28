@@ -79,7 +79,8 @@ s1_dg_baseline_final_norms <- merge.data.frame(s1_dg_baseline_appropriateness_su
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s1_dg_baseline_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_baseline_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -127,7 +128,8 @@ s1_dg_always_final_norms <- merge.data.frame(s1_dg_always_appropriateness_sum, s
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s1_dg_always_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_always_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -176,7 +178,8 @@ s1_dg_nr_final_norms <- merge.data.frame(s1_dg_nr_appropriateness_sum, s1_dg_nr_
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s1_dg_nr_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_nr_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -225,7 +228,8 @@ s1_dg_nc_final_norms <- merge.data.frame(s1_dg_nc_appropriateness_sum, s1_dg_nc_
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 4, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s1_dg_nc_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_nc_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -274,7 +278,8 @@ s2_dg_baseline_final_norms <- merge.data.frame(s2_dg_baseline_appropriateness_su
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 7, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s2_dg_baseline_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_baseline_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -323,7 +328,8 @@ s2_dg_always_final_norms <- merge.data.frame(s2_dg_always_appropriateness_sum, s
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s2_dg_always_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_always_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -372,7 +378,8 @@ s2_dg_nr_final_norms <- merge.data.frame(s2_dg_nr_appropriateness_sum, s2_dg_nr_
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s2_dg_nr_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_nr_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -421,7 +428,8 @@ s2_dg_nc_final_norms <- merge.data.frame(s2_dg_nc_appropriateness_sum, s2_dg_nc_
   mutate(PaperID = "2021Kon127", 
          TreatmentCode = 10, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(s2_dg_nc_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_nc_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

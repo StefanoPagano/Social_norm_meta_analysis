@@ -47,7 +47,8 @@ ex8_dg_final_norms <- merge.data.frame(ex8_dg_appropriateness_sum, ex8_dg_norms_
   mutate(PaperID = "2019Tjo060", 
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/800,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(ex8_dg_appropriateness_sum$., decreasing = T)[1]/sort(ex8_dg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 
@@ -93,7 +94,8 @@ ex9_dg_final_norms <- merge.data.frame(ex9_dg_appropriateness_sum, ex9_dg_norms_
   mutate(PaperID = "2019Tjo060", 
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/800,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(ex9_dg_appropriateness_sum$., decreasing = T)[1]/sort(ex9_dg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

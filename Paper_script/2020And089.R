@@ -84,7 +84,8 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   mutate(PaperID = "2020And089", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/50,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -137,7 +138,8 @@ dg2_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "
   mutate(PaperID = "2020And089", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/50,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -165,7 +167,7 @@ pgg_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 1) %>%
 
 
 # 2. Beliefs dataframe ----
-pgg_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA) %>%
+pgg_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
   mutate(PaperID = "2020And089", TreatmentCode = 3)
 
 
@@ -193,7 +195,7 @@ pgg2_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 2) %>%
 
 
 # 2. Beliefs dataframe ----
-pgg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA) %>%
+pgg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
   mutate(PaperID = "2020And089", TreatmentCode = 4)
 
 # 3. combine dataset ----

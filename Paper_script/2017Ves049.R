@@ -1,7 +1,3 @@
-library(tidyverse)
-library(readxl)
-rm(list = ls())
-
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2017Ves049")
 
@@ -67,7 +63,8 @@ pgg1_final_norms <- merge.data.frame(pgg1_appropriateness_sum, pgg1_norms_var, b
   mutate(PaperID = "2017Ves049", 
          TreatmentCode = "3a", 
          Avg_NE = as.integer(donation)/20,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(pgg1_appropriateness_sum$., decreasing = T)[1]/sort(pgg1_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -119,7 +116,8 @@ pgg2_final_norms <- merge.data.frame(pgg2_appropriateness_sum, pgg2_norms_var, b
   mutate(PaperID = "2017Ves049", 
          TreatmentCode = "2a", 
          Avg_NE = as.integer(donation)/20,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(pgg2_appropriateness_sum$., decreasing = T)[1]/sort(pgg2_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -172,7 +170,8 @@ pgg3_final_norms <- merge.data.frame(pgg3_appropriateness_sum, pgg3_norms_var, b
   mutate(PaperID = "2017Ves049", 
          TreatmentCode = "1a", 
          Avg_NE = as.integer(donation)/20,
-         Var_NE = ..y) %>% 
+         Var_NE = ..y,
+         Strength_NE = sort(pgg3_appropriateness_sum$., decreasing = T)[1]/sort(pgg3_appropriateness_sum$., decreasing = T)[2]) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
