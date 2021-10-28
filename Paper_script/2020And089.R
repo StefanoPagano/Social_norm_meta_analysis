@@ -148,7 +148,8 @@ finaldf <- meta_dataset %>%
   merge.data.frame(dg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf)
 
-# PGG Private-----------------
+# PGG Private----------------- 
+#### recode di defect (F), calcolo di quanti fanno cooperate
 # get information on treatment
 
 # cleaning PGG

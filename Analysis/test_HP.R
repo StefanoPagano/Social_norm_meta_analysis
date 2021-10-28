@@ -9,7 +9,7 @@ setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
 master <- read.csv("Paper_csv/Master.csv")
-DG <- master %>% subset.data.frame(Game_type=="DG")
+DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
 
