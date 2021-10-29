@@ -36,7 +36,7 @@ Bas115_db_norms <- Bas115_db_norms %>%
   subset.data.frame(select = -c(dg_sn_1, dg_sn_2, dg_sn_3, dg_sn_4, dg_sn_5, dg_sn_6, dg_sn_7, dg_sn_8, dg_sn_9, dg_sn_10, dg_sn_11))
 
 # Subject ID (treatment social 123, private 127 subjects, tot 250)
-coldg = c("code","give","social")
+coldg = c("code","give","social","demo_gender","demo_age") #gender: 1-maschio, 0-femmina
 
 
 # treatment social
@@ -49,11 +49,11 @@ Bas115_sub_1a <- Bas115 %>%
   mutate(treatment_id = paste("2020Bas115", "1a", sep = "_"), paper_id = "2020Bas115")
   
 
-colnames(Bas115_sub_1a) <- c("code", "choice", "social", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Bas115_sub_1a) <- c("code", "choice", "social", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Bas115_sub_1a <- Bas115_sub_1a %>%
   subset.data.frame(select = -c(code, social)) %>% 
-  relocate(subject_id, treatment_id, choice, endowment, cooperation)
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age)
 
 Choice_DB <- Bas115_sub_1a
 
@@ -74,11 +74,11 @@ Bas115_sub_2a <- Bas115 %>%
   mutate(subject_id = paste("2020Bas115", "2a", code, sep = "_")) %>%
   mutate(treatment_id = paste("2020Bas115", "2a", sep = "_"), paper_id = "2020Bas115")
 
-colnames(Bas115_sub_2a) <- c("code", "choice", "social", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Bas115_sub_2a) <- c("code", "choice", "social", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Bas115_sub_2a <- Bas115_sub_2a %>%
   subset.data.frame(select = -c(code, social)) %>% 
-  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation)
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age)
 
 Choice_DB <- Bas115_sub_2a %>%
   rbind.data.frame(Choice_DB)
@@ -449,9 +449,9 @@ Choice_DB <- Her061_sub_1 %>%
 # for (ewt in Choice_DB$endowment) {if (is.nan(d) == T) {print(is.nan(d))} }
 # fine test
 
-Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA)
+Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA)
 dbbase <- Choice_DB %>%
-  subset.data.frame(subset = paper_id %in% c("2020Bas115", "2017Tho028", "2017Del037")) %>%
+  subset.data.frame(subset = paper_id %in% c("2020Bas115")) %>%
   mutate(n = c(1:length(Choice_DB$subject_id)))
 
 j = 1
@@ -467,7 +467,9 @@ for (x in dbbase$n) {
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
                               #KW_score = -999,
-                              A = 0)
+                              A = 0,
+                              gender = dbbase$gender[x],
+                              age = dbbase$age[x])
 
     Belief_DB <- new_line_DB %>% rbind.data.frame(Belief_DB) %>% arrange(p)
     j = j+1

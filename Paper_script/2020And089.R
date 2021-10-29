@@ -151,7 +151,7 @@ dg2_final_norms <- merge.data.frame(dg2_appropriateness_sum, dg2_norms_var, by =
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/50,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2],
+         Strength_NE = sort(dg2_appropriateness_sum$., decreasing = T)[1]/sort(dg2_appropriateness_sum$., decreasing = T)[2],
          Avg_EE = as.numeric(dg2_EE/50)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -229,12 +229,37 @@ colpdg = c("id","Treatment","Pdg_cooperate", "Experiment")
 # 1. Choice dataframe ----
 pdg2_dta_coop <- dg %>% subset.data.frame(select = colpdg, subset = Treatment == 2) %>%
   subset.data.frame(subset = Experiment == 2) %>%
-  summarise(Avg_coop = sum(Pdg_cooperate, na.rm =T)/length(id)) %>% 
-  mutate(Var_coop = NA, PaperID = "2020And089", TreatmentCode = 4)
+  summarise(Avg_coop = mean(Pdg_cooperate, na.rm =T), Var_coop = var(Pdg_cooperate, na.rm = T)) %>% 
+  mutate(PaperID = "2020And089", TreatmentCode = 4)
 
 # 2. Beliefs dataframe ----
-pdg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
-  mutate(PaperID = "2020And089", TreatmentCode = 4)
+## compute norm 
+pdg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 0) %>%
+  summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(Action=label_col)
+
+## compute variance norm
+pdg2_norms_var <- norms[, norms_columns] %>%
+  subset.data.frame(subset = Condition == 0) %>%
+  summarise_at(vars(KWPDG_Coop:KWPDG_Def), var, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(Action=label_col)
+
+pdg2_EE <- norms[, norms_columns] %>%
+  subset.data.frame(subset = Condition == 0) %>% 
+  summarise(Avg_EE = mean(EE_PDG, na.rm =T))
+
+pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, by = "Action") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2020And089", 
+         TreatmentCode = 4, 
+         Avg_NE = as.integer(Action),
+         Var_NE = ..y,
+         Strength_NE = - sort(pdg2_appropriateness_sum$., decreasing = T)[1]/sort(pdg2_appropriateness_sum$., decreasing = T)[2],
+         Avg_EE = as.numeric(pdg2_EE)) %>% 
+  subset.data.frame(select = -c(..x, ..y, Action))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
