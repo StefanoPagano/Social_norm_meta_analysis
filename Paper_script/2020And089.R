@@ -6,13 +6,14 @@ csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysi
 # choice file
 dg=read_excel("2020And089_data.xlsx", sheet = "public decisions data")
 # only columns needed
-dg <- dg %>% subset.data.frame(select = c(1,4,5,19:20))
+dg <- dg %>% subset.data.frame(select = c(1,4,6,19:20))
 
 # rename columns
-colnames(dg) <- c("Treatment", "sent", "contribution", "Age", "Experiment")
+colnames(dg) <- c("Treatment", "sent", "Pdg_coop", "Age", "Experiment")
 
 # add id variable as a progressive numbers
-dg <- dg %>% mutate(id = c(1:374))
+dg <- dg %>% mutate(id = c(1:374)) %>%
+  mutate(Pdg_cooperate = recode(Pdg_coop, `1` = 0, `2` = 1 ))
 
 # norms file
 norms=read_excel("DecisionRevealProsocial_NormElicitationData.xlsx", sheet = "datanew")
@@ -33,12 +34,15 @@ norms <- norms %>% mutate(id = c(1:195)) %>%
          KW20_M = recode(KW20, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
          KW30_M = recode(KW30, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
          KW40_M = recode(KW40, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW50_M = recode(KW50, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1))
+         KW50_M = recode(KW50, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
+         KWPDG_Coop = recode(AppropPGG_COOPERATE, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
+         KWPDG_Def = recode(AppropPGG_DEFECT, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
+         EE_PDG = recode(Common_PGG, `1` = 1, `2` = 0))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2020And089", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
 
-# DG Private-----------------
+# Donation G Private-----------------
 # get information on treatment
 
 # cleaning DG
@@ -63,7 +67,7 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 1) %>%
 ## KW scale: -2: VI; -1: I; 1: A; 2: VA -> recoding done.
 
 label_col = as.character(seq(0,50,10))
-norms_columns <- c(1,21,23:28)
+norms_columns <- c(1,15,16,21,23:31)
 
 ## compute norm 
 dg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
@@ -79,20 +83,25 @@ dg_norms_var <- norms[, norms_columns] %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
+dg_EE <- norms [, norms_columns] %>%
+  subset.data.frame(subset = Condition == 0) %>% 
+  summarise(Avg_EE = mean(Common_DonateAverage, na.rm =T))
+
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2020And089", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/50,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2],
+         Avg_EE = as.numeric(dg_EE/50)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
 
-# DG Public-----------------
+# Donation G Public-----------------
 # get information on treatment
 
 # cleaning DG
@@ -117,29 +126,33 @@ dg2_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 2) %>%
 ## KW scale: -2: VI; -1: I; 1: A; 2: VA -> recoding done.
 
 label_col = as.character(seq(0,50,10))
-dg_columns <- c(1,21,23:28)
 
 ## compute norm 
-dg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
+dg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KW00_M:KW50_M), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
-dg_norms_var <- norms[, norms_columns] %>%
+dg2_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KW00_M:KW50_M), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-dg2_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
+dg2_EE <- norms [, norms_columns] %>%
+  subset.data.frame(subset = Condition == 1) %>% 
+  summarise(Avg_EE = mean(Common_DonateAverage, na.rm =T))
+
+dg2_final_norms <- merge.data.frame(dg2_appropriateness_sum, dg2_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2020And089", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/50,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2],
+         Avg_EE = as.numeric(dg2_EE/50)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -148,34 +161,60 @@ finaldf <- meta_dataset %>%
   merge.data.frame(dg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf)
 
-# PGG Private----------------- 
+# PDG Private (mini PGG)----------------- 
 #### recode di defect (F), calcolo di quanti fanno cooperate
 # get information on treatment
-
 # cleaning PGG
 ## Treatment :  1 if private; or 2 if public
 ## id: progressive number created in script
 ## contribution : How much money (SEK) player decide to contribute
 
-coldg = c("id","Treatment","contribution")
+colpdg = c("id","Treatment","Pdg_cooperate", "Experiment")
 
 # 1. Choice dataframe ----
-pgg_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 1) %>%
-  mutate(endowment = 50, cooperation = contribution/endowment) %>% 
-  summarise(Avg_coop = mean(cooperation, na.rm =T),
-            Var_coop = var(cooperation, na.rm = T)) %>% 
+pdg_dta_coop <- dg %>% subset.data.frame(select = colpdg, subset = Treatment == 1) %>%
+  subset.data.frame(subset = Experiment == 2) %>%
+  summarise(Avg_coop = mean(Pdg_cooperate, na.rm =T), Var_coop = var(Pdg_cooperate, na.rm = T)) %>% 
   mutate(PaperID = "2020And089", TreatmentCode = 3)
 
 
 # 2. Beliefs dataframe ----
-pgg_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
-  mutate(PaperID = "2020And089", TreatmentCode = 3)
+label_col <- c(1, 0) # 1=cooperate, 0=defect
 
+
+## compute norm 
+pdg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 1) %>%
+  summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
+  t.data.frame() %>% 
+  cbind.data.frame(Action=label_col)
+
+## compute variance norm
+pdg_norms_var <- norms[, norms_columns] %>%
+  subset.data.frame(subset = Condition == 1) %>%
+  summarise_at(vars(KWPDG_Coop:KWPDG_Def), var, na.rm=T) %>% 
+  t.data.frame() %>% 
+  cbind.data.frame(Action=label_col)
+
+pdg_EE <- norms[, norms_columns] %>%
+  subset.data.frame(subset = Condition == 1) %>% 
+  summarise(Avg_EE = mean(EE_PDG, na.rm =T))
+
+pdg_final_norms <- merge.data.frame(pdg_appropriateness_sum, pdg_norms_var, by = "Action") %>% 
+  subset.data.frame(subset = ..x == max(..x)) %>% 
+  mutate(PaperID = "2020And089", 
+         TreatmentCode = 3, 
+         Avg_NE = as.integer(Action),
+         Var_NE = ..y,
+         Strength_NE = - sort(pdg_appropriateness_sum$., decreasing = T)[1]/sort(pdg_appropriateness_sum$., decreasing = T)[2],
+         Avg_EE = as.numeric(pdg_EE)) %>% 
+  subset.data.frame(select = -c(..x, ..y, Action))
 
 # 3. combine dataset ----
-finaldf <- meta_dataset %>% merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(pgg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+finaldf <- meta_dataset %>% merge.data.frame(pdg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(pdg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf)
+
 
 # PGG Private-----------------
 # get information on treatment
@@ -185,25 +224,23 @@ finaldf <- meta_dataset %>% merge.data.frame(pgg_dta_coop, by = c("PaperID","Tre
 ## id: progressive number created in script
 ## contribution : How much money (SEK) player decide to contribute
 
-coldg = c("id","Treatment","contribution")
+colpdg = c("id","Treatment","Pdg_cooperate", "Experiment")
 
 # 1. Choice dataframe ----
-pgg2_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 2) %>%
-  mutate(endowment = 50, cooperation = contribution/endowment) %>% 
-  summarise(Avg_coop = mean(cooperation, na.rm =T),
-            Var_coop = var(cooperation, na.rm = T)) %>% 
-  mutate(PaperID = "2020And089", TreatmentCode = 4)
-
+pdg2_dta_coop <- dg %>% subset.data.frame(select = colpdg, subset = Treatment == 2) %>%
+  subset.data.frame(subset = Experiment == 2) %>%
+  summarise(Avg_coop = sum(Pdg_cooperate, na.rm =T)/length(id)) %>% 
+  mutate(Var_coop = NA, PaperID = "2020And089", TreatmentCode = 4)
 
 # 2. Beliefs dataframe ----
-pgg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
+pdg2_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
   mutate(PaperID = "2020And089", TreatmentCode = 4)
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
-  merge.data.frame(pgg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
-  merge.data.frame(pgg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(pdg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(pdg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   rbind.data.frame(finaldf) %>%
-  mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
+  mutate(Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
