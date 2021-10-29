@@ -105,7 +105,9 @@ Bas115_norms_all <- Bas115_norms_all %>%
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2017Del037")
 
 # choice file
-Del037=read.csv("DATA_full.csv", sep=",")
+Del037=read.csv("DATA_full.csv", sep=",") %>%
+  mutate(gender = recode(ANAGansw.1., `2` = 1, `4` = 0),
+         age = ANAGansw.2.)
 
 Del037_db_norms <- Del037 %>% 
   subset.data.frame(select = c(ID, Treatment, Dictator,
@@ -126,7 +128,7 @@ Del037_db_norms <- Del037 %>%
   subset.data.frame(select = -c(KWansw.1., KWansw.2., KWansw.3., KWansw.4., KWansw.5., KWansw.6., KWansw.7.))
 
 # Subject ID (treatment base 60, in 64, out 68 subjects, tot 192)
-coldg = c("ID", "Treatment", "Dictator", "earn_TOT", "DICT_oth")
+coldg = c("ID", "Treatment", "Dictator", "earn_TOT", "DICT_oth", "gender", "age")
 
 # treatment base
 # n_progr_1 <- c(1:60)
@@ -138,11 +140,11 @@ Del037_sub_1 <- Del037 %>%
   mutate(subject_id = paste("2017Del037", "1", ID, sep = "_")) %>%
   mutate(treatment_id = paste("2017Del037", "1", sep = "_"), paper_id = "2017Del037")
 
-colnames(Del037_sub_1) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Del037_sub_1) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Del037_sub_1 <- Del037_sub_1 %>%
   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation) 
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
 
 Choice_DB <- Del037_sub_1 %>%
   rbind.data.frame(Choice_DB)
@@ -166,11 +168,11 @@ Del037_sub_2 <- Del037 %>%
   mutate(subject_id = paste("2017Del037", "2", ID, sep = "_")) %>%
   mutate(treatment_id = paste("2017Del037", "2", sep = "_"), paper_id = "2017Del037")
 
-colnames(Del037_sub_2) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Del037_sub_2) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Del037_sub_2 <- Del037_sub_2 %>%
   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation)
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age)
 
 Choice_DB <- Del037_sub_2 %>%
   rbind.data.frame(Choice_DB)
@@ -194,11 +196,11 @@ Del037_sub_3 <- Del037 %>%
   mutate(subject_id = paste("2017Del037", "3", ID, sep = "_")) %>%
   mutate(treatment_id = paste("2017Del037", "3", sep = "_"), paper_id = "2017Del037")
 
-colnames(Del037_sub_3) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Del037_sub_3) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Del037_sub_3 <- Del037_sub_3 %>%
   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation) 
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
 
 Choice_DB <- Del037_sub_3 %>%
   rbind.data.frame(Choice_DB)
@@ -451,7 +453,7 @@ Choice_DB <- Her061_sub_1 %>%
 
 Belief_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA)
 dbbase <- Choice_DB %>%
-  subset.data.frame(subset = paper_id %in% c("2020Bas115")) %>%
+  subset.data.frame(subset = paper_id %in% c("2020Bas115", "2017Del037")) %>%
   mutate(n = c(1:length(Choice_DB$subject_id)))
 
 j = 1
@@ -466,7 +468,6 @@ for (x in dbbase$n) {
                               scenarios = i, 
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
-                              #KW_score = -999,
                               A = 0,
                               gender = dbbase$gender[x],
                               age = dbbase$age[x])
