@@ -113,11 +113,6 @@ master <- Paper_127 %>%
 
 
 # save master file as csv
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/Output/")
 
-write.csv(master, file = "Master.csv", row.names = F)
-
-master_individual <- master %>%
-  subset.data.frame(subset = Game_type =="DG") %>%
-  subset.data.frame(subset = Avg_coop > -1) %>%
-  subset.data.frame(subset = Avg_NE > -1)
+write.csv(master, file = "Treatment.csv", row.names = F)

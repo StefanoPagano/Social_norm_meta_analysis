@@ -1,6 +1,3 @@
-library(tidyverse)
-library(readxl)
-rm(list = ls())
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
 
@@ -94,7 +91,7 @@ Bas115_norms_2a <- Bas115_db_norms %>%
 Bas115_norms_all <- rbind.data.frame(Bas115_norms_1a, Bas115_norms_2a)
 
 Bas115_norms_all <- Bas115_norms_all %>%
-  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social), names_to = "scenarios", values_to = "KW_score") %>%
+  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `DG_SN_1` = 0, `DG_SN_2` = 1, `DG_SN_3` = 2, `DG_SN_4` = 3, `DG_SN_5` = 4, `DG_SN_6` = 5, `DG_SN_7` = 6, `DG_SN_8` = 7, `DG_SN_9` = 8, `DG_SN_10` = 9, `DG_SN_11` = 10))) %>%
   subset.data.frame(select = -c(code, social))
 
@@ -218,7 +215,7 @@ Del037_norms_all <- rbind.data.frame(Del037_norms_BASE, Del037_norms_IN, Del037_
 
 #da confermare ordine score kw
 Del037_norms_all <- Del037_norms_all %>%
-  pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_score") %>%
+  pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `KW1` = 6, `KW2` = 5, `KW3` = 4, `KW4` = 3, `KW5` = 2, `KW6` = 1, `KW7` = 0))) %>%
   subset.data.frame(select = -c(ID, Treatment, Dictator))
 
@@ -264,117 +261,19 @@ for (y in Individual_Within_DB$p) {
 }
 
 Bas115_output <- Individual_Within_DB %>% merge.data.frame(Bas115_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
-  arrange(subject_id, scenarios)
+  arrange(subject_id, scenarios) %>%
+  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  subset.data.frame(select = -c(p)) %>%
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA)
 
 Del037_output <- Individual_Within_DB %>% merge.data.frame(Del037_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
-  arrange(subject_id, scenarios)
-
-# write csv file
-write.csv(Bas115_output, file = paste(csv_path_output, "Bas115_output.csv", sep = ""), row.names = F)
-write.csv(Del037_output, file = paste(csv_path_output, "Del037_output.csv", sep = ""), row.names = F)
-write.csv(Individual_Within_DB, file = paste(csv_path_output, "Individual_Within_DB.csv", sep = ""), row.names = F)
-write.csv(Choice_Within_DB, file = paste(csv_path_output, "Choice_Within_DB.csv", sep = ""), row.names = F)
-
-
-#### Non runnare
-# #### Paper: 2017Tho028
-# 
-# # set wd 
-# setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2017Tho028")
-# 
-# # choice file
-# Tho028=read_excel("libcons_alldata.xlsx", sheet = "alldata")
-# 
-# Tho028_db_norms <- Tho028 %>%
-#   subset.data.frame(select = c(4:16, 28, 33, 34)) %>%
-#   mutate(BASE0 = recode(base0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          BASE1 = recode(base1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          BASE2 = recode(base2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          BASE3 = recode(base3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          BASE4 = recode(base4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          BASE5 = recode(base5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM0 = recode(asym1_0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM1 = recode(asym1_1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM2 = recode(asym1_2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM3 = recode(asym1_3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM4 = recode(asym1_4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-#          ASYM5 = recode(asym1_5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1)) %>%
-#   subset.data.frame(select = -c(base0, base1, base2, base3, base4, base5, asym1_0, asym1_1, asym1_2, asym1_3, asym1_4, asym1_5))
-# 
-# # Subject ID (treatment base 106, asym 266, tot 372)
-# coldg = c("subj", "treat", "role", "decider", "sent")
-# 
-# # treatment base
-# # n_progr_1 <- c(1:106)
-# Tho028_sub_1 <- Tho028 %>%
-#   subset.data.frame(select = coldg, subset = treat == 1) %>%
-#   subset.data.frame(subset = role == 1) %>%
-#   subset.data.frame(subset = decider == 1) %>%
-#   mutate(endowment = 20) %>%
-#   mutate(coop = sent/endowment) %>%
-#   mutate(subject_id = paste("2017Tho028", "1", subj, sep = "_")) %>%
-#   mutate(treatment_id = paste("2017Tho028", "1", sep = "_"), paper_id = "2017Tho028")
-# 
-# colnames(Tho028_sub_1) <- c("subj", "treat", "role", "decider", "choice", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
-# 
-# Tho028_sub_1 <- Tho028_sub_1 %>%
-#   subset.data.frame(select = -c(subj, treat, role, decider)) %>% 
-#   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation) 
-# 
-# Choice_Within_DB <- Tho028_sub_1 %>%
-#   rbind.data.frame(Choice_Within_DB)
-# 
-# Tho028_norms_base <- Tho028_db_norms %>%
-#   subset.data.frame(select = c(1:4, 5:10)) %>%
-#   subset.data.frame(subset = treat == 1) %>%
-#   subset.data.frame(subset = role == 1) %>%
-#   subset.data.frame(subset = decider == 1) %>%
-#   mutate(subject_id = paste("2017Tho028", "1", subj, sep = "_")) %>%
-#   mutate(treatment_id = paste("2017Tho028", "1", sep = "_"), paper_id = "2017Tho028") %>% 
-#   relocate(paper_id) %>%
-#   relocate(treatment_id) %>%
-#   relocate(subject_id)
-# 
-# colnames(Tho028_norms_base) <- c("subject_id", "treatment_id", "paper_id", "subj", "treat", "role", "decider", "KW0", "KW1", "KW2", "KW3", "KW4", "KW5")
-# 
-# 
-# # treatment asym
-# # n_progr_1 <- c(1:166)
-# Tho028_sub_2 <- Tho028 %>%
-#   subset.data.frame(select = coldg, subset = treat == 2) %>%
-#   subset.data.frame(subset = role == 1) %>%
-#   subset.data.frame(subset = decider == 1) %>%
-#   mutate(endowment = 20) %>%
-#   mutate(coop = sent/endowment) %>%
-#   mutate(subject_id = paste("2017Tho028", "2", subj, sep = "_")) %>%
-#   mutate(treatment_id = paste("2017Tho028", "2", sep = "_"), paper_id = "2017Tho028")
-# 
-# colnames(Tho028_sub_2) <- c("subj", "treat", "role", "decider", "choice", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
-# 
-# Tho028_sub_2 <- Tho028_sub_2 %>%
-#   subset.data.frame(select = -c(subj, treat, role, decider)) %>% 
-#   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation)
-# 
-# Choice_Within_DB <- Tho028_sub_2 %>%
-#   rbind.data.frame(Choice_Within_DB)
-# 
-# Tho028_norms_asym <- Tho028_db_norms %>%
-#   subset.data.frame(select = c(1:4, 11:16)) %>%
-#   subset.data.frame(subset = treat == 2) %>%
-#   subset.data.frame(subset = role == 1) %>%
-#   subset.data.frame(subset = decider == 1) %>%
-#   mutate(subject_id = paste("2017Tho028", "2", subj, sep = "_")) %>%
-#   mutate(treatment_id = paste("2017Tho028", "2", sep = "_"), paper_id = "2017Tho028") %>% 
-#   relocate(paper_id) %>%
-#   relocate(treatment_id) %>%
-#   relocate(subject_id)
-# 
-# colnames(Tho028_norms_asym) <- c("subject_id", "treatment_id", "paper_id", "subj", "treat", "role", "decider", "KW0", "KW1", "KW2", "KW3", "KW4", "KW5")
-# 
-# # PIVOT
-# Tho028_norms_all <- rbind.data.frame(Tho028_norms_base, Tho028_norms_asym)
-# 
-# Tho028_norms_all <- Tho028_norms_all %>%
-#   pivot_longer(!c(subject_id, treatment_id, paper_id, subj, treat, role, decider), names_to = "scenarios", values_to = "KW_score") %>%
-#   mutate(scenarios = as.numeric(recode(scenarios, `KW0` = 0, `KW1` = 2, `KW2` = 4, `KW3` = 6, `KW4` = 8, `KW5` = 10))) %>%
-#   subset.data.frame(select = -c(subj, treat, role, decider))
+  arrange(subject_id, scenarios) %>%
+  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  subset.data.frame(select = -c(p)) %>%
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA)
