@@ -335,6 +335,7 @@ Kim003_KW_score_add$KW_score[6] = mean(Kim003_KW_score$KW_Score_M[6],Kim003_KW_s
 Kim003_KW_score_add$KW_score[7] = mean(Kim003_KW_score$KW_Score_M[7],Kim003_KW_score$KW_Score_M[8])
 Kim003_KW_score_add$KW_score[8] = mean(Kim003_KW_score$KW_Score_M[8],Kim003_KW_score$KW_Score_M[9])
 
+### continuare con l'unione delle tabelle kw score
 
 Individual_Her061_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA, Design = NA)
 dbbase <- Choice_Her061_DB %>%
