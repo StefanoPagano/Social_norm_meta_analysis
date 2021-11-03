@@ -5,10 +5,10 @@ library(sjmisc)
 library(ggrepel)
 library(sjPlot)
 
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/")
+setwd("C:/Users/aguido/Documents/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("Paper_csv/Master.csv")
+master <- read.csv("File_DB/Output/Treatment.csv")
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
@@ -55,53 +55,51 @@ ggplot(data=DG_UG, aes(x=Game_type, y=Avg_NE)) + geom_boxplot(outlier.shape = NA
 
 
 ## INDIVIDUAL-LEVEL ANALYSIS
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis")
-Tho028_output <- read.csv("File_DB/Tho028_output.csv", sep = ",")
-Bas115_output <- read.csv("File_DB/Bas115_output.csv", sep = ",")
-Del037_output <- read.csv("File_DB/Del037_output.csv", sep = ",")
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
+choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
 
-# per treatment 
-Tho028_model_1 <- mclogit(cbind(A,scenarios)~KW_score,data=Tho028_output %>% subset.data.frame(subset = treatment_id =="2017Tho028_1"), random = ~1|subject_id)
+# within design -----
 
-Tho028_model_2 <- mclogit(cbind(A,scenarios)~KW_score,data=Tho028_output %>% subset.data.frame(subset = treatment_id =="2017Tho028_2"), random = ~1|subject_id)
+## issues: 
+### - 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
 
-Bas115_model_1 <- mclogit(cbind(A,scenarios)~KW_score,data=Bas115_output %>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"), random = ~1|subject_id)
+beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
+choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
+individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
-Bas115_model_2 <- mclogit(cbind(A,scenarios)~KW_score,data=Bas115_output %>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"), random = ~1|subject_id)
+# prelim analysis all together
+model_1 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w)
 
-Del037_model_1 <- mclogit(cbind(A,scenarios)~KW_score,data=Del037_output %>% subset.data.frame(treatment_id=="2017Del037_1"), random = ~1|subject_id)
+model_2017Del037 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
+                            subset.data.frame(subset = paper_id =="2017Del037"))
 
-Del037_model_2 <- mclogit(cbind(A,scenarios)~KW_score,data=Del037_output %>% subset.data.frame(treatment_id=="2017Del037_2"), random = ~1|subject_id)
+model_2020Bas115 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
+                              subset.data.frame(subset = paper_id=="2020Bas115"))
 
-Del037_model_3 <- mclogit(cbind(A,scenarios)~KW_score,data=Del037_output %>% subset.data.frame(treatment_id=="2017Del037_3"), random = ~1|subject_id)
+tab_model(model_1, model_2017Del037, 
+          model_2020Bas115, 
+          dv.labels = c("general model","Del037_model_1","2020Bas115"))
 
-tab_model(Tho028_model_1, Tho028_model_2, 
-          Bas115_model_1, Bas115_model_2,
-          Del037_model_1, Del037_model_3,
-          dv.labels = c("Tho028_model_1", "Tho028_model_2", 
-                        "Bas115_model_1", "Bas115_model_2", 
-                        "Del037_model_1", "Del037_model_3"))
+plot_models(model_1, model_2017Del037, 
+          model_2020Bas115)
 
-plot_models(Tho028_model_1, Tho028_model_2, 
-            Bas115_model_1, Bas115_model_2,
-            Del037_model_1, Del037_model_3)
+# between design -----
+beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+choices_b <- choices %>% subset.data.frame(subset = Design=="Between")
+individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 
-# per paper
-Tho028_model <- mclogit(cbind(A,scenarios)~KW_score,data=Tho028_output, random = ~1|subject_id)
+model_2 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b)
 
-Bas115_model <- mclogit(cbind(A,scenarios)~KW_score,data=Bas115_output, random = ~1|subject_id)
+model_2016Kim003 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b %>% 
+                              subset.data.frame(subset = paper_id =="2016Kim003"))
 
-Del037_model <- mclogit(cbind(A,scenarios)~KW_score,data=Del037_output, random = ~1|subject_id)
+model_2018Her061 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b %>% 
+                              subset.data.frame(subset = paper_id =="2018Her061"))
 
-tab_model(Tho028_model, Bas115_model, Del037_model, 
-          dv.labels = c("Tho028_model", "Bas115_model", "Del037_model"))
+model_2019Cha026 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b %>% 
+                              subset.data.frame(subset = paper_id =="2019Cha026"))
+
+tab_model(model_2, model_2016Kim003, model_2018Her061, model_2019Cha026,
+          dv.labels = c("General model between", "2016Kim003", "2018Her061", "2019Cha026"))
 
 plot_models(Tho028_model, Bas115_model, Del037_model)
-
-
-
-## avg_coop bassi
-# read data 
-
-master_sub <- read.csv("Paper_csv/Master.csv") %>% mutate(norm_str = Avg_NE/Var_NE) %>% subset.data.frame(subset = Avg_coop < 0.3)
-
