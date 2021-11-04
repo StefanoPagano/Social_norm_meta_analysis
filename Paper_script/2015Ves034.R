@@ -9,7 +9,18 @@ colnames(ug) <- c("Subject", "Session", "Condition", "Incentives", "Approriatene
 
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms <- ug %>% 
-  subset.data.frame(subset = Condition == c(1,2))
+  subset.data.frame(subset = Condition == c(1,2)) %>%
+  mutate(AR0_M = recode(AR0, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR1_M = recode(AR1, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR2_M = recode(AR2, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR3_M = recode(AR3, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR4_M = recode(AR4, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR5_M = recode(AR5, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR6_M = recode(AR6, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR7_M = recode(AR7, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR8_M = recode(AR8, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR9_M = recode(AR9, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         AR10_M = recode(AR10, `1`= -1, `2` = -1/3, `3` = 1/3, `4` = 1))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2015Ves034", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -36,14 +47,14 @@ label_col = as.character(seq(0,10,1))
 ## compute norm 
 ug1_appropriateness_sum <- norms %>%
   subset.data.frame(subset = Condition == 1) %>%
-  summarise_at(vars(AR0:AR10), sum, na.rm=T) %>% 
+  summarise_at(vars(AR0_M:AR10_M), sum, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 ug1_norms_var <- norms %>%
   subset.data.frame(subset = Condition == 1) %>%
-  summarise_at(vars(AR0:AR10), var, na.rm=T) %>% 
+  summarise_at(vars(AR0_M:AR10_M), var, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col)
 
@@ -83,14 +94,14 @@ label_col = as.character(seq(0,10,1))
 ## compute norm 
 ug2_appropriateness_sum <- norms %>%
   subset.data.frame(subset = Condition == 2) %>%
-  summarise_at(vars(AR0:AR10), sum, na.rm=T) %>% 
+  summarise_at(vars(AR0_M:AR10_M), sum, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col)
 
 ## compute variance norm
 ug2_norms_var <- norms %>%
   subset.data.frame(subset = Condition == 2) %>%
-  summarise_at(vars(AR0:AR10), var, na.rm=T) %>% 
+  summarise_at(vars(AR0_M:AR10_M), var, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col)
 
