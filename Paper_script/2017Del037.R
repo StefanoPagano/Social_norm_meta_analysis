@@ -54,6 +54,11 @@ dg_base_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator =
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
 label_col = as.character(seq(6,0,-1))
+n_sub_N = norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "BASE") %>% 
+  summarise(n_sub_N = n())
+
 
 ## compute norm 
 dg_base_appropriateness_sum <- norms %>%
@@ -61,7 +66,8 @@ dg_base_appropriateness_sum <- norms %>%
   subset.data.frame(subset = Treatment == "BASE") %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
 
 ## compute variance norm
 dg_base_norms_var <- norms %>%
@@ -76,14 +82,15 @@ dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_nor
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y,
-         Strength_NE = sort(dg_base_appropriateness_sum$., decreasing = T)[1]/sort(dg_base_appropriateness_sum$., decreasing = T)[2]) %>%
+         Var_NE = ..y) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_base_dta_coop, by = c("PaperID","TreatmentCode")) %>%
-  merge.data.frame(dg_base_final_norms[1,], all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(dg_base_final_norms[1,], all.x=T, by = c("PaperID","TreatmentCode")) %>% 
+  subset.data.frame(select = -c(n_sub_N))
+
 
 # DG IN treatment ---------------
 # get information on treatment
@@ -112,6 +119,10 @@ dg_in_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
 label_col = as.character(seq(6,0,-1))
+n_sub_N = norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "IN") %>% 
+  summarise(n_sub_N = n())
 
 ## compute norm 
 dg_in_appropriateness_sum <- norms %>%
@@ -119,7 +130,8 @@ dg_in_appropriateness_sum <- norms %>%
   subset.data.frame(subset = Treatment == "IN") %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
 
 ## compute variance norm
 dg_in_norms_var <- norms %>%
@@ -134,14 +146,14 @@ dg_in_final_norms <- merge.data.frame(dg_in_appropriateness_sum, dg_in_norms_var
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y,
-         Strength_NE = sort(dg_in_appropriateness_sum$., decreasing = T)[1]/sort(dg_in_appropriateness_sum$., decreasing = T)[2]) %>%
+         Var_NE = ..y) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_in_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_in_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N)) %>%
   rbind.data.frame(finaldf)
 
 
@@ -172,6 +184,10 @@ dg_out_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator ==
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
 label_col = as.character(seq(6,0,-1))
+n_sub_N = norms %>%
+  subset.data.frame(subset = Dictator == 1) %>%
+  subset.data.frame(subset = Treatment == "OUT") %>% 
+  summarise(n_sub_N = n())
 
 ## compute norm 
 dg_out_appropriateness_sum <- norms %>%
@@ -179,7 +195,8 @@ dg_out_appropriateness_sum <- norms %>%
   subset.data.frame(subset = Treatment == "OUT") %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
 
 ## compute variance norm
 dg_out_norms_var <- norms %>%
@@ -194,14 +211,14 @@ dg_out_final_norms <- merge.data.frame(dg_out_appropriateness_sum, dg_out_norms_
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y,
-         Strength_NE = sort(dg_out_appropriateness_sum$., decreasing = T)[1]/sort(dg_out_appropriateness_sum$., decreasing = T)[2]) %>%
+         Var_NE = ..y) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_out_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_out_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
