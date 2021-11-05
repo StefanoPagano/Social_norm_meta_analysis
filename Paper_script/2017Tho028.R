@@ -30,7 +30,7 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent")
 
 # 1. Choice dataframe ----
-dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
+dgb_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
   subset.data.frame(subset = decider == 1) %>%
   subset.data.frame(subset = treat == 1) %>%
   mutate(endowment = 10, cooperation = sent/endowment) %>% 
@@ -48,35 +48,40 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 
 label_col = as.character(seq(0,10,2))
 dg_columns <- c(1:10, 28, 33, 34)
+n_sub_N = dg %>% subset.data.frame(select = dg_columns) %>%
+  subset.data.frame(subset = treat == 1) %>%
+  subset.data.frame(subset = role == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
-dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
+dgb_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 1) %>%
   subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
-dg_norms_var <- dg[, dg_columns] %>%
+dgb_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 1) %>%
   subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(base0:base5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
+dgb_final_norms <- merge.data.frame(dgb_appropriateness_sum, dgb_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Tho028", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dgb_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
-finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+finaldf <- meta_dataset %>% merge.data.frame(dgb_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(dgb_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 
 # DG Asym1-----------------
@@ -98,7 +103,7 @@ finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","Trea
 coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent")
 
 # 1. Choice dataframe ----
-dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
+dga_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
   subset.data.frame(subset = decider == 1) %>%
   subset.data.frame(subset = treat == 2) %>%
   mutate(endowment = 10, cooperation = sent/endowment) %>% 
@@ -116,36 +121,41 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 
 label_col = as.character(seq(0,10,2))
 dg_columns <- c(1:4, 11:16, 28, 33, 34)
+n_sub_N = dg %>% subset.data.frame(select = dg_columns) %>%
+  subset.data.frame(subset = treat == 2) %>%
+  subset.data.frame(subset = role == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
-dg_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
+dga_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(asym1_0:asym1_5), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
-dg_norms_var <- dg[, dg_columns] %>%
+dga_norms_var <- dg[, dg_columns] %>%
   subset.data.frame(subset = treat == 2) %>%
   subset.data.frame(subset = role == 1) %>%
   summarise_at(vars(asym1_0:asym1_5), var, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
+dga_final_norms <- merge.data.frame(dga_appropriateness_sum, dga_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Tho028", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dga_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
-  merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(dga_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(dga_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

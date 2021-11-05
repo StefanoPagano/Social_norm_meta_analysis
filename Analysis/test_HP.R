@@ -5,10 +5,10 @@ library(sjmisc)
 library(ggrepel)
 library(sjPlot)
 
-setwd("C:/Users/aguido/Documents/GitHub/Social_norm_meta_analysis/")
+setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv")
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = scarto/Sd_Avg_NE)
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
@@ -18,16 +18,16 @@ cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H1 : correlation between average cooperation and norm (NE)")
 
 # H2a : correlation between average cooperation and norm (NE)
-cor.test(master$Avg_coop, master$Strength_NE, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
+cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
 
 # H2b : correlation between variance cooperation and norm (NE)
-cor.test(master$Var_coop, master$Strength_NE, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
+cor.test(master$Var_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
 
 #H3 
-cor.test(master$Avg_coop, master$Strength_NE, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3")
+cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3")
 
 ## DG analysis
 
@@ -36,16 +36,16 @@ cor.test(DG$Avg_coop, DG$Avg_NE, method= "spearman", exact = F)
 ggplot(data=DG, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H1 : correlation between average cooperation and norm (NE) \n DG only")
 
 # H2a : correlation between average cooperation and norm (NE)
-cor.test(DG$Avg_coop, DG$Strength_NE, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Strength_NE, y=Avg_coop)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE) \n DG only")
+cor.test(DG$Avg_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE) \n DG only")
 
 # H2b : correlation between variance cooperation and norm (NE)
-cor.test(DG$Var_coop, DG$Strength_NE, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Strength_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE) \n DG only")
+cor.test(DG$Var_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE) \n DG only")
 
 #H3 
-cor.test(DG$Avg_coop, DG$Strength_NE, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Strength_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3 \n DG only")
+cor.test(DG$Avg_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3 \n DG only")
 
 ## DG & UG
 

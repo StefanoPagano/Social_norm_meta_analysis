@@ -51,7 +51,7 @@ ug1_appropriateness_sum <- norms %>%
   summarise_at(vars(AR0_M:AR10_M), sum, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ug1_norms_var <- norms %>%
@@ -65,14 +65,15 @@ ug1_final_norms <- merge.data.frame(ug1_appropriateness_sum, ug1_norms_var, by =
   mutate(PaperID = "2015Ves034", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Sd_Avg_NE = sd(ug1_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(ug1_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(ug1_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
-  subset.data.frame(select = -c(n_sub_N))
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 # UG Incentivized-Appropriateness last ---------------
 # get information on treatment
@@ -100,7 +101,7 @@ ug2_appropriateness_sum <- norms %>%
   summarise_at(vars(AR0_M:AR10_M), sum, na.rm=T) %>% 
   t.data.frame() %>%
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ug2_norms_var <- norms %>%
@@ -114,14 +115,15 @@ ug2_final_norms <- merge.data.frame(ug2_appropriateness_sum, ug2_norms_var, by =
   mutate(PaperID = "2015Ves034", 
          TreatmentCode = 4, 
          Avg_NE = as.integer(donation)/10,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Sd_Avg_NE = sd(ug2_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(ug2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(ug2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)  %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

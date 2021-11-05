@@ -68,13 +68,16 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 1) %>%
 
 label_col = as.character(seq(0,50,10))
 norms_columns <- c(1,15,16,21,23:31)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 0) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = Condition == 0) %>%
   summarise_at(vars(KW00_M:KW50_M), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg_norms_var <- norms[, norms_columns] %>%
@@ -93,13 +96,14 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/50,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2],
+         Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(dg_EE/50)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 # Donation G Public-----------------
 # get information on treatment
@@ -126,13 +130,16 @@ dg2_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == 2) %>%
 ## KW scale: -2: VI; -1: I; 1: A; 2: VA -> recoding done.
 
 label_col = as.character(seq(0,50,10))
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KW00_M:KW50_M), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg2_norms_var <- norms[, norms_columns] %>%
@@ -151,7 +158,7 @@ dg2_final_norms <- merge.data.frame(dg2_appropriateness_sum, dg2_norms_var, by =
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/50,
          Var_NE = ..y,
-         Strength_NE = sort(dg2_appropriateness_sum$., decreasing = T)[1]/sort(dg2_appropriateness_sum$., decreasing = T)[2],
+         Sd_Avg_NE = sd(dg2_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(dg2_EE/50)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -159,6 +166,7 @@ dg2_final_norms <- merge.data.frame(dg2_appropriateness_sum, dg2_norms_var, by =
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # PDG Private (mini PGG)----------------- 
@@ -180,14 +188,16 @@ pdg_dta_coop <- dg %>% subset.data.frame(select = colpdg, subset = Treatment == 
 
 # 2. Beliefs dataframe ----
 label_col <- c(1, 0) # 1=cooperate, 0=defect
-
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 pdg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col)
+  cbind.data.frame(Action=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 pdg_norms_var <- norms[, norms_columns] %>%
@@ -206,13 +216,14 @@ pdg_final_norms <- merge.data.frame(pdg_appropriateness_sum, pdg_norms_var, by =
          TreatmentCode = 3, 
          Avg_NE = as.integer(Action),
          Var_NE = ..y,
-         Strength_NE = - sort(pdg_appropriateness_sum$., decreasing = T)[1]/sort(pdg_appropriateness_sum$., decreasing = T)[2],
+         Sd_Avg_NE = sd(pdg_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(pdg_EE)) %>% 
   subset.data.frame(select = -c(..x, ..y, Action))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(pdg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(pdg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 
@@ -234,11 +245,15 @@ pdg2_dta_coop <- dg %>% subset.data.frame(select = colpdg, subset = Treatment ==
 
 # 2. Beliefs dataframe ----
 ## compute norm 
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = Condition == 0) %>% summarise(n_sub_N = n())
+
 pdg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = Condition == 0) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col)
+  cbind.data.frame(Action=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 pdg2_norms_var <- norms[, norms_columns] %>%
@@ -257,7 +272,7 @@ pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, b
          TreatmentCode = 4, 
          Avg_NE = as.integer(Action),
          Var_NE = ..y,
-         Strength_NE = - sort(pdg2_appropriateness_sum$., decreasing = T)[1]/sort(pdg2_appropriateness_sum$., decreasing = T)[2],
+         Sd_Avg_NE = sd(pdg2_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(pdg2_EE)) %>% 
   subset.data.frame(select = -c(..x, ..y, Action))
 
@@ -265,6 +280,7 @@ pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, b
 finaldf <- meta_dataset %>% 
   merge.data.frame(pdg2_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(pdg2_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

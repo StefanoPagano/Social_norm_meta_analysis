@@ -30,7 +30,7 @@ dg_neutral_dta_coop <- dg %>% subset.data.frame(select = coldg, where == 0) %>%
 
 
 # 2. Beliefs dataframe ----
-dg_neutral_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
+dg_neutral_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA) %>%
   mutate(PaperID = "2018Kim038", TreatmentCode = 1)
 
 # 3. combine dataset ----
@@ -57,7 +57,7 @@ dg_tog_dta_coop <- dg %>% subset.data.frame(select = coldg, where == 1 | where =
   mutate(PaperID = "2018Kim038", TreatmentCode = 2)
 
 # 2. Beliefs dataframe ----
-dg_tog_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Strength_NE = NA) %>%
+dg_tog_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA) %>%
   mutate(PaperID = "2018Kim038", TreatmentCode = 2)
 
 # 3. combine dataset ----

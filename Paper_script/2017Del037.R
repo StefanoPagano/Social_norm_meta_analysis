@@ -67,7 +67,7 @@ dg_base_appropriateness_sum <- norms %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg_base_norms_var <- norms %>%
@@ -82,14 +82,15 @@ dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_nor
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Sd_Avg_NE = sd(dg_base_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_base_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_base_final_norms[1,], all.x=T, by = c("PaperID","TreatmentCode")) %>% 
-  subset.data.frame(select = -c(n_sub_N))
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 
 # DG IN treatment ---------------
@@ -131,7 +132,7 @@ dg_in_appropriateness_sum <- norms %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg_in_norms_var <- norms %>%
@@ -146,14 +147,15 @@ dg_in_final_norms <- merge.data.frame(dg_in_appropriateness_sum, dg_in_norms_var
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Sd_Avg_NE = sd(dg_in_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_in_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_in_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 
@@ -196,7 +198,7 @@ dg_out_appropriateness_sum <- norms %>%
   summarise_at(vars(KW1:KW7), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg_out_norms_var <- norms %>%
@@ -211,14 +213,15 @@ dg_out_final_norms <- merge.data.frame(dg_out_appropriateness_sum, dg_out_norms_
   mutate(PaperID = "2017Del037", 
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/6,
-         Var_NE = ..y) %>%
+         Var_NE = ..y,
+         Sd_Avg_NE = sd(dg_out_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_out_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_out_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

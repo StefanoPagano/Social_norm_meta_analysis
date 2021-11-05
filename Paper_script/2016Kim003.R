@@ -91,7 +91,7 @@ dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>%
   summarise_at(vars(ANSW01:ANSW09), sum, na.rm=T) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 
 ## compute variance norm
@@ -105,14 +105,15 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 7, 
     Avg_NE = as.integer(donation)/16,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
-  subset.data.frame(select = -c(n_sub_N))
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 
 # TG ---------------------
@@ -143,7 +144,7 @@ tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>%
   summarise_at(vars(ANSW34:ANSW42), sum, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 tg_norms_var <- norms1[, tg_columns] %>% 
@@ -156,14 +157,15 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 6, 
     Avg_NE = as.integer(donation)/80,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Sd_Avg_NE = sd(tg_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(tg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(tg_final_norms) %>% 
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
   
 
@@ -203,7 +205,7 @@ ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>%
   summarise_at(vars(ANSW23:ANSW31), sum, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ug_norms_var <- norms1[, ug_columns] %>% 
@@ -216,14 +218,15 @@ ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "d
   mutate(PaperID = "2016Kim003",
     TreatmentCode = 8, 
     Avg_NE = as.integer(donation)/16, 
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Sd_Avg_NE = sd(ug_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf =  meta_dataset %>% 
   merge.data.frame(ug_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(ug_final_norms) %>% 
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 
@@ -265,7 +268,7 @@ pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>
   summarise_at(vars(ANSW12:ANSW22), sum, na.rm=T) %>% 
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
-  mutate(n_sub_N, Var_Avg_NE = ./n_sub_N)
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ### compute variance norm
 pgg_norms_var <- norms1[, pgg_columns] %>% 
@@ -278,14 +281,15 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
   mutate(PaperID = "2016Kim003", 
     TreatmentCode = 9, 
     Avg_NE = as.integer(donation)/50,
-    Var_NE = ..y) %>% 
+    Var_NE = ..y,
+    Sd_Avg_NE = sd(pgg_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(pgg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(pgg_final_norms) %>% 
-  subset.data.frame(select = -c(n_sub_N)) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

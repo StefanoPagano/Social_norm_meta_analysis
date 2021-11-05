@@ -57,6 +57,9 @@ s1_dg_baseline_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
+n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s1_dg_baseline_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -64,7 +67,8 @@ s1_dg_baseline_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = no
   subset.data.frame(subset = player.treatment == "baseline") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s1_dg_baseline_norms_var <- norms_s1[, norms_columns] %>%
@@ -80,12 +84,13 @@ s1_dg_baseline_final_norms <- merge.data.frame(s1_dg_baseline_appropriateness_su
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s1_dg_baseline_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_baseline_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s1_dg_baseline_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s1_dg_baseline_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(s1_dg_baseline_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(s1_dg_baseline_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 # Study 1 - DG Always-----------------
 # get information on treatment
@@ -106,6 +111,9 @@ s1_dg_always_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
+n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s1_dg_always_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -113,7 +121,8 @@ s1_dg_always_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norm
   subset.data.frame(subset = player.treatment == "always remind") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s1_dg_always_norms_var <- norms_s1[, norms_columns] %>%
@@ -129,12 +138,13 @@ s1_dg_always_final_norms <- merge.data.frame(s1_dg_always_appropriateness_sum, s
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s1_dg_always_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_always_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s1_dg_always_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s1_dg_always_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s1_dg_always_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 1 - DG Never remind-----------------
@@ -156,6 +166,9 @@ s1_dg_nr_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
+n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s1_dg_nr_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -163,7 +176,8 @@ s1_dg_nr_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   subset.data.frame(subset = player.treatment == "never remind") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s1_dg_nr_norms_var <- norms_s1[, norms_columns] %>%
@@ -179,12 +193,13 @@ s1_dg_nr_final_norms <- merge.data.frame(s1_dg_nr_appropriateness_sum, s1_dg_nr_
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s1_dg_nr_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_nr_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s1_dg_nr_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s1_dg_nr_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s1_dg_nr_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 1 - DG No conflict-----------------
@@ -206,6 +221,9 @@ s1_dg_nc_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
+n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s1_dg_nc_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -213,7 +231,8 @@ s1_dg_nc_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   subset.data.frame(subset = player.treatment == "no conflict") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s1_dg_nc_norms_var <- norms_s1[, norms_columns] %>%
@@ -229,12 +248,13 @@ s1_dg_nc_final_norms <- merge.data.frame(s1_dg_nc_appropriateness_sum, s1_dg_nc_
          TreatmentCode = 4, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s1_dg_nc_appropriateness_sum$., decreasing = T)[1]/sort(s1_dg_nc_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s1_dg_nc_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s1_dg_nc_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s1_dg_nc_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 2 - DG Baseline-----------------
@@ -256,6 +276,9 @@ s2_dg_baseline_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
+n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s2_dg_baseline_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -263,7 +286,8 @@ s2_dg_baseline_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = no
   subset.data.frame(subset = player.treatment == "baseline") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s2_dg_baseline_norms_var <- norms_s2[, norms_columns] %>%
@@ -279,12 +303,13 @@ s2_dg_baseline_final_norms <- merge.data.frame(s2_dg_baseline_appropriateness_su
          TreatmentCode = 7, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s2_dg_baseline_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_baseline_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s2_dg_baseline_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s2_dg_baseline_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s2_dg_baseline_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 2 - DG Always-----------------
@@ -306,6 +331,9 @@ s2_dg_always_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
+n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s2_dg_always_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -313,7 +341,8 @@ s2_dg_always_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norm
   subset.data.frame(subset = player.treatment == "always remind") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s2_dg_always_norms_var <- norms_s2[, norms_columns] %>%
@@ -329,12 +358,13 @@ s2_dg_always_final_norms <- merge.data.frame(s2_dg_always_appropriateness_sum, s
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s2_dg_always_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_always_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s2_dg_always_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s2_dg_always_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s2_dg_always_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 2 - DG Never remind-----------------
@@ -356,6 +386,9 @@ s2_dg_nr_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
+n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s2_dg_nr_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -363,7 +396,8 @@ s2_dg_nr_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   subset.data.frame(subset = player.treatment == "never remind") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s2_dg_nr_norms_var <- norms_s2[, norms_columns] %>%
@@ -379,12 +413,13 @@ s2_dg_nr_final_norms <- merge.data.frame(s2_dg_nr_appropriateness_sum, s2_dg_nr_
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s2_dg_nr_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_nr_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s2_dg_nr_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s2_dg_nr_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s2_dg_nr_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # Study 2 - DG No conflict-----------------
@@ -406,6 +441,9 @@ s2_dg_nc_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
+n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
+  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = n())
 
 ## compute norm 
 s2_dg_nc_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -413,7 +451,8 @@ s2_dg_nc_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   subset.data.frame(subset = player.treatment == "no conflict") %>%
   summarise_at(vars(DG_SN_0:DG_SN_10), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 s2_dg_nc_norms_var <- norms_s2[, norms_columns] %>%
@@ -429,12 +468,13 @@ s2_dg_nc_final_norms <- merge.data.frame(s2_dg_nc_appropriateness_sum, s2_dg_nc_
          TreatmentCode = 10, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(s2_dg_nc_appropriateness_sum$., decreasing = T)[1]/sort(s2_dg_nc_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(s2_dg_nc_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(s2_dg_nc_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(s2_dg_nc_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

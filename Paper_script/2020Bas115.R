@@ -73,13 +73,16 @@ dgS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 1) %
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,43:53)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dgS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 1) %>%
   summarise_at(vars(DG_SN_1:DG_SN_11), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dgS_norms_var <- norms[, norms_columns] %>%
@@ -94,12 +97,13 @@ dgS_final_norms <- merge.data.frame(dgS_appropriateness_sum, dgS_norms_var, by =
          TreatmentCode = "1a", 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(dgS_appropriateness_sum$., decreasing = T)[1]/sort(dgS_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dgS_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(dgS_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(dgS_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(dgS_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 
 # DG Private-----------------
@@ -128,13 +132,16 @@ dgP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 0) %
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,43:53)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 0) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dgP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 0) %>%
   summarise_at(vars(DG_SN_1:DG_SN_11), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dgP_norms_var <- norms[, norms_columns] %>%
@@ -149,13 +156,14 @@ dgP_final_norms <- merge.data.frame(dgP_appropriateness_sum, dgP_norms_var, by =
          TreatmentCode = "2a", 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(dgP_appropriateness_sum$., decreasing = T)[1]/sort(dgP_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dgP_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dgP_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dgP_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # DG Tax Social-----------------
@@ -184,13 +192,16 @@ dgtS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 1) 
 
 label_col = as.character(seq(0,12,1.5))
 norms_columns <- c(1,2,54:62)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dgtS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 1) %>%
   summarise_at(vars(DGT_SN_1:DGT_SN_9), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dgtS_norms_var <- norms[, norms_columns] %>%
@@ -205,13 +216,14 @@ dgtS_final_norms <- merge.data.frame(dgtS_appropriateness_sum, dgtS_norms_var, b
          TreatmentCode = "1b",
          Avg_NE = as.integer(donation)/12,
          Var_NE = ..y,
-         Strength_NE = sort(dgtS_appropriateness_sum$., decreasing = T)[1]/sort(dgtS_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dgtS_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dgtS_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dgtS_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # DG Tax Private-----------------
@@ -240,13 +252,17 @@ dgtP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 0) 
 
 label_col = as.character(seq(0,12,1.5))
 norms_columns <- c(1,2,54:62)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 0) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dgtP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 0) %>%
   summarise_at(vars(DGT_SN_1:DGT_SN_9), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
+
 
 ## compute variance norm
 dgtP_norms_var <- norms[, norms_columns] %>%
@@ -261,12 +277,13 @@ dgtP_final_norms <- merge.data.frame(dgtP_appropriateness_sum, dgtP_norms_var, b
          TreatmentCode = "2b", 
          Avg_NE = as.integer(donation)/12,
          Var_NE = ..y,
-         Strength_NE = sort(dgtP_appropriateness_sum$., decreasing = T)[1]/sort(dgtP_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(dgtP_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(dgtP_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(dgtP_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 # UG Social-----------------
@@ -297,13 +314,16 @@ ugS_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 1) %
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,63:73)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 1) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 ugS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 1) %>%
   summarise_at(vars(UG_SN_1:UG_SN_11), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ugS_norms_var <- norms[, norms_columns] %>%
@@ -318,13 +338,14 @@ ugS_final_norms <- merge.data.frame(ugS_appropriateness_sum, ugS_norms_var, by =
          TreatmentCode = "1c", 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(ugS_appropriateness_sum$., decreasing = T)[1]/sort(ugS_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(ugS_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(ugS_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(ugS_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf)
 
 
@@ -356,13 +377,16 @@ ugP_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = social == 0) %
 
 label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,63:73)
+n_sub_N = norms %>% subset.data.frame(select = norms_columns) %>%
+  subset.data.frame(subset = social == 0) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 ugP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = social == 0) %>%
   summarise_at(vars(UG_SN_1:UG_SN_11), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ugP_norms_var <- norms[, norms_columns] %>%
@@ -377,13 +401,14 @@ ugP_final_norms <- merge.data.frame(ugP_appropriateness_sum, ugP_norms_var, by =
          TreatmentCode = "2c", 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Strength_NE = sort(ugP_appropriateness_sum$., decreasing = T)[1]/sort(ugP_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(ugP_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(ugP_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(ugP_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 

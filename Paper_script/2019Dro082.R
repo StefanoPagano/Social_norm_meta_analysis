@@ -41,13 +41,16 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg) %>%
 
 label_col = as.character(c(0,0.1,0.25,0.50,1.00,1.50,2.00))
 col_treat = c(1:7,21:24)
+n_sub_N = norms %>%
+  subset.data.frame(select = col_treat) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 dg_appropriateness_sum <- norms %>%
   subset.data.frame(select = col_treat) %>%
   summarise_at(vars(norm1_0:norm1_200), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation_range=label_col)
+  cbind.data.frame(donation_range=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 dg_norms_var <- norms %>%
@@ -61,13 +64,14 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
          TreatmentCode = "1a", 
          Avg_NE = as.integer(donation_range)/13,
          Var_NE = ..y,
-         Strength_NE = sort(dg_appropriateness_sum$., decreasing = T)[1]/sort(dg_appropriateness_sum$., decreasing = T)[2]) %>%
+         Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation_range))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)

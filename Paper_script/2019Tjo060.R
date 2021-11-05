@@ -29,12 +29,14 @@ ex8_dg_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,800,200))
 norms_columns <- c(1:10)
+n_sub_N = norms_8 %>% subset.data.frame(select = norms_columns) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 ex8_dg_appropriateness_sum <- norms_8 %>% subset.data.frame(select = norms_columns) %>%
   summarise_at(vars(S4H1:S4H5), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ex8_dg_norms_var <- norms_8[, norms_columns] %>%
@@ -48,14 +50,15 @@ ex8_dg_final_norms <- merge.data.frame(ex8_dg_appropriateness_sum, ex8_dg_norms_
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/800,
          Var_NE = ..y,
-         Strength_NE = sort(ex8_dg_appropriateness_sum$., decreasing = T)[1]/sort(ex8_dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(ex8_dg_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(ex8_dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
-  merge.data.frame(ex8_dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode"))
+  merge.data.frame(ex8_dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 # Experiment 9 - DG Norm-----------------
 # get information on treatment
@@ -76,12 +79,14 @@ ex9_dg_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 
 label_col = as.character(seq(0,800,200))
 norms_columns <- c(1:9)
+n_sub_N = norms_9 %>% subset.data.frame(select = norms_columns) %>% summarise(n_sub_N = n())
 
 ## compute norm 
 ex9_dg_appropriateness_sum <- norms_9 %>% subset.data.frame(select = norms_columns) %>%
   summarise_at(vars(Handling1:Handling5), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation=label_col)
+  cbind.data.frame(donation=label_col) %>%
+  mutate(n_sub_N, Kw_m = ./n_sub_N)
 
 ## compute variance norm
 ex9_dg_norms_var <- norms_9[, norms_columns] %>%
@@ -95,12 +100,13 @@ ex9_dg_final_norms <- merge.data.frame(ex9_dg_appropriateness_sum, ex9_dg_norms_
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/800,
          Var_NE = ..y,
-         Strength_NE = sort(ex9_dg_appropriateness_sum$., decreasing = T)[1]/sort(ex9_dg_appropriateness_sum$., decreasing = T)[2]) %>% 
+         Sd_Avg_NE = sd(ex9_dg_appropriateness_sum$Kw_m)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(ex9_dg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
   merge.data.frame(ex9_dg_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
