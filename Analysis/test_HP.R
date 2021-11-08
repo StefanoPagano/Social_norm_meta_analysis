@@ -10,7 +10,7 @@ library(readxl)
 setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = Avg_NE/Sd_Avg_NE)
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop, Strength_N = Delta_Avg/Sd_Avg_NE)
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
@@ -21,15 +21,15 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 # H2a : correlation between average cooperation and norm (NE)
 cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Sd_Avg_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
 
 # H2b : correlation between variance cooperation and norm (NE)
 cor.test(master$Var_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
+ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
 
 #H3 
-cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3")
+cor.test(master$Delta_Avg, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm") + geom_text(aes(label=PaperID)) + ggtitle("H3")
 
 ## DG analysis
 

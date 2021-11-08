@@ -8,7 +8,6 @@ output:
 ---
 
 # Analysis Treatment-level: All Games
-Le analisi svolte in questa sezione sono condotte a livello di trattamento. Di seguito i risultati sulle analisi delle diverse ipotesi (H1-H2-H3).
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE, include=FALSE}
 
@@ -22,7 +21,7 @@ library(readxl)
 setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = scarto/Sd_Avg_NE)
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop, Strength_N = Delta_Avg/Sd_Avg_NE)
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
@@ -35,35 +34,63 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : correlation between average cooperation and norm (NE)")
+
 ```
-# sistemare nomi sezione
-## H2a : Norm Uncertainty: 
-- Does a higher norm variability lead to lower cooperation?
-- Does a higher norm variability lead to higher cooperation var.?
+
+## HP2: Norm Uncertainty
+- a. Does a higher norm variability lead to lower cooperation?
+- b. Does a higher norm variability lead to higher cooperation var.?
+
+
+### a. Does a higher norm variability lead to lower cooperation?
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
 
 cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2a : correlation between average cooperation and norm (NE)")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2a : correlation between average cooperation and norm (NE)")
 ```
 
-## H2b : correlation between variance cooperation and norm (NE)
+
+### b. Does a higher norm variability lead to higher cooperation var.?
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
 
 cor.test(master$Var_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
+ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
 
 ```
 
-## H3 : does higher norm strength lead to higher norm compliance 
-# sistemare grafico sulla y scarto
-# indicare come viene calcolato lo strength
-# summary(master$Strength_N)
-# hist(master$Strength_N)
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+## HP3 : Norm Strength
+### Does higher norm strength lead to higher norm compliance?
 
-cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H3")
+
+**How did we compute Strength index?**
+
+$$Strength = {Delta_{avg} \over NE_{sd}}$$
+where:
+
+- $Delta_{avg} = NE_{avg} - Coop_{avg}$
+- $NE_{sd}$ is the standard deviation of means of KW appropriateness score (for each scenarios)
+ 
+ 
+**Summary of Norm strength**
+**Distribution**
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+summary(master$Strength_N)
+```
+
+**Distribution**
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+hist(master$Strength_N, breaks = 20, main = "Histogram of Strength Norm", xlab = "Strength Norm")
+```
+
+
+**Results**
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+cor.test(DG$Delta_Avg, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Does higher norm strength lead to higher norm compliance?")
 
 ```
 
