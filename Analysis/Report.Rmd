@@ -2,10 +2,9 @@
 title: "Social Norms Meta"
 
 output: 
-  html_document:
-    toc: true
-    toc_float: true
+  html_document
 ---
+<br>
 
 # Analysis Treatment-level: All Games
 
@@ -28,6 +27,8 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 ```
 
+<br>
+
 ## HP1: Relation between norms and actions: Are stronger norms related with higher cooperation?
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
@@ -38,9 +39,13 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 ```
 
 ## HP2: Norm Uncertainty
+
+<br>
+
 - a. Does a higher norm variability lead to lower cooperation?
 - b. Does a higher norm variability lead to higher cooperation var.?
 
+<br>
 
 ### a. Does a higher norm variability lead to lower cooperation?
 
@@ -50,6 +55,7 @@ cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2a : correlation between average cooperation and norm (NE)")
 ```
 
+<br>
 
 ### b. Does a higher norm variability lead to higher cooperation var.?
 
@@ -60,24 +66,35 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() +
 
 ```
 
+<br>
+
 ## HP3 : Norm Strength
+
+<br>
+
 ### Does higher norm strength lead to higher norm compliance?
 
+<br>
 
-**How did we compute Strength index?**
+**How did we compute Norm Strength Index?**
+
+<br>
 
 $$Strength = {Delta_{avg} \over NE_{sd}}$$
-where:
+*where:*
 
 - $Delta_{avg} = NE_{avg} - Coop_{avg}$
 - $NE_{sd}$ is the standard deviation of means of KW appropriateness score (for each scenarios)
- 
- 
+
+<br>
+
 **Summary of Norm strength**
-**Distribution**
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
 summary(master$Strength_N)
 ```
+
+<br>
 
 **Distribution**
 
@@ -85,6 +102,7 @@ summary(master$Strength_N)
 hist(master$Strength_N, breaks = 20, main = "Histogram of Strength Norm", xlab = "Strength Norm")
 ```
 
+<br>
 
 **Results**
 
@@ -126,11 +144,11 @@ ggplot(data=DG, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(meth
 ```
 
 # INDIVIDUAL-LEVEL ANALYSIS
-```{r}
+
 setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
-```
+
 
 ## Within-subjects Design
 
