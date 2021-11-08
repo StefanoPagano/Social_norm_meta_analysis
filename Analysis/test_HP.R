@@ -1,14 +1,16 @@
 library(ggplot2)
 library(tidyverse)
 library(mclogit)
+library(mlogit)
 library(sjmisc)
 library(ggrepel)
 library(sjPlot)
+library(readxl)
 
 setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = scarto/Sd_Avg_NE)
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = Avg_NE/Sd_Avg_NE)
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
@@ -19,7 +21,7 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 # H2a : correlation between average cooperation and norm (NE)
 cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Strength_N, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
+ggplot(data=master, aes(x=Sd_Avg_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + geom_text(aes(label=PaperID)) + ggtitle("H2a : correlation between average cooperation and norm (NE)")
 
 # H2b : correlation between variance cooperation and norm (NE)
 cor.test(master$Var_coop, master$Strength_N, method= "spearman", exact = F)
@@ -88,7 +90,8 @@ beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")
 individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 
-model_2 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b)
+mlogit.db <- mlogit.data(individual_db_b, choice = 'scenarios', shape = 'long')
+model_2 <- mlogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b)
 
 model_2016Kim003 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_b %>% 
                               subset.data.frame(subset = paper_id =="2016Kim003"))

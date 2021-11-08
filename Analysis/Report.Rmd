@@ -1,0 +1,131 @@
+---
+title: "Social Norms Meta"
+
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Analysis Treatment-level: All Games
+Le analisi svolte in questa sezione sono condotte a livello di trattamento. Di seguito i risultati sulle analisi delle diverse ipotesi (H1-H2-H3).
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE, include=FALSE}
+
+library(ggplot2)
+library(tidyverse)
+library(mclogit)
+library(sjmisc)
+library(ggrepel)
+library(readxl)
+
+setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
+
+# read data 
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(scarto = Avg_NE - Avg_coop, Strength_N = scarto/Sd_Avg_NE)
+DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
+DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
+UG <- master %>% subset.data.frame(Game_type=="UG")
+
+```
+
+## HP1: Relation between norms and actions: Are stronger norms related with higher cooperation?
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(master$Avg_coop, master$Avg_NE, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : correlation between average cooperation and norm (NE)")
+```
+# sistemare nomi sezione
+## H2a : Norm Uncertainty: 
+- Does a higher norm variability lead to lower cooperation?
+- Does a higher norm variability lead to higher cooperation var.?
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2a : correlation between average cooperation and norm (NE)")
+```
+
+## H2b : correlation between variance cooperation and norm (NE)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(master$Var_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : correlation between variance cooperation and norm (NE)")
+
+```
+
+## H3 : does higher norm strength lead to higher norm compliance 
+# sistemare grafico sulla y scarto
+# indicare come viene calcolato lo strength
+# summary(master$Strength_N)
+# hist(master$Strength_N)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(master$Avg_coop, master$Strength_N, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H3")
+
+```
+
+
+# Analysis Treatment-level: Dictator Game
+
+## H1
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(DG$Avg_coop, DG$Avg_NE, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : correlation between average cooperation and norm (NE) \n DG only")
+```
+
+## H2a : correlation between average cooperation and norm (NE)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(DG$Avg_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth() + ggtitle("H2a : correlation between average cooperation and norm (NE) \n DG only")
+```
+
+## H2b : correlation between variance cooperation and norm (NE)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+      
+cor.test(DG$Var_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : correlation between variance cooperation and norm (NE) \n DG only")
+```
+
+### H3
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=FALSE}
+
+cor.test(DG$Avg_coop, DG$Strength_N, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Strength_N, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H3 \n DG only")
+```
+
+# INDIVIDUAL-LEVEL ANALYSIS
+```{r}
+setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
+choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
+```
+
+## Within-subjects Design
+
+## issues: 
+### - 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
+
+beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
+choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
+individual_db_w <- merge.data.frame(choices_w, beliefs_w)
+
+# prelim analysis all together
+model_1 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w)
+
+model_2017Del037 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
+                            subset.data.frame(subset = paper_id =="2017Del037"))
+
+model_2020Bas115 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
+                              subset.data.frame(subset = paper_id=="2020Bas115"))
+
+tab_model(model_1, model_2017Del037, 
+          model_2020Bas115, 
+          dv.labels = c("general model","Del037_model_1","2020Bas115"))
+
+plot_models(model_1, model_2017Del037, 
+          model_2020Bas115)
