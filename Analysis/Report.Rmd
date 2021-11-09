@@ -56,7 +56,10 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)")
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)")
+
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_grid(~game_type)
+
 ```
 
 <br>
