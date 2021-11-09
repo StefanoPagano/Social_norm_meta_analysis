@@ -90,7 +90,6 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() +
 $$Strength = {NE_{avg} \over NE_{sd}}$$
 <b>where:</b>
 
-- $Delta_{avg} = NE_{avg} - Coop_{avg}$
 - $NE_{sd}$ is the standard deviation of means of KW appropriateness score (for each scenarios)
 
 <br>
@@ -116,13 +115,29 @@ hist(Strenght_stat_df$Strength_N, breaks = 6, main = "Histogram of Norm Strength
 <br>
 
 <b>Results</b>
+- $Delta_{avg} = NE_{avg} - Coop_{avg}$
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+new_master = master %>% mutate(new_strenght = Avg_NE/(sqrt(Var_NE)+Sd_Avg_NE)) %>% subset
 cor.test(Strenght_stat_df$Strength_N, Strenght_stat_df$Delta_Avg, method= "spearman", exact = F)
 ggplot(data=Strenght_stat_df, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")# + geom_text(aes(label=PaperID))
 
 ```
 
+<br>
+
+<h3>New Strength</h3>
+
+<br>
+
+$$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+new_master = master %>% mutate(new_strenght = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop)/Avg_NE)
+cor.test(new_master$new_strenght, new_master$Delta_new, method= "spearman", exact = F)
+ggplot(data=new_master, aes(x=new_strenght, y=Delta_new, color=Game_type)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3)# + geom_text(aes(label=PaperID))
+ggplot(data=new_master, aes(x=new_strenght, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")
+
+```
 <h6><b>Note:</b> without outliers</h6>
 
 <center><h2>Analysis Treatment-level: Dictator Game</center></h2>
