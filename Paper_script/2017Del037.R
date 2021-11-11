@@ -53,7 +53,7 @@ dg_base_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator =
 ## earn_TOT
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
-label_col = as.character(seq(6,0,-1))
+label_col = as.character(seq(0,6,1))
 n_sub_N = norms %>%
   subset.data.frame(subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "BASE") %>% 
@@ -119,7 +119,7 @@ dg_in_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator == 
 ## earn_TOT
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
-label_col = as.character(seq(6,0,-1))
+label_col = as.character(seq(0,6,1))
 n_sub_N = norms %>%
   subset.data.frame(subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "IN") %>% 
@@ -185,7 +185,7 @@ dg_out_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = Dictator ==
 ## earn_TOT
 ## KW scale: -1 = VI, -1/3 = I, 1/3 = A, 1 = VA.
 
-label_col = as.character(seq(6,0,-1))
+label_col = as.character(seq(0,6,1))
 n_sub_N = norms %>%
   subset.data.frame(subset = Dictator == 1) %>%
   subset.data.frame(subset = Treatment == "OUT") %>% 
