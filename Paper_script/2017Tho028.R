@@ -33,7 +33,7 @@ coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent
 dgb_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
   subset.data.frame(subset = decider == 1) %>%
   subset.data.frame(subset = treat == 1) %>%
-  mutate(endowment = 10, cooperation = sent/endowment) %>% 
+  mutate(endowment = 20, cooperation = sent/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2017Tho028", TreatmentCode = 1)
@@ -73,7 +73,7 @@ dgb_final_norms <- merge.data.frame(dgb_appropriateness_sum, dgb_norms_var, by =
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Tho028", 
          TreatmentCode = 1, 
-         Avg_NE = as.integer(donation)/10,
+         Avg_NE = as.integer(donation)/20,
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgb_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
@@ -106,7 +106,7 @@ coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent
 dga_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
   subset.data.frame(subset = decider == 1) %>%
   subset.data.frame(subset = treat == 2) %>%
-  mutate(endowment = 10, cooperation = sent/endowment) %>% 
+  mutate(endowment = 20, cooperation = sent/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2017Tho028", TreatmentCode = 2)
@@ -146,7 +146,7 @@ dga_final_norms <- merge.data.frame(dga_appropriateness_sum, dga_norms_var, by =
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Tho028", 
          TreatmentCode = 2, 
-         Avg_NE = as.integer(donation)/10,
+         Avg_NE = as.integer(donation)/20,
          Var_NE = ..y,
          Sd_Avg_NE = sd(dga_appropriateness_sum$Kw_m)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))

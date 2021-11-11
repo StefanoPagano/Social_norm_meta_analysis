@@ -1,12 +1,12 @@
 ---
 title: "Social Norms Meta"
-
 output: 
-  html_document
+  html_document:
+    toc: True
+    toc_float: True
 ---
-<br>
 
-<center><h2>Analysis Treatment-level: All Games</h2></center>
+# Analysis Treatment-level: All Games
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 
@@ -16,12 +16,14 @@ library(mclogit)
 library(sjmisc)
 library(ggrepel)
 library(readxl)
+library(ggpubr)
 
-setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
+setwd("../")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop, Strength_N = Avg_NE/Sd_Avg_NE)
-DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct") %>% subset.data.frame(subset = Strength_N<5)
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop,
+                                                              Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type))
+DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
 
@@ -29,20 +31,23 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 <br>
 
-<h3>HP1: Relation between norms and actions</h3>
+## HP1: Relation between norms and actions
 
 <br>
 
-<h4><i>Are stronger norms related with higher cooperation?</i></h4>
+<h4><i>Are norms and cooperation behavior related?</i></h4>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Avg_NE, master$Avg_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)")
+
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman")
+
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
 
 ```
 
-<h3>HP2: Norm Uncertainty</h3>
+## HP2: Norm Uncertainty
 
 <br>
 
@@ -75,7 +80,7 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() +
 
 <br>
 
-<h3>HP3 : Norm Strength</h3>
+## HP3 : Norm Strength
 
 <br>
 
@@ -126,7 +131,7 @@ ggplot(data=Strenght_stat_df, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + g
 
 <br>
 
-<h3>New Strength</h3>
+## New Strength
 
 <br>
 
@@ -155,7 +160,7 @@ cor.test(DG$Avg_NE, DG$Avg_coop, method= "spearman", exact = F)
 ggplot(data=DG, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)\nDG Only")
 ```
 
-<h3>HP2: Norm Uncertainty</h3>
+## HP2: Norm Uncertainty
 
 <br>
 
@@ -176,7 +181,7 @@ cor.test(DG$Var_NE, DG$Var_coop, method= "spearman", exact = F)
 ggplot(data=DG, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)\nDG Only")
 ```
 
-<h3>HP3 : Norm Strength</h3>
+## HP3 : Norm Strength
 
 <br>
 
