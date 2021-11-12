@@ -76,7 +76,7 @@ master <- Paper_037 %>%
   rbind.data.frame(master)
 
 Paper_038=read.csv("2018Kim038_finaldf.csv", sep=",")
-master <- Paper_038 %>% 
+master <- Paper_038 %>%
   rbind.data.frame(master)
 
 Paper_049=read.csv("2017Ves049_finaldf.csv", sep=",")
