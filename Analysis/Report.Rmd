@@ -79,49 +79,13 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Macro_game_type)) + geom_poi
 
 <br>
 
-## HP3 : Norm Strength
-
-<br>
-
-<h4><i>Does higher norm strength lead to higher norm compliance?</i></h4>
-
-<br>
-
-<b>How did we compute Norm Strength Index?</b>
-
-<br>
-
-$$Strength = {NE_{avg} \over NE_{sd}}$$
-<b>where:</b>
-
-- $NE_{sd}$ is the standard deviation of means of KW appropriateness score (for each scenarios)
-
-<br>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-Strenght_stat_df <- master
-```
-
-
-
-<br>
-
-
-<br>
-
-<b>Results</b>
-- $Delta_{avg} = NE_{avg} - Coop_{avg}$
-
-
-<br>
-
 ## HP3 : New Strength
 
 $$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 new_master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop)/Avg_NE)
 cor.test(new_master$Norm_Strength, new_master$Delta_new, method= "spearman", exact = F)
-ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")
+ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
 ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
