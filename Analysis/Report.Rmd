@@ -2,8 +2,8 @@
 title: "Social Norms Meta"
 output: 
   html_document:
-  toc: True
-  toc_float: True
+    toc: True
+    toc_float: True
 ---
 
 # Analysis Treatment-level: All Games
@@ -17,6 +17,7 @@ library(sjmisc)
 library(ggrepel)
 library(readxl)
 library(ggpubr)
+library(mlogit)
 
 setwd("../")
 
@@ -38,11 +39,16 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE
 
 cor.test(master$Avg_NE, master$Avg_coop, method= "spearman", exact = F)
 
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman")
 
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
 
 ```
+
+### Results
+- Evidence from testing H1 shows that there is a positive and significant correlation between social expectations and cooperative behavior (Fig. 1).
+- By splitting data by game type, there is evidence of positive and significant correlation in DG (and Donation game), while norms are not heterogeneous in other game types. 
+- Hence, the analysis including all games possibly makes more sense here.
 
 ## HP2: Norm Uncertainty
 
@@ -53,17 +59,19 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 <br>
 
+to do so we computed VAR NE SUCA as ...
+
 <h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(method="lm") + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + stat_cor(method = "spearman")
 
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(method="lm") + ggtitle("Fig. 3 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + stat_cor(method = "spearman") 
+
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("Fig. 4 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman") + geom_smooth(method="lm")
 
 ```
-
 <br>
 
 <h4><i>b. Does a higher norm variability lead to higher cooperation var.?</i></h4>
@@ -71,48 +79,60 @@ ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("H2a : C
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Var_NE, master$Var_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)")
+ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 5 H2b : Correlation Between Variance Cooperation and Norm (NE)")
 
-ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Macro_game_type)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type) + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 6 H2b : Correlation Between Variance Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type) + stat_cor(method = "spearman")
 
 ```
 
 <br>
 
-## HP3 : New Strength
+## HP3 : Is compliance related to norm strength?
 
 $$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
+where SUCA
+
+specificity is Var NE and consistency is SUCA
+We compute compliance as delta SUCA
+
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-new_master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop)/Avg_NE)
-cor.test(new_master$Norm_Strength, new_master$Delta_new, method= "spearman", exact = F)
-ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
-ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+
+master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop))
+
+cor.test(master$Norm_Strength, master$Delta_new, method= "spearman", exact = F)
+
+ggplot(data=master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
+
+ggplot(data=master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
 
 <b>Summary of Norm strength</b>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-summary(new_master$Norm_Strength)
+summary(master$Norm_Strength)
 ```
 
 <b>Distribution</b>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-hist(new_master$Norm_Strength, breaks = 6, main = "Histogram of Norm Strength", xlab = "Strength Norm", border = "#edf6f9", col = "#001d3d")
+ggplot(data=master, aes(x=Norm_Strength)) +
+geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Macro_game_type)
+
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-DG <- new_master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
-DG_UG <- new_master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
-UG <- new_master %>% subset.data.frame(Game_type=="UG")
+DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
+DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
+UG <- master %>% subset.data.frame(Game_type=="UG")
 ```
 
-<center><h2>Analysis Treatment-level: Dictator Game</center></h2>
+# Analysis Treatment-level: Dictator Game
 
 <br>
 
-<h3>HP1: Relation between norms and actions</h3>
+## HP1: Relation between norms and actions
 
 <br>
 
@@ -158,20 +178,32 @@ ggplot(data=DG, aes(x=Norm_Strength, y=Delta_Avg)) + geom_point() + geom_smooth(
 ```
 
 # INDIVIDUAL-LEVEL ANALYSIS
-setwd("C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/")
-beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
-choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
 
+## Analysis plan
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
+choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
+```
 
 ## Within-subjects Design
 
 ## issues: 
-### - 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
+- 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
 
+```{r}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
 individual_db_w <- merge.data.frame(choices_w, beliefs_w)
+```
+## analysis with mlogit (McFadden 1975)
 
+```{r}
+Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115")
+mlogit.bas <- mlogit.data(Bas115, choice = "A", chid.var = "choice", alt.var = "scenarios", id.var = "subject_id", shape = "long")
+summary(mlogit(A~KW_Normative, data = mlogit.bas))
+```
 # prelim analysis all together
 model_1 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w)
 
