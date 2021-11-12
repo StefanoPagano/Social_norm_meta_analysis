@@ -201,7 +201,7 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
 ```{r}
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115")
-mlogit.bas <- mlogit.data(Bas115, choice = "A", chid.var = "choice", alt.var = "scenarios", id.var = "subject_id", shape = "long")
+mlogit.bas <- mlogit.data(Bas115, choice = "A", shape = "long", alt.var = "scenarios", id.var = "subjects_id", )
 summary(mlogit(A~KW_Normative, data = mlogit.bas))
 ```
 # prelim analysis all together

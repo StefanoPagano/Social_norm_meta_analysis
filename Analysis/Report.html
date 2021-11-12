@@ -414,16 +414,58 @@ sample estimates:
 </div>
 <div id="individual-level-analysis" class="section level1">
 <h1>INDIVIDUAL-LEVEL ANALYSIS</h1>
-<p>setwd(“C:/Users/stefa/Documenti/CNR/GitHub/Social_norm_meta_analysis/”) beliefs &lt;- read.csv(“File_DB/Output/Subjects_beliefs.csv”, sep = “,”) choices &lt;- read.csv(“File_DB/Output/Subjects_choices.csv”, sep = “,”)</p>
+<div id="analysis-plan" class="section level2">
+<h2>Analysis plan</h2>
+</div>
 <div id="within-subjects-design" class="section level2">
 <h2>Within-subjects Design</h2>
 </div>
 <div id="issues" class="section level2">
 <h2>issues:</h2>
-<div id="subjects-but-only-342-in-preliminary-analysis-check-if-subjects-are-the-same-and-scenarios-are-all-for-everyone" class="section level3">
-<h3>- 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone</h3>
-<p>beliefs_w &lt;- beliefs %&gt;% subset.data.frame(subset = Design==“Within”) choices_w &lt;- choices %&gt;% subset.data.frame(subset = Design==“Within”) individual_db_w &lt;- merge.data.frame(choices_w, beliefs_w)</p>
+<ul>
+<li>345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone</li>
+</ul>
+<pre class="r"><code>beliefs_w &lt;- beliefs %&gt;% subset.data.frame(subset = Design==&quot;Within&quot;)
+choices_w &lt;- choices %&gt;% subset.data.frame(subset = Design==&quot;Within&quot;)
+individual_db_w &lt;- merge.data.frame(choices_w, beliefs_w)</code></pre>
 </div>
+<div id="analysis-with-mlogit-mcfadden-1975" class="section level2">
+<h2>analysis with mlogit (McFadden 1975)</h2>
+<pre class="r"><code>Bas115 = individual_db_w %&gt;% subset.data.frame(paper_id==&quot;2020Bas115&quot;)
+mlogit.bas &lt;- mlogit.data(Bas115, choice = &quot;A&quot;, shape = &quot;long&quot;, alt.var = &quot;scenarios&quot;, id.var = &quot;subjects_id&quot;, )
+summary(mlogit(A~KW_Normative, data = mlogit.bas))</code></pre>
+<pre><code>## 
+## Call:
+## mlogit(formula = A ~ KW_Normative, data = mlogit.bas, method = &quot;nr&quot;)
+## 
+## Frequencies of alternatives:choice
+##     0     1     2     3     4     5     6     7     8     9    10 
+## 0.208 0.024 0.036 0.108 0.148 0.468 0.004 0.000 0.000 0.000 0.004 
+## 
+## nr method
+## 18 iterations, 0h:0m:0s 
+## g&#39;(-H)^-1g = 4.58E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##                  Estimate Std. Error z-value  Pr(&gt;|z|)    
+## (Intercept):1    -2.30096    0.43405 -5.3011 1.151e-07 ***
+## (Intercept):2    -2.04603    0.37423 -5.4673 4.568e-08 ***
+## (Intercept):3    -1.19797    0.29963 -3.9982 6.384e-05 ***
+## (Intercept):4    -1.14554    0.34519 -3.3186 0.0009048 ***
+## (Intercept):5    -0.38136    0.42900 -0.8890 0.3740222    
+## (Intercept):6    -4.87355    1.05982 -4.5985 4.256e-06 ***
+## (Intercept):7   -21.45776 4244.03772 -0.0051 0.9959659    
+## (Intercept):8   -21.36414 4222.30018 -0.0051 0.9959629    
+## (Intercept):9   -21.29957 4194.26197 -0.0051 0.9959481    
+## (Intercept):10   -4.57965    1.04661 -4.3757 1.211e-05 ***
+## KW_Normative      0.69011    0.22805  3.0261 0.0024775 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Log-Likelihood: -359.74
+## McFadden R^2:  NaN 
+## Likelihood ratio test : chisq = NaN (p.value = NA)</code></pre>
 </div>
 </div>
 <div id="prelim-analysis-all-together" class="section level1">
