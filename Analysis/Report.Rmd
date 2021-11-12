@@ -2,14 +2,14 @@
 title: "Social Norms Meta"
 output: 
   html_document:
-    toc: True
-    toc_float: True
+  toc: True
+  toc_float: True
 ---
 
 # Analysis Treatment-level: All Games
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-
+rm(list=ls())
 library(ggplot2)
 library(tidyverse)
 library(mclogit)
@@ -22,10 +22,7 @@ setwd("../")
 
 # read data 
 master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop,
-                                                              Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type))
-DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
-DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
-UG <- master %>% subset.data.frame(Game_type=="UG")
+                                                            Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% subset.data.frame(subset = PaperID !="2017Del037")
 
 ```
 
@@ -61,9 +58,9 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)")
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(method="lm") + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + stat_cor(method = "spearman")
 
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Game_type, ncol=3)
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
 
 ```
 
@@ -75,6 +72,8 @@ ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("H2a : C
 
 cor.test(master$Var_NE, master$Var_coop, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)")
+
+ggplot(data=master, aes(x=Var_NE, y=Var_coop, color=Macro_game_type)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type) + stat_cor(method = "spearman")
 
 ```
 
@@ -100,50 +99,50 @@ $$Strength = {NE_{avg} \over NE_{sd}}$$
 <br>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-Strenght_stat_df <- master %>% subset.data.frame(subset = Strength_N<5)
+Strenght_stat_df <- master
 ```
 
-<b>Summary of Norm strength</b>
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-summary(Strenght_stat_df$Strength_N)
-```
 
 <br>
 
-<b>Distribution</b>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-hist(Strenght_stat_df$Strength_N, breaks = 6, main = "Histogram of Norm Strength", xlab = "Strength Norm", border = "#edf6f9", col = "#001d3d")
-```
 
 <br>
 
 <b>Results</b>
 - $Delta_{avg} = NE_{avg} - Coop_{avg}$
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-new_master = master %>% mutate(new_strenght = Avg_NE/(sqrt(Var_NE)+Sd_Avg_NE)) %>% subset
-cor.test(Strenght_stat_df$Strength_N, Strenght_stat_df$Delta_Avg, method= "spearman", exact = F)
-ggplot(data=Strenght_stat_df, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")# + geom_text(aes(label=PaperID))
-
-```
 
 <br>
 
-## New Strength
-
-<br>
+## HP3 : New Strength
 
 $$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-new_master = master %>% mutate(new_strenght = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop)/Avg_NE)
-cor.test(new_master$new_strenght, new_master$Delta_new, method= "spearman", exact = F)
-ggplot(data=new_master, aes(x=new_strenght, y=Delta_new, color=Game_type)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3)# + geom_text(aes(label=PaperID))
-ggplot(data=new_master, aes(x=new_strenght, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")
+new_master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop)/Avg_NE)
+cor.test(new_master$Norm_Strength, new_master$Delta_new, method= "spearman", exact = F)
+ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")
+ggplot(data=new_master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
-<h6><b>Note:</b> without outliers</h6>
+
+<b>Summary of Norm strength</b>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+summary(new_master$Norm_Strength)
+```
+
+<b>Distribution</b>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+hist(new_master$Norm_Strength, breaks = 6, main = "Histogram of Norm Strength", xlab = "Strength Norm", border = "#edf6f9", col = "#001d3d")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+DG <- new_master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
+DG_UG <- new_master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
+UG <- new_master %>% subset.data.frame(Game_type=="UG")
+```
 
 <center><h2>Analysis Treatment-level: Dictator Game</center></h2>
 
@@ -190,9 +189,8 @@ ggplot(data=DG, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geo
 <br>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-
-cor.test(DG$Strength_N, DG$Delta_Avg, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Strength_N, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")
+cor.test(DG$Norm_Strength, DG$Delta_Avg, method= "spearman", exact = F)
+ggplot(data=DG, aes(x=Norm_Strength, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")
 ```
 
 # INDIVIDUAL-LEVEL ANALYSIS
@@ -217,11 +215,11 @@ model_2017Del037 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w
                             subset.data.frame(subset = paper_id =="2017Del037"))
 
 model_2020Bas115 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
-                              subset.data.frame(subset = paper_id=="2020Bas115"))
+                            subset.data.frame(subset = paper_id=="2020Bas115"))
 
 tab_model(model_1, model_2017Del037, 
-          model_2020Bas115, 
-          dv.labels = c("general model","Del037_model_1","2020Bas115"))
+        model_2020Bas115, 
+        dv.labels = c("general model","Del037_model_1","2020Bas115"))
 
 plot_models(model_1, model_2017Del037, 
           model_2020Bas115)
