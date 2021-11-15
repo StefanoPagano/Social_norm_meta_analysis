@@ -17,7 +17,8 @@ library(sjmisc)
 library(ggrepel)
 library(readxl)
 library(ggpubr)
-library(mlogit)
+library(survival)
+library(sjPlot)
 
 setwd("../")
 
@@ -177,7 +178,7 @@ cor.test(DG$Norm_Strength, DG$Delta_Avg, method= "spearman", exact = F)
 ggplot(data=DG, aes(x=Norm_Strength, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")
 ```
 
-# INDIVIDUAL-LEVEL ANALYSIS
+# Individual-level analysis
 
 ## Analysis plan
 
@@ -188,41 +189,30 @@ choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
 ```
 
 ## Within-subjects Design
-
-## issues: 
-- 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
-
 ```{r}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
 individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 ```
-## analysis with mlogit (McFadden 1975)
+#### analysis with conditional logit (McFadden 1975)
+
 ### 2020Bas115
 ```{r}
-Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115")
-mlogit.bas <- mlogit.data(Bas115, choice = "A", shape = "long", alt.var = "scenarios", id.var = "subjects_id", )
-summary(mlogit(A~KW_Normative, data = mlogit.bas))
+Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
+clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 ```
-### 2017Del037
+#### issues: 
+- 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
+
+## Between 
 ```{r}
-Del037 = individual_db_w %>% subset.data.frame(paper_id=="2017Del037")
-mlogit.del <- mlogit.data(Del037, choice = "A", shape = "long", alt.var = "scenarios", id.var = "subjects_id", )
-summary(mlogit(A~KW_Normative, data = mlogit.del))
+beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
+individual_db_b <- merge.data.frame(choices_b, beliefs_b)
+
 ```
 
-# prelim analysis all together
-model_1 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w)
+```{r}
+between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = individual_db_b)
+```
 
-model_2017Del037 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
-                            subset.data.frame(subset = paper_id =="2017Del037"))
-
-model_2020Bas115 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w %>% 
-                            subset.data.frame(subset = paper_id=="2020Bas115"))
-
-tab_model(model_1, model_2017Del037, 
-        model_2020Bas115, 
-        dv.labels = c("general model","Del037_model_1","2020Bas115"))
-
-plot_models(model_1, model_2017Del037, 
-          model_2020Bas115)
