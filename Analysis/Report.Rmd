@@ -181,7 +181,18 @@ ggplot(data=DG, aes(x=Norm_Strength, y=Delta_Avg)) + geom_point() + geom_smooth(
 # Individual-level analysis
 
 ## Analysis plan
+Here we estimate a random utility model.
+We split our individual-level analysis into 2 steps: 
 
+1. we estimate the utility function when beliefs and actions are elicited for the same subject
+2. we estimate the utility function when beliefs and actions are elicited using distinct subjects
+
+
+For 1., the model we estimate is the following:
+
+$U_ij = \alpha \pi_j + \beta S_ij$ 
+
+while for 2., we use $S_j=\Sigma S_ij/N$ from the external sample
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
@@ -194,7 +205,7 @@ beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
 individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 ```
-#### analysis with conditional logit (McFadden 1975)
+
 
 ### 2020Bas115
 ```{r}
@@ -214,5 +225,8 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 
 ```{r}
 between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = individual_db_b)
+betas=between$coefficients
+sigma=sqrt(between$var) # diagonal is variance; others are covariance
+plot_model(model = between )
 ```
 
