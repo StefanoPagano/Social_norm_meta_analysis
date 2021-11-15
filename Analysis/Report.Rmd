@@ -192,7 +192,7 @@ For 1., the model we estimate is the following:
 
 $U_ij = \alpha \pi_j + \beta S_ij$ 
 
-while for 2., we use $S_j=\Sigma S_ij/N$ from the external sample
+while for 2., we use $S_j=\Sigma S_ij/N$ from the external sample with which social norms were elicited.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
