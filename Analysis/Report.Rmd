@@ -212,21 +212,9 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 ```
-<<<<<<< HEAD
 
-### 2017Del037
-```{r}
-Del037 = individual_db_w %>% subset.data.frame(paper_id=="2017Del037")
-mlogit.del <- mlogit.data(Del037, choice = "A", shape = "long", alt.var = "scenarios", id.var = "subjects_id", )
-summary(mlogit(A~KW_Normative, data = mlogit.del))
-```
-
-# prelim analysis all together
-model_1 <- mclogit(cbind(A,scenarios)~KW_Normative,data=individual_db_w)
-=======
 #### issues: 
 - 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
->>>>>>> 68e32ffa99f2074467217539b1acf5d6cae92ed0
 
 ## Between 
 ```{r}
