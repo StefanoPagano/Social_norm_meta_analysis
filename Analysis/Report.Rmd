@@ -129,55 +129,6 @@ DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
 ```
 
-# Analysis Treatment-level: Dictator Game
-
-<br>
-
-## HP1: Relation between norms and actions
-
-<br>
-
-<h4><i>Are stronger norms related with higher cooperation?</i></h4>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(DG$Avg_NE, DG$Avg_coop, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("H1 : Correlation Between Average Cooperation and Norm (NE)\nDG Only")
-```
-
-## HP2: Norm Uncertainty
-
-<br>
-
-- a. Does a higher norm variability lead to lower cooperation?
-- b. Does a higher norm variability lead to higher cooperation variance?
-
-<br>
-
-<h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(DG$Var_NE, DG$Avg_coop, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth() + ggtitle("H2a : Correlation Between Average Cooperation and Norm Variance (NE)\nDG Only")
-```
-
-<h4><i>b. Does a higher norm variability lead to higher cooperation variance?</i></h4>
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(DG$Var_NE, DG$Var_coop, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Var_NE, y=Var_coop, color=Game_type)) + geom_point() + geom_smooth() + ggtitle("H2b : Correlation Between Variance Cooperation and Norm (NE)\nDG Only")
-```
-
-## HP3 : Norm Strength
-
-<br>
-
-<h4><i>Does higher norm strength lead to higher norm compliance?</i></h4>
-
-<br>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(DG$Norm_Strength, DG$Delta_Avg, method= "spearman", exact = F)
-ggplot(data=DG, aes(x=Norm_Strength, y=Delta_Avg)) + geom_point() + geom_smooth(method = "lm")
-```
-
 # Individual-level analysis
 
 ## Analysis plan
@@ -211,6 +162,7 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 ```{r}
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
+summary(clogit.bas)
 ```
 
 #### issues: 
@@ -230,4 +182,38 @@ betas=between$coefficients
 sigma=sqrt(between$var) # diagonal is variance; others are covariance
 plot_model(model = between )
 ```
+
+### 2016Kim003
+```{r}
+Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios)
+clogit.kim <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Kim003)
+summary(clogit.kim)
+betas=clogit.kim$coefficients
+sigma=sqrt(clogit.kim$var) # diagonal is variance; others are covariance
+plot_model(model = clogit.kim, title = "2016Kim003: Conditional Logit Model")
+
+```
+
+### 2018Her061
+```{r}
+Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
+clogit.her <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Her061)
+summary(clogit.her)
+betas=clogit.her$coefficients
+sigma=sqrt(clogit.her$var) # diagonal is variance; others are covariance
+plot_model(model = clogit.her, title = "2018Her061: Conditional Logit Model")
+```
+
+### 2019Cha026
+``` {r}
+Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
+clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Cha026)
+summary(clogit.cha)
+betas=clogit.cha$coefficients
+sigma=sqrt(clogit.cha$var) # diagonal is variance; others are covariance
+plot_model(model = clogit.cha, title = "2019Cha026: Conditional Logit Model")
+```
+
+
+
 
