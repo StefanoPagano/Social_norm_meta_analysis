@@ -213,6 +213,7 @@ summary(clogit.cha)
 betas=clogit.cha$coefficients
 sigma=sqrt(clogit.cha$var) # diagonal is variance; others are covariance
 plot_model(model = clogit.cha, title = "2019Cha026: Conditional Logit Model")
+plot_models(Kim003, Cha026)
 ```
 
 
