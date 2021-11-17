@@ -36,11 +36,13 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE
 
 <h4><i>Are norms and cooperation behavior related?</i></h4>
 
+The content of the norm and behavior correlate positively.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 cor.test(master$Avg_NE, master$Avg_coop, method= "spearman", exact = F)
 
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman") + xlab("Cooperation Norm (as % of endowment)") + ylab("Cooperation (% of endowment)")
 
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
 
@@ -60,7 +62,7 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 <br>
 
-to do so we computed VAR NE SUCA as ...
+to do so we computed VAR NE as ...
 
 <h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
 
@@ -91,10 +93,11 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(meth
 ## HP3 : Is compliance related to norm strength?
 
 $$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
-where SUCA
+where 
 
-specificity is Var NE and consistency is SUCA
-We compute compliance as delta SUCA
+specificity is  and consistency accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores )
+
+We compute compliance as delta XXX
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -181,7 +184,7 @@ between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, pa
 betas=between$coefficients
 summary(between)
 sigma=sqrt(between$var) # diagonal is variance; others are covariance
-plot_model(model = between)
+plot_model(between)
 ```
 
 ### 2016Kim003
