@@ -23,8 +23,8 @@ library(sjPlot)
 setwd("../")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Delta_Avg = Avg_NE - Avg_coop,
-                                                            Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% subset.data.frame(subset = PaperID !="2017Del037")
+master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% 
+  subset.data.frame(subset = PaperID !="2017Del037")
 
 ```
 
@@ -92,17 +92,21 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(meth
 
 ## HP3 : Is compliance related to norm strength?
 
+We compute norm strength as:
+
 $$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
+
 where 
 
-specificity is  and consistency accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores )
+*specificity* is and consistency accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores )
 
 We compute compliance as delta XXX
 
-
+  
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
-master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE)) %>% mutate(Delta_new = (Avg_NE-Avg_coop))
+master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE),
+                           Delta_new = (Avg_NE-Avg_coop))
 
 cor.test(master$Norm_Strength, master$Delta_new, method= "spearman", exact = F)
 
@@ -131,6 +135,10 @@ DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
 ```
+
+## HP4: Effect of punishment on norms and actions
+tabella con cooperazione; sd cooperazione; delta; strength
+
 
 # Individual-level analysis
 
