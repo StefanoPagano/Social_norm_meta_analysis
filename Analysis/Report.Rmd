@@ -141,9 +141,9 @@ We split our individual-level analysis into 2 steps:
 
 For 1., the model we estimate is the following:
 
-$U_ij = \alpha \pi_j + \beta S_ij$ 
+$U_{ij} = \alpha \pi_j + \beta S_{ij}$ 
 
-while for 2., we use $S_j=\Sigma S_ij/N$ from the external sample with which social norms were elicited.
+while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
@@ -179,8 +179,9 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```{r}
 between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = individual_db_b)
 betas=between$coefficients
+summary(between)
 sigma=sqrt(between$var) # diagonal is variance; others are covariance
-plot_model(model = between )
+plot_model(model = between)
 ```
 
 ### 2016Kim003
