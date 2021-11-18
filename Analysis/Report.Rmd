@@ -19,6 +19,7 @@ library(readxl)
 library(ggpubr)
 library(survival)
 library(sjPlot)
+library(kableExtra)
 
 setwd("../")
 
@@ -53,40 +54,6 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 - By splitting data by game type, there is evidence of positive and significant correlation in DG (and Donation game), while norms are not heterogeneous in other game types. 
 - Hence, the analysis including all games possibly makes more sense here.
 
-## HP2: Norm Uncertainty
-
-<br>
-
-- a. Does a higher norm variability lead to lower cooperation?
-- b. Does a higher norm variability lead to higher cooperation variance?
-
-<br>
-
-to do so we computed VAR NE as ...
-
-<h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-
-cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
-
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(method="lm") + ggtitle("Fig. 3 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + stat_cor(method = "spearman") 
-
-ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("Fig. 4 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman") + geom_smooth(method="lm")
-
-```
-<br>
-
-<h4><i>b. Does a higher norm variability lead to higher cooperation var.?</i></h4>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-
-cor.test(master$Var_NE, master$Var_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 5 H2b : Correlation Between Variance Cooperation and Norm (NE)")
-
-ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 6 H2b : Correlation Between Variance Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type) + stat_cor(method = "spearman")
-
-```
 
 <br>
 
@@ -137,8 +104,31 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 ```
 
 ## HP4: Effect of punishment on norms and actions
-tabella con cooperazione; sd cooperazione; delta; strength
 
+### Delta and Strength Comparison between DG and UG
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+hp4 <- master %>% 
+  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
+  group_by(Macro_game_type) %>% 
+  summarise(Coop = mean(Avg_coop, na.rm = T), Sd = mean(sqrt(Var_coop), na.rm = T),Delta = mean(Delta_new, na.rm = T),Strength = mean(Norm_Strength, na.rm = T), n = n()) %>% arrange(Coop)
+
+master_test <- master %>% subset.data.frame(select = c(Game_type, Delta_new, Norm_Strength, Macro_game_type), subset = Game_type %in% c("DG", "UG"))
+
+wilc_delta = wilcox.test(Delta_new ~ Macro_game_type, data=master_test)
+wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
+
+hp4plus <- hp4 %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+opts <- options(knitr.kable.NA = "")
+kbl(hp4plus, digits = 4, booktabs = T, align = "lccccc", centering = F) %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T) %>%
+  row_spec(3, bold = T, color = "white", background = "#6c757d")
+```
+
+
+### Results:
+- xxxx
 
 # Individual-level analysis
 
@@ -162,7 +152,7 @@ choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
 ```
 
 ## Within-subjects Design
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
 individual_db_w <- merge.data.frame(choices_w, beliefs_w)
@@ -170,7 +160,7 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
 
 ### 2020Bas115
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 summary(clogit.bas)
@@ -180,14 +170,14 @@ summary(clogit.bas)
 - 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
 
 ## Between 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
 individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 
 ```
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = individual_db_b)
 betas=between$coefficients
 summary(between)
@@ -196,7 +186,7 @@ plot_model(between)
 ```
 
 ### 2016Kim003
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios)
 clogit.kim <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Kim003)
 summary(clogit.kim)
@@ -207,7 +197,7 @@ plot_model(model = clogit.kim, title = "2016Kim003: Conditional Logit Model")
 ```
 
 ### 2018Her061
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
 clogit.her <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Her061)
 summary(clogit.her)
@@ -217,16 +207,51 @@ plot_model(model = clogit.her, title = "2018Her061: Conditional Logit Model")
 ```
 
 ### 2019Cha026
-``` {r}
+``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
 clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Cha026)
 summary(clogit.cha)
 betas=clogit.cha$coefficients
 sigma=sqrt(clogit.cha$var) # diagonal is variance; others are covariance
 plot_model(model = clogit.cha, title = "2019Cha026: Conditional Logit Model")
-plot_models(Kim003, Cha026)
 ```
 
 
+# Appendix : Effect of varibility on norms and actions
+
+## HP2: Norm Uncertainty
+
+<br>
+
+- a. Does a higher norm variability lead to lower cooperation?
+- b. Does a higher norm variability lead to higher cooperation variance?
+
+<br>
+
+to do so we computed VAR NE as ...
+
+<h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
+
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(method="lm") + ggtitle("Fig. 3 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + stat_cor(method = "spearman") 
+
+ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("Fig. 4 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman") + geom_smooth(method="lm")
+
+```
+<br>
+
+<h4><i>b. Does a higher norm variability lead to higher cooperation var.?</i></h4>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+cor.test(master$Var_NE, master$Var_coop, method= "spearman", exact = F)
+ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 5 H2b : Correlation Between Variance Cooperation and Norm (NE)")
+
+ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 6 H2b : Correlation Between Variance Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type) + stat_cor(method = "spearman")
+
+```
 
 
