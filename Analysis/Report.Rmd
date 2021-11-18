@@ -107,7 +107,8 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 ### Delta and Strength Comparison between DG and UG
 We test the hypothesis whether delta in DG and Donation Game is lower then UG. In this case, the p-value of Mann-Whitney-Wilcoxon Test is 0.0242, therefore we can reject the null hypothesis (at .05 significance level).
-Furthermore., we test the hypothesis whether Norm Strength in DG and Donation Game is lower then UG. 
+Furthermore, we test the hypothesis whether Norm Strength in DG and Donation Game is lower then UG. 
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4 <- master %>% 
   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
