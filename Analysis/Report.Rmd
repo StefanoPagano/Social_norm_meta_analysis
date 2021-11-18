@@ -106,12 +106,18 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 ## HP4: Effect of punishment on norms and actions
 
 ### Delta and Strength Comparison between DG and UG
-
+We test the hypothesis whether delta in DG and Donation Game is lower then UG. In this case, the p-value of Mann-Whitney-Wilcoxon Test is 0.0242, therefore we can reject the null hypothesis (at .05 significance level).
+Furthermore., we test the hypothesis whether Norm Strength in DG and Donation Game is lower then UG. 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4 <- master %>% 
   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
   group_by(Macro_game_type) %>% 
-  summarise(Coop = mean(Avg_coop, na.rm = T), Sd = mean(sqrt(Var_coop), na.rm = T),Delta = mean(Delta_new, na.rm = T),Strength = mean(Norm_Strength, na.rm = T), n = n()) %>% arrange(Coop)
+  summarise(Coop = mean(Avg_coop, na.rm = T), 
+            Sd_Coop = mean(sqrt(Var_coop), na.rm = T), 
+            Avg_Norm = mean(Avg_NE, na.rm = T), 
+            Delta = mean(Delta_new, na.rm = T), 
+            Strength = mean(Norm_Strength, na.rm = T),
+            n = n()) %>% arrange(Coop)
 
 master_test <- master %>% subset.data.frame(select = c(Game_type, Delta_new, Norm_Strength, Macro_game_type), subset = Game_type %in% c("DG", "UG"))
 
@@ -119,6 +125,7 @@ wilc_delta = wilcox.test(Delta_new ~ Macro_game_type, data=master_test)
 wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
 
 hp4plus <- hp4 %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+
 opts <- options(knitr.kable.NA = "")
 kbl(hp4plus, digits = 4, booktabs = T, align = "lccccc", centering = F) %>%
   kable_styling(position = "left", full_width = F) %>%
