@@ -24,8 +24,11 @@ library(kableExtra)
 setwd("../")
 
 # read data 
-master <- read.csv("File_DB/Output/Treatment.csv") %>% mutate(Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% 
-  subset.data.frame(subset = PaperID !="2017Del037")
+master <- read.csv("File_DB/Output/Treatment.csv") %>% 
+  mutate(Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% 
+  subset.data.frame(subset = Standard_game != "N")
+
+# se togliamo tutti i giochi non standard abbiamo problemi con l'ipotesi HP3... per i dg la relazione non è più significativa...
 
 ```
 
@@ -61,25 +64,29 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 We compute norm strength as:
 
-$$Strength = {1 \over NE_{Specificity}+NE_{Consistency}}$$
+$$Strength = {1 \over NE_{Consistency}+NE_{Specificity}}$$
 
-where 
+where:
 
-*specificity* is and consistency accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores )
+* $NE_{Specificity}$ is the standard deviation of Krupka-Weber appropriateness score (for each treatment accounts for the mean of subjects' scores)
 
-We compute compliance as delta XXX
+* $NE_{Consistency}$ accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores
+
+We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 
   
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# specificity = Sd_Avg_NE
+# consistency = sqrt(Var_NE)
 
 master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE),
-                           Delta_new = (Avg_NE-Avg_coop))
+                           Delta = (Avg_NE-Avg_coop))
 
-cor.test(master$Norm_Strength, master$Delta_new, method= "spearman", exact = F)
+cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 
-ggplot(data=master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
 
-ggplot(data=master, aes(x=Norm_Strength, y=Delta_new)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
 
@@ -105,38 +112,86 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 ## HP4: Effect of punishment on norms and actions
 
-### Delta and Strength Comparison between DG and UG
-We test the hypothesis whether delta in DG and Donation Game is lower then UG. In this case, the p-value of Mann-Whitney-Wilcoxon Test is 0.0242, therefore we can reject the null hypothesis (at .05 significance level).
-Furthermore, we test the hypothesis whether Norm Strength in DG and Donation Game is lower then UG. 
+### Cooperation, Delta and Strength Comparison between DG and UG
+
+We test the hypothesis whether :
+
+* **Cooperation** ($Coop_{avg}$) in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is *0.0088*, therefore we *can* reject the null hypothesis (at .05 significance level).
+
+* **Normative Expectation** ($NE_{avg}$) in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is *0.4923*, therefore we *can't* reject the null hypothesis (at .05 significance level).
+  
+* **Delta** in DG and Donation Game is lower then UG.
+  + *Delta* is computed as $NE_{avg}-Coop_{avg}$ 
+  + The p-value of Mann-Whitney-Wilcoxon Test is *0.0242*, therefore we *can* reject the null hypothesis (at .05 significance level).
+  
+* **Norm Strength** in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is *0.1989*, therefore we *can't* reject the null hypothesis (at .05 significance level).
+  
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-hp4 <- master %>% 
+hp4_mean <- master %>% 
   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
   group_by(Macro_game_type) %>% 
   summarise(Coop = mean(Avg_coop, na.rm = T), 
-            Sd_Coop = mean(sqrt(Var_coop), na.rm = T), 
             Avg_Norm = mean(Avg_NE, na.rm = T), 
-            Delta = mean(Delta_new, na.rm = T), 
+            Delta = mean(Delta, na.rm = T), 
             Strength = mean(Norm_Strength, na.rm = T),
-            n = n()) %>% arrange(Coop)
+            n = n()) %>% 
+  arrange(Macro_game_type)
 
-master_test <- master %>% subset.data.frame(select = c(Game_type, Delta_new, Norm_Strength, Macro_game_type), subset = Game_type %in% c("DG", "UG"))
+master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type), subset = Game_type %in% c("DG", "UG"))
 
-wilc_delta = wilcox.test(Delta_new ~ Macro_game_type, data=master_test)
+wilc_delta = wilcox.test(Delta ~ Macro_game_type, data=master_test)
 wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
+wilc_coop = wilcox.test(Avg_coop ~ Macro_game_type, data = master_test)
+wilc_norm = wilcox.test(Avg_NE ~ Macro_game_type, data = master_test)
 
-hp4plus <- hp4 %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+hp4plus_mean <- hp4_mean %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
 
 opts <- options(knitr.kable.NA = "")
-kbl(hp4plus, digits = 4, booktabs = T, align = "lccccc", centering = F) %>%
+kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Average and Minn-Whitney-Wilcoxon Test") %>%
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T) %>%
   row_spec(3, bold = T, color = "white", background = "#6c757d")
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# hp4_sd <- master %>% 
+#   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
+#   group_by(Macro_game_type) %>% 
+#   summarise(Coop = sd(Avg_coop, na.rm = T), 
+#             Avg_Norm = sd(Avg_NE, na.rm = T), 
+#             Delta = sd(Delta, na.rm = T), 
+#             Strength = sd(Norm_Strength, na.rm = T),
+#             n = n()) %>% 
+#   arrange(Macro_game_type)
+# 
+# opts <- options(knitr.kable.NA = "")
+# kbl(hp4_sd, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Standard Deviation") %>%
+#   kable_styling(position = "left", full_width = F) %>%
+#   column_spec(1, bold = T)
+```
 
-### Results:
-- xxxx
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+hp4_SP_CS <- master %>% 
+  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
+  group_by(Macro_game_type) %>% 
+  summarise(Specificity = mean(Sd_Avg_NE, na.rm = T), 
+            Consistency = mean(sqrt(Var_NE), na.rm = T)) %>% 
+  arrange(Macro_game_type)
+
+opts <- options(knitr.kable.NA = "")
+kbl(hp4_SP_CS, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Consistency e Specificity") %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T)
+```
+
 
 # Individual-level analysis
 
