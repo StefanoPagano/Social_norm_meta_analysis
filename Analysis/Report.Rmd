@@ -208,6 +208,7 @@ ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var
 
 ciao questo è il risultato `r F_test_spec$p.value`
 
+
 # Individual-level analysis
 
 ## Analysis plan
