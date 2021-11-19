@@ -20,15 +20,14 @@ library(ggpubr)
 library(survival)
 library(sjPlot)
 library(kableExtra)
+library(car)
 
 setwd("../")
 
 # read data 
 master <- read.csv("File_DB/Output/Treatment.csv") %>% 
   mutate(Macro_game_type = ifelse(Game_type %in% c("DG","Donation Game"), "DG and Donation Game", Game_type)) %>% 
-  subset.data.frame(subset = Standard_game != "N")
-
-# se togliamo tutti i giochi non standard abbiamo problemi con l'ipotesi HP3... per i dg la relazione non è più significativa...
+  subset.data.frame(subset = !(Standard_game %in% c("N")))
 
 ```
 
@@ -64,33 +63,26 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 We compute norm strength as:
 
-$$Strength = {1 \over NE_{Consistency}+NE_{Specificity}}$$
+$$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
 where:
 
-* $NE_{Specificity}$ is the standard deviation of Krupka-Weber appropriateness score (for each treatment accounts for the mean of subjects' scores)
+* $NE_{Specificity} = {1 \over \sigma_{j}}$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions $j$
 
-* $NE_{Consistency}$ accounts for the variability among appropriateness scores of individuals with respect to the norm in the game (e.g., if the norm in the game is 5, we compute the standard deviation among the appropriateness scores
+* $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
 
 We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 
-  
+<b>Summary of Norm strength</b>
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # specificity = Sd_Avg_NE
 # consistency = sqrt(Var_NE)
 
-master = master %>% mutate(Norm_Strength = 1/(sqrt(Var_NE)+Sd_Avg_NE),
+master = master %>% mutate(Norm_Strength = 1/sqrt(Var_NE) + 1/Sd_Avg_NE,
                            Delta = (Avg_NE-Avg_coop))
-
-cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
-
-ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
-
-ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
-
 ```
 
-<b>Summary of Norm strength</b>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength)
@@ -103,6 +95,17 @@ ggplot(data=master, aes(x=Norm_Strength)) +
 geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Macro_game_type)
 
 ```
+
+  
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
+
+ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
+
+ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+
+```
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
@@ -145,7 +148,7 @@ hp4_mean <- master %>%
             n = n()) %>% 
   arrange(Macro_game_type)
 
-master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type), subset = Game_type %in% c("DG", "UG"))
+master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, Sd_Avg_NE, Var_NE), subset = Game_type %in% c("DG", "UG"))
 
 wilc_delta = wilcox.test(Delta ~ Macro_game_type, data=master_test)
 wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
@@ -155,7 +158,7 @@ wilc_norm = wilcox.test(Avg_NE ~ Macro_game_type, data = master_test)
 hp4plus_mean <- hp4_mean %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
 
 opts <- options(knitr.kable.NA = "")
-kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Average and Minn-Whitney-Wilcoxon Test") %>%
+kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Average and Mann-Whitney-Wilcoxon Test") %>%
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T) %>%
   row_spec(3, bold = T, color = "white", background = "#6c757d")
@@ -182,16 +185,28 @@ kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, cap
 hp4_SP_CS <- master %>% 
   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
   group_by(Macro_game_type) %>% 
-  summarise(Specificity = mean(Sd_Avg_NE, na.rm = T), 
-            Consistency = mean(sqrt(Var_NE), na.rm = T)) %>% 
+  summarise(Specificity = mean(1/(Sd_Avg_NE), na.rm = T), 
+            Consistency = mean(1/(sqrt(Var_NE)), na.rm = T)) %>% 
   arrange(Macro_game_type)
 
+F_test_spec <- wilcox.test(1/(master_test$Sd_Avg_NE) ~ master_test$Macro_game_type)
+F_test_cons <- wilcox.test(1/(sqrt(master_test$Var_NE)) ~ master_test$Macro_game_type)
+
+hp4plus_SP_CS <- hp4_SP_CS %>% 
+  add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Specificity = F_test_spec$p.value, Consistency = F_test_cons$p.value)
+
 opts <- options(knitr.kable.NA = "")
-kbl(hp4_SP_CS, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Consistency e Specificity") %>%
+kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, caption = "Consistency e Specificity") %>%
   kable_styling(position = "left", full_width = F) %>%
-  column_spec(1, bold = T)
+  column_spec(1, bold = T) %>%
+  row_spec(3, bold = T, color = "white", background = "#6c757d")
+
+ggarrange(ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/Sd_Avg_NE))) + xlab("Specificity"),
+ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var_NE)))) + xlab("Consistency"), common.legend = T)
+
 ```
 
+ciao questo è il risultato `r F_test_spec$p.value`
 
 # Individual-level analysis
 
@@ -317,4 +332,16 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(meth
 
 ```
 
+
+``` {r}
+list_of_paper <- master %>% mutate(data_type = ifelse(is.na(Avg_NE), "Actions", ifelse(is.na(Avg_coop), "Norms", "Both"))) %>% 
+  group_by(data_type, PaperID, Game_type, Method_elicitation, Separate_sample_beliefs, Standard_game) %>% 
+  summarise(n_treatments = n())
+            
+opts <- options(knitr.kable.NA = "")
+kbl(list_of_paper, digits = 4, booktabs = T, align = "lcccccc", centering = F, caption = "Ciao") %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T)
+
+```
 
