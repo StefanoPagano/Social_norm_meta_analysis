@@ -215,19 +215,25 @@ ciao questo è il risultato `r F_test_spec$p.value`
 Here we estimate a random utility model.
 We split our individual-level analysis into 2 steps: 
 
-1. we estimate the utility function when beliefs and actions are elicited for the same subject
-2. we estimate the utility function when beliefs and actions are elicited using distinct subjects
+1. *Within subject design belief elicitation papers*: we estimate the utility function when beliefs and actions are elicited for the same subject
+2. *Between subject design belief elicitation papers*: we estimate the utility function when beliefs and actions are elicited using distinct subjects
 
 
 For 1., the model we estimate is the following:
-
+<center>
 $U_{ij} = \alpha \pi_j + \beta S_{ij}$ 
+</center>
 
-while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited.
+while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
+<center>
+$U_{ij} = \alpha \pi_j + \beta S_{j}$ 
+</center>
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
+dataframe_betas <- data.frame(ID=NA, alpha=NA, beta=NA,var_alpha=NA,var_beta=NA)
 ```
 
 ## Within-subjects Design
@@ -243,46 +249,44 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 summary(clogit.bas)
+dataframe_betas[1,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],clogit.bas$var[1,1],clogit.bas$var[2,2])
 ```
-
-#### issues: 
-- 345 subjects but only 342 in preliminary analysis: check if subjects are the same and scenarios are all for everyone
 
 ## Between 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
 individual_db_b <- merge.data.frame(choices_b, beliefs_b)
-
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-between <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = individual_db_b)
+between <-clogit(A~ payoff + KW_Normative, data = individual_db_b)
 betas=between$coefficients
 summary(between)
-sigma=sqrt(between$var) # diagonal is variance; others are covariance
-plot_model(between)
+dataframe_betas[2,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```
 
 ### 2016Kim003
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios)
-clogit.kim <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Kim003)
-summary(clogit.kim)
-betas=clogit.kim$coefficients
-sigma=sqrt(clogit.kim$var) # diagonal is variance; others are covariance
-plot_model(model = clogit.kim, title = "2016Kim003: Conditional Logit Model")
-
+Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
+Kim003 <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
+            idx = c("subject_id","scenarios"), 
+            idpkg = "mlogit")
+head(Kim003)
+mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003)
+summary(mlogit.kim)$CoefTable[1,2] ### SUCA
+dataframe_etas[3,] <- c("2016Kim003",mlogit.kim$coefficients["payoff"],mlogit.kim$coefficients["KW_Normative"],mlogit.kim$[1,1],between$var[2,2])
 ```
 
 ### 2018Her061
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
-clogit.her <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Her061)
-summary(clogit.her)
-betas=clogit.her$coefficients
-sigma=sqrt(clogit.her$var) # diagonal is variance; others are covariance
-plot_model(model = clogit.her, title = "2018Her061: Conditional Logit Model")
+Her061 <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
+            idx = c("subject_id","scenarios"), 
+            idpkg = "mlogit")
+mlogit.her <- mlogit(A~ 0+payoff + KW_Normative, data = Her061)
+summary(mlogit.her)
+
 ```
 
 ### 2019Cha026
