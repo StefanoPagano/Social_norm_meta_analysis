@@ -140,7 +140,7 @@ We test the hypothesis whether :
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4_mean <- master %>% 
-  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
+  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")&Choice_Method != "OnlyNorms") %>%
   group_by(Macro_game_type) %>% 
   summarise(Coop = mean(Avg_coop, na.rm = T), 
             Avg_Norm = mean(Avg_NE, na.rm = T), 
@@ -276,7 +276,7 @@ Kim003_dg = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_ty
 
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
-clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
+clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_dg)
 summary(clogit.kim)
 dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
 ```
@@ -291,8 +291,8 @@ Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_ty
 
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
-clogit.kim_ug <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
-summary(clogit.kim)
+clogit.kim_ug <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_ug)
+summary(clogit.kim_ug)
 dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
 ```
 
@@ -326,7 +326,7 @@ summary(clogit.cha)
 dataframe_betas[i,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],sqrt(clogit.cha$var[1,1]),sqrt(clogit.cha$var[2,2]))
 ```
 
-#### All papers results
+### All papers results
 ```{r echo=F, message=FALSE, warning=FALSE}
 opts <- options(knitr.kable.NA = "")
 kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
@@ -335,22 +335,23 @@ kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% 
 ```
 
 ## Augmented Utility framework {.tabset}
-Here we estimate a random utility model using a conditional logit model (McFadden 1975).
 
-XXX
+Here we augment the standard utility framework by including a measure of norm specificity either at the individual level and at the choice level depending on the nature of the data (between-subject elicitation or within-subject elicitation).
+
 
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{ij} + \eta SD(S_{ij})_i$ 
+$U_{ij} = \alpha \pi_j + \beta S_{ij} + \eta S_{ij}*\sigma_i(S_{ij})$ 
 </center>
 
-while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
+where $\sigma(\cdot)$ is the standard deviation of $S_{ij}$ representing uncertainty around the norm.
+
 
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta SD_j$ 
+$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta SD(S_{ij})_i$ 
 </center>
 
 
-### Within-subjects Design {.tabset}
+### Within-subjects elicitation {.tabset}
 
 #### 2020Bas115
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -358,9 +359,9 @@ i=1
 SDi= Bas115 %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
 Bas115_plus <- Bas115 %>% merge.data.frame(SDi)
 summary(Bas115_plus$sdi)
-Bas115_plus_m <- dfidx(Bas115_plus %>% mutate(scenarios=as.factor(scenarios)),
-            idx = c("subject_id","scenarios"), 
-            idpkg = "mlogit")
+#Bas115_plus_m <- dfidx(Bas115_plus %>% mutate(scenarios=as.factor(scenarios)),
+#            idx = c("subject_id","scenarios"), 
+#            idpkg = "mlogit")
 
 clogit.bas_plus <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + KW_Normative:age + KW_Normative:gender + strata(subject_id), data = Bas115_plus)
 summary(clogit.bas_plus)
@@ -368,7 +369,7 @@ summary(clogit.bas_plus)
 dataframe_betas[i,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],sqrt(clogit.bas$var[1,1]),sqrt(clogit.bas$var[2,2]))
 ```
 
-### Between {.tabset}
+### Between-subjects elicitation {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
@@ -420,7 +421,7 @@ summary(clogit.cha)
 dataframe_betas[i,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],sqrt(clogit.cha$var[1,1]),sqrt(clogit.cha$var[2,2]))
 ```
 
-#### All papers results
+### All papers results
 ```{r echo=F, message=FALSE, warning=FALSE}
 opts <- options(knitr.kable.NA = "")
 kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
