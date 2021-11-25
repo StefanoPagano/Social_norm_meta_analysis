@@ -2,7 +2,7 @@
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
 
 df_merge_game_type = read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
-  subset.data.frame(select = c(treatment_id, Game_type))
+  subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 #### CHOICES DB ----
 # ONLY DG
@@ -177,7 +177,63 @@ Bas115_norms_ug <- rbind.data.frame(Bas115_norms_1c, Bas115_norms_2c)%>%
   subset.data.frame(select = -c(code, social))
 
 ### Merge pivot
-Bas115_norms_all <- rbind(Bas115_norms_dg, Bas115_norms_ug)
+Bas115_norms_all <- rbind(Bas115_norms_dg, Bas115_norms_ug) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
+  mutate(gender = NA, 
+         age = NA, 
+         KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs))
+
+
+#### INDIVIDUAL DB (ONLY WITHIN DESIGN) ----
+
+Bas115_choice <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA)
+dbbase <- Choice_Within_DB %>%
+  subset.data.frame(subset = paper_id %in% c("2020Bas115")) %>%
+  mutate(n = c(1:length(Choice_Within_DB$subject_id)))
+
+j = 1
+
+for (x in dbbase$n) {
+  ewt = dbbase$endowment[x]
+  for (i in 0:ewt) {
+    new_line_DB <- data.frame(p = j,
+                              subject_id = dbbase$subject_id[x], 
+                              treatment_id = dbbase$treatment_id[x],
+                              paper_id = dbbase$paper_id[x],
+                              scenarios = i, 
+                              choice = dbbase$choice[x],
+                              endowment = dbbase$endowment[x],
+                              A = 0,
+                              gender = dbbase$gender[x],
+                              age = dbbase$age[x])
+
+    Bas115_choice <- new_line_DB %>% rbind.data.frame(Bas115_choice) %>% arrange(p)
+    j = j+1
+    
+  }
+
+}
+
+Bas115_choice <- Bas115_choice %>%
+  subset.data.frame(subset = endowment > 0)
+
+for (y in Bas115_choice$p) {
+  if (Bas115_choice$choice[y] == Bas115_choice$scenarios[y]) {Bas115_choice$A[y] = 1}
+  else {Bas115_choice$A[y] = 0}
+}
+
+Bas115_choice <- Bas115_choice %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(p, Separate_sample_beliefs))
+
+
 
 #### Paper: 2017Del037 ----
 
@@ -304,65 +360,3 @@ Del037_norms_all <- Del037_norms_all %>%
   subset.data.frame(select = -c(ID, Treatment, Dictator))
 
 
-
-#### INDIVIDUAL DB (ONLY WITHIN DESIGN) ----
-
-Individual_Within_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA, Design = NA)
-dbbase <- Choice_Within_DB %>%
-  subset.data.frame(subset = paper_id %in% c("2020Bas115", "2017Del037")) %>%
-  mutate(n = c(1:length(Choice_Within_DB$subject_id)))
-
-j = 1
-
-for (x in dbbase$n) {
-  ewt = dbbase$endowment[x]
-  for (i in 0:ewt) {
-    new_line_DB <- data.frame(p = j,
-                              subject_id = dbbase$subject_id[x], 
-                              treatment_id = dbbase$treatment_id[x],
-                              paper_id = dbbase$paper_id[x],
-                              scenarios = i, 
-                              choice = dbbase$choice[x],
-                              endowment = dbbase$endowment[x],
-                              A = 0,
-                              gender = dbbase$gender[x],
-                              age = dbbase$age[x],
-                              Design = "Within")
-
-    Individual_Within_DB <- new_line_DB %>% rbind.data.frame(Individual_Within_DB) %>% arrange(p)
-    j = j+1
-    
-  }
-
-}
-
-Individual_Within_DB <- Individual_Within_DB %>%
-  subset.data.frame(subset = endowment > 0)
-
-for (y in Individual_Within_DB$p) {
-  if (Individual_Within_DB$choice[y] == Individual_Within_DB$scenarios[y]) {Individual_Within_DB$A[y] = 1}
-  else {Individual_Within_DB$A[y] = 0}
-}
-
-Individual_Within_DB <- Individual_Within_DB %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
-  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design)
-
-Bas115_output <- Individual_Within_DB %>% 
-  merge.data.frame(Bas115_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
-  arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
-  subset.data.frame(select = -c(p)) %>%
-  mutate(KW_Personal = NA,
-         Bicchieri_Empirical = NA,
-         Bicchieri_Normative = NA,
-         Bicchieri_Personal = NA)
-
-Del037_output <- Individual_Within_DB %>% merge.data.frame(Del037_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
-  arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
-  subset.data.frame(select = -c(p)) %>%
-  mutate(KW_Personal = NA,
-         Bicchieri_Empirical = NA,
-         Bicchieri_Normative = NA,
-         Bicchieri_Personal = NA)
