@@ -329,6 +329,7 @@ Kim003_db_norms <- Kim003_db_norms %>%
 
 
 # DG
+## 
 coldg = c("subj_id", "role", "sent", "gender", "age")
 
 Kim003_sub_1 <- Kim003_dg %>%
@@ -347,6 +348,7 @@ Kim003_sub_1 <- Kim003_sub_1 %>%
 
 Choice_Kim003_dg_DB <- Kim003_sub_1
 
+## norms 
 Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143))
 
 Kim003_KW_score_dg <- Kim003_db_norms_dg %>%
@@ -385,13 +387,12 @@ for (x in dbbase$n) {
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
                               A = 0,
-                              gender = dbbase$gender,
-                              age = dbbase$age,
+                              gender = dbbase$gender[x],
+                              age = dbbase$age[x],
                               Design = "Between")
     
     Individual_Kim003_dg_DB <- new_line_DB %>% rbind.data.frame(Individual_Kim003_dg_DB) %>% arrange(p)
     j = j+1
-    
   }
   
 }
@@ -475,8 +476,8 @@ for (x in dbbase$n) {
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
                               A = 0,
-                              gender = dbbase$gender,
-                              age = dbbase$age,
+                              gender = dbbase$gender[x],
+                              age = dbbase$age[x],
                               Design = "Between")
     
     Individual_Kim003_ug_DB <- new_line_DB %>% rbind.data.frame(Individual_Kim003_ug_DB) %>% arrange(p)

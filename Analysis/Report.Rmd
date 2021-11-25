@@ -251,7 +251,7 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 #### 2020Bas115
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
+Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="DG") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 summary(clogit.bas)
 dataframe_betas[i,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],sqrt(clogit.bas$var[1,1]),sqrt(clogit.bas$var[2,2]))
@@ -265,16 +265,33 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
 #### 2016Kim003
+For DG game
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
+Kim003_dg = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="DG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
 #Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
 #            idx = c("subject_id","scenarios"), 
 #            idpkg = "mlogit")
-head(Kim003)
+
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
 clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
+summary(clogit.kim)
+dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
+```
+
+For UG game
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="UG") %>% mutate(payoff=endowment-scenarios)
+#Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
+#            idx = c("subject_id","scenarios"), 
+#            idpkg = "mlogit")
+
+#mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
+#summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
+clogit.kim_ug <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
 summary(clogit.kim)
 dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
 ```
