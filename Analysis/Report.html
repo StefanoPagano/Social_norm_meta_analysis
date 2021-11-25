@@ -518,48 +518,6 @@ Score (logrank) test = 199.9  on 2 df,   p=&lt;2e-16</code></pre>
 </div>
 <div id="between" class="section level2">
 <h2>Between</h2>
-<pre><code>Call:
-coxph(formula = Surv(rep(1, 8454L), A) ~ payoff * paper_id + 
-    KW_Normative * paper_id + strata(subject_id), data = individual_db_b, 
-    method = &quot;exact&quot;)
-
-  n= 8454, number of events= 731 
-
-                                      coef  exp(coef)   se(coef)      z
-payoff                           9.523e-01  2.592e+00  1.647e-01  5.783
-paper_id2018Her061                      NA         NA  0.000e+00     NA
-paper_id2019Cha026                      NA         NA  0.000e+00     NA
-KW_Normative                     1.477e+01  2.590e+06  2.700e+00  5.469
-payoff:paper_id2018Her061        9.147e-01  2.496e+00  5.370e-01  1.703
-payoff:paper_id2019Cha026       -7.755e-01  4.605e-01  1.657e-01 -4.680
-paper_id2018Her061:KW_Normative -9.853e+00  5.261e-05  3.173e+00 -3.105
-paper_id2019Cha026:KW_Normative -1.259e+01  3.391e-06  2.708e+00 -4.651
-                                Pr(&gt;|z|)    
-payoff                          7.35e-09 ***
-paper_id2018Her061                    NA    
-paper_id2019Cha026                    NA    
-KW_Normative                    4.54e-08 ***
-payoff:paper_id2018Her061         0.0885 .  
-payoff:paper_id2019Cha026       2.87e-06 ***
-paper_id2018Her061:KW_Normative   0.0019 ** 
-paper_id2019Cha026:KW_Normative 3.30e-06 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-                                exp(coef) exp(-coef) lower .95 upper .95
-payoff                          2.592e+00  3.858e-01 1.877e+00 3.579e+00
-paper_id2018Her061                     NA         NA        NA        NA
-paper_id2019Cha026                     NA         NA        NA        NA
-KW_Normative                    2.590e+06  3.861e-07 1.302e+04 5.151e+08
-payoff:paper_id2018Her061       2.496e+00  4.007e-01 8.713e-01 7.150e+00
-payoff:paper_id2019Cha026       4.605e-01  2.172e+00 3.328e-01 6.372e-01
-paper_id2018Her061:KW_Normative 5.261e-05  1.901e+04 1.047e-07 2.643e-02
-paper_id2019Cha026:KW_Normative 3.391e-06  2.949e+05 1.680e-08 6.843e-04
-
-Concordance= 0.81  (se = 0.01 )
-Likelihood ratio test= 569.5  on 6 df,   p=&lt;2e-16
-Wald test            = 271.6  on 6 df,   p=&lt;2e-16
-Score (logrank) test = 412.2  on 6 df,   p=&lt;2e-16</code></pre>
 <div id="kim003" class="section level3">
 <h3>2016Kim003</h3>
 <pre><code>    paper_id scenarios        subject_id treatment_id choice endowment A gender
@@ -705,7 +663,7 @@ Frequencies of alternatives:choice
 0.0095694 0.0143541 0.0430622 
 
 nr method
-6 iterations, 0h:0m:0s 
+6 iterations, 0h:0m:1s 
 g&#39;(-H)^-1g = 8.29E-06 
 successive function values within tolerance limits 
 
@@ -766,26 +724,6 @@ MRS
 </td>
 <td style="text-align:center;">
 6.76
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-Avg. Between
-</td>
-<td style="text-align:center;">
-0.95
-</td>
-<td style="text-align:center;">
-14.77
-</td>
-<td style="text-align:center;">
-0.03
-</td>
-<td style="text-align:center;">
-0.00
-</td>
-<td style="text-align:center;">
-31.01
 </td>
 </tr>
 <tr>
@@ -1378,6 +1316,51 @@ no check
 </tr>
 </tbody>
 </table>
+</div>
+<div id="between-model" class="section level2">
+<h2>Between model</h2>
+<pre><code>Call:
+coxph(formula = Surv(rep(1, 8454L), A) ~ payoff * paper_id + 
+    KW_Normative * paper_id + strata(subject_id), data = individual_db_b, 
+    method = &quot;exact&quot;)
+
+  n= 8454, number of events= 731 
+
+                                      coef  exp(coef)   se(coef)      z
+payoff                           9.523e-01  2.592e+00  1.647e-01  5.783
+paper_id2018Her061                      NA         NA  0.000e+00     NA
+paper_id2019Cha026                      NA         NA  0.000e+00     NA
+KW_Normative                     1.477e+01  2.590e+06  2.700e+00  5.469
+payoff:paper_id2018Her061        9.147e-01  2.496e+00  5.370e-01  1.703
+payoff:paper_id2019Cha026       -7.755e-01  4.605e-01  1.657e-01 -4.680
+paper_id2018Her061:KW_Normative -9.853e+00  5.261e-05  3.173e+00 -3.105
+paper_id2019Cha026:KW_Normative -1.259e+01  3.391e-06  2.708e+00 -4.651
+                                Pr(&gt;|z|)    
+payoff                          7.35e-09 ***
+paper_id2018Her061                    NA    
+paper_id2019Cha026                    NA    
+KW_Normative                    4.54e-08 ***
+payoff:paper_id2018Her061         0.0885 .  
+payoff:paper_id2019Cha026       2.87e-06 ***
+paper_id2018Her061:KW_Normative   0.0019 ** 
+paper_id2019Cha026:KW_Normative 3.30e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+                                exp(coef) exp(-coef) lower .95 upper .95
+payoff                          2.592e+00  3.858e-01 1.877e+00 3.579e+00
+paper_id2018Her061                     NA         NA        NA        NA
+paper_id2019Cha026                     NA         NA        NA        NA
+KW_Normative                    2.590e+06  3.861e-07 1.302e+04 5.151e+08
+payoff:paper_id2018Her061       2.496e+00  4.007e-01 8.713e-01 7.150e+00
+payoff:paper_id2019Cha026       4.605e-01  2.172e+00 3.328e-01 6.372e-01
+paper_id2018Her061:KW_Normative 5.261e-05  1.901e+04 1.047e-07 2.643e-02
+paper_id2019Cha026:KW_Normative 3.391e-06  2.949e+05 1.680e-08 6.843e-04
+
+Concordance= 0.81  (se = 0.01 )
+Likelihood ratio test= 569.5  on 6 df,   p=&lt;2e-16
+Wald test            = 271.6  on 6 df,   p=&lt;2e-16
+Score (logrank) test = 412.2  on 6 df,   p=&lt;2e-16</code></pre>
 </div>
 </div>
 

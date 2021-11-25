@@ -237,6 +237,7 @@ $U_{ij} = \alpha \pi_j + \beta S_{j}$
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
 dataframe_betas <- data.frame(ID=NA, alpha=NA, beta=NA,var_alpha=NA,var_beta=NA)
+i=0
 ```
 
 ## Within-subjects Design
@@ -249,10 +250,11 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
 ### 2020Bas115
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
 Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115") %>% mutate(payoff=endowment-scenarios)
 clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
 summary(clogit.bas)
-dataframe_betas[1,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],clogit.bas$var[1,1],clogit.bas$var[2,2])
+dataframe_betas[i,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],clogit.bas$var[1,1],clogit.bas$var[2,2])
 ```
 
 ## Between 
@@ -262,14 +264,9 @@ choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate
 individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id), data = individual_db_b)
-summary(between)
-dataframe_betas[2,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
-```
-
 ### 2016Kim003
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
 Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
 Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
@@ -279,11 +276,12 @@ mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
 clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
 summary(clogit.kim)
-dataframe_betas[3,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],clogit.kim$var[1,1],clogit.kim$var[2,2])
+dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],clogit.kim$var[1,1],clogit.kim$var[2,2])
 ```
 
 ### 2018Her061
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
 Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
@@ -292,12 +290,13 @@ mlogit.her <- mlogit(A~ payoff + KW_Normative|0, data = Her061_m)
 clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
 summary(mlogit.her)
 summary(clogit.her)
-dataframe_betas[4,] <- c("2018Her061",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],clogit.her$var[1,1],clogit.her$var[2,2])
+dataframe_betas[i,] <- c("2018Her061",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],clogit.her$var[1,1],clogit.her$var[2,2])
 
 ```
 
 ### 2019Cha026
 ``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
 Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
 Cha026_m <- dfidx(Cha026 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
@@ -307,7 +306,7 @@ clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id,
 summary(clogit.cha)
 mlogit.cha <- mlogit(A~ 0+payoff + KW_Normative, data = Cha026_m)
 summary(mlogit.cha)
-dataframe_betas[5,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],clogit.cha$var[1,1],clogit.cha$var[2,2])
+dataframe_betas[i,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],clogit.cha$var[1,1],clogit.cha$var[2,2])
 ```
 
 ```{r}
@@ -379,3 +378,10 @@ kbl(list_of_paper, digits = 4, booktabs = T, align = "lcccccc", centering = F, c
 
 ```
 
+## Between model
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id), data = individual_db_b)
+summary(between)
+dataframe_betas[i,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
+```
