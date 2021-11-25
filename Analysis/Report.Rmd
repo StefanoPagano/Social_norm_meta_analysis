@@ -263,7 +263,7 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-between <-clogit(A~ payoff + KW_Normative + KW_Normative:paper_id + strata(subject_id), data = individual_db_b)
+between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id), data = individual_db_b)
 summary(between)
 dataframe_betas[2,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```

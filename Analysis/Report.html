@@ -519,30 +519,47 @@ Score (logrank) test = 199.9  on 2 df,   p=&lt;2e-16</code></pre>
 <div id="between" class="section level2">
 <h2>Between</h2>
 <pre><code>Call:
-coxph(formula = Surv(rep(1, 8454L), A) ~ payoff + KW_Normative + 
-    KW_Normative:paper_id + strata(subject_id), data = individual_db_b, 
+coxph(formula = Surv(rep(1, 8454L), A) ~ payoff * paper_id + 
+    KW_Normative * paper_id + strata(subject_id), data = individual_db_b, 
     method = &quot;exact&quot;)
 
   n= 8454, number of events= 731 
 
-                                    coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-payoff                           0.20626   1.22908  0.01779 11.592  &lt; 2e-16 ***
-KW_Normative                     2.05462   7.80388  0.77740  2.643 0.008219 ** 
-KW_Normative:paper_id2018Her061 -3.04234   0.04772  0.82251 -3.699 0.000217 ***
-KW_Normative:paper_id2019Cha026  0.12967   1.13845  0.79938  0.162 0.871139    
+                                      coef  exp(coef)   se(coef)      z
+payoff                           9.523e-01  2.592e+00  1.647e-01  5.783
+paper_id2018Her061                      NA         NA  0.000e+00     NA
+paper_id2019Cha026                      NA         NA  0.000e+00     NA
+KW_Normative                     1.477e+01  2.590e+06  2.700e+00  5.469
+payoff:paper_id2018Her061        9.147e-01  2.496e+00  5.370e-01  1.703
+payoff:paper_id2019Cha026       -7.755e-01  4.605e-01  1.657e-01 -4.680
+paper_id2018Her061:KW_Normative -9.853e+00  5.261e-05  3.173e+00 -3.105
+paper_id2019Cha026:KW_Normative -1.259e+01  3.391e-06  2.708e+00 -4.651
+                                Pr(&gt;|z|)    
+payoff                          7.35e-09 ***
+paper_id2018Her061                    NA    
+paper_id2019Cha026                    NA    
+KW_Normative                    4.54e-08 ***
+payoff:paper_id2018Her061         0.0885 .  
+payoff:paper_id2019Cha026       2.87e-06 ***
+paper_id2018Her061:KW_Normative   0.0019 ** 
+paper_id2019Cha026:KW_Normative 3.30e-06 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
                                 exp(coef) exp(-coef) lower .95 upper .95
-payoff                            1.22908     0.8136  1.186953    1.2727
-KW_Normative                      7.80388     0.1281  1.700556   35.8122
-KW_Normative:paper_id2018Her061   0.04772    20.9541  0.009519    0.2393
-KW_Normative:paper_id2019Cha026   1.13845     0.8784  0.237618    5.4544
+payoff                          2.592e+00  3.858e-01 1.877e+00 3.579e+00
+paper_id2018Her061                     NA         NA        NA        NA
+paper_id2019Cha026                     NA         NA        NA        NA
+KW_Normative                    2.590e+06  3.861e-07 1.302e+04 5.151e+08
+payoff:paper_id2018Her061       2.496e+00  4.007e-01 8.713e-01 7.150e+00
+payoff:paper_id2019Cha026       4.605e-01  2.172e+00 3.328e-01 6.372e-01
+paper_id2018Her061:KW_Normative 5.261e-05  1.901e+04 1.047e-07 2.643e-02
+paper_id2019Cha026:KW_Normative 3.391e-06  2.949e+05 1.680e-08 6.843e-04
 
-Concordance= 0.784  (se = 0.01 )
-Likelihood ratio test= 515.2  on 4 df,   p=&lt;2e-16
-Wald test            = 265.7  on 4 df,   p=&lt;2e-16
-Score (logrank) test = 403.6  on 4 df,   p=&lt;2e-16</code></pre>
+Concordance= 0.81  (se = 0.01 )
+Likelihood ratio test= 569.5  on 6 df,   p=&lt;2e-16
+Wald test            = 271.6  on 6 df,   p=&lt;2e-16
+Score (logrank) test = 412.2  on 6 df,   p=&lt;2e-16</code></pre>
 <div id="kim003" class="section level3">
 <h3>2016Kim003</h3>
 <pre><code>    paper_id scenarios        subject_id treatment_id choice endowment A gender
@@ -700,128 +717,134 @@ KW_Normative 2.172766   0.200781 10.8216 &lt; 2.2e-16 ***
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
 Log-Likelihood: -1296.6</code></pre>
-<pre class="r"><code>kable(dataframe_betas %&gt;% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %&gt;% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2)</code></pre>
-<table>
+<pre class="r"><code>opts &lt;- options(knitr.kable.NA = &quot;&quot;)
+kbl(dataframe_betas %&gt;% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %&gt;% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = &quot;lccccc&quot;, centering = F, caption = &quot;Estimated Parameters&quot;) %&gt;%
+  kable_styling(position = &quot;left&quot;, full_width = F) %&gt;%
+  column_spec(1, bold = T) </code></pre>
+<table class="table" style="width: auto !important; ">
+<caption>
+Estimated Parameters
+</caption>
 <thead>
 <tr>
 <th style="text-align:left;">
 ID
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 alpha
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 beta
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 var_alpha
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 var_beta
 </th>
-<th style="text-align:right;">
+<th style="text-align:center;">
 MRS
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:left;font-weight: bold;">
 2020Bas115
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.73
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.46
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.00
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 6.76
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:left;font-weight: bold;">
 Avg. Between
 </td>
-<td style="text-align:right;">
-0.21
-</td>
-<td style="text-align:right;">
-2.05
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.60
-</td>
-<td style="text-align:right;">
-19.92
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2016Kim003
-</td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.95
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 14.77
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.03
 </td>
-<td style="text-align:right;">
-7.29
+<td style="text-align:center;">
+0.00
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 31.01
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:left;font-weight: bold;">
+2016Kim003
+</td>
+<td style="text-align:center;">
+0.95
+</td>
+<td style="text-align:center;">
+14.77
+</td>
+<td style="text-align:center;">
+0.03
+</td>
+<td style="text-align:center;">
+7.29
+</td>
+<td style="text-align:center;">
+31.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;">
 2018Her061
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 1.87
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 4.91
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.26
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.78
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 5.26
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:left;font-weight: bold;">
 2019Cha026
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.18
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 2.17
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.00
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 0.04
 </td>
-<td style="text-align:right;">
+<td style="text-align:center;">
 24.57
 </td>
 </tr>
@@ -829,6 +852,13 @@ Avg. Between
 </table>
 </div>
 </div>
+<div id="individual-analysis-of-norm-compliance" class="section level2">
+<h2>Individual analysis of norm compliance</h2>
+</div>
+</div>
+<div id="bas155" class="section level1">
+<h1>bas155</h1>
+<p>bas115_strenght &lt;- Bas115 %&gt;% group_by(subject_id) %&gt;% summarise(specificity = sd(KW_Normative)) data_bas115 &lt;- Bas115 %&gt;% merge.data.frame(bas115_strenght) data_bas115_m &lt;- dfidx(data_bas115 %&gt;% mutate(scenarios=as.factor(scenarios)), idx = c(“subject_id”,“scenarios”), idpkg = “mlogit”) summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))</p>
 </div>
 <div id="appendix-effect-of-varibility-on-norms-and-actions" class="section level1">
 <h1>Appendix : Effect of varibility on norms and actions</h1>
