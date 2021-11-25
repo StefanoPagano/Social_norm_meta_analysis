@@ -501,26 +501,50 @@ Difference (Wilcoxon p-value)
 <h3 class="tabset">Within-subjects Design</h3>
 <div id="bas115" class="section level4">
 <h4>2020Bas115</h4>
+<p>Treatment 1 (“Social”)</p>
 <pre><code>Call:
-coxph(formula = Surv(rep(1, 2750L), A) ~ payoff + KW_Normative + 
-    strata(subject_id), data = Bas115, method = &quot;exact&quot;)
+coxph(formula = Surv(rep(1, 1353L), A) ~ payoff + KW_Normative + 
+    strata(subject_id), data = Bas115_dg %&gt;% subset.data.frame(subset = treatment_id == 
+    &quot;2020Bas115_1a&quot;), method = &quot;exact&quot;)
 
-  n= 2750, number of events= 250 
+  n= 1353, number of events= 123 
 
-                 coef exp(coef) se(coef)     z Pr(&gt;|z|)    
-payoff        0.72731   2.06951  0.07049 10.32   &lt;2e-16 ***
-KW_Normative  2.45738  11.67421  0.20283 12.12   &lt;2e-16 ***
+                coef exp(coef) se(coef)      z Pr(&gt;|z|)    
+payoff        0.7632    2.1452   0.1089  7.009  2.4e-12 ***
+KW_Normative  3.3497   28.4934   0.3270 10.243  &lt; 2e-16 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
              exp(coef) exp(-coef) lower .95 upper .95
-payoff            2.07    0.48321     1.802     2.376
-KW_Normative     11.67    0.08566     7.845    17.373
+payoff           2.145     0.4662     1.733     2.656
+KW_Normative    28.493     0.0351    15.010    54.089
 
-Concordance= 0.815  (se = 0.015 )
-Likelihood ratio test= 310.4  on 2 df,   p=&lt;2e-16
-Wald test            = 148.1  on 2 df,   p=&lt;2e-16
-Score (logrank) test = 199.9  on 2 df,   p=&lt;2e-16</code></pre>
+Concordance= 0.865  (se = 0.021 )
+Likelihood ratio test= 232.8  on 2 df,   p=&lt;2e-16
+Wald test            = 116  on 2 df,   p=&lt;2e-16
+Score (logrank) test = 177.2  on 2 df,   p=&lt;2e-16</code></pre>
+<p>Treatment 2 (“Private”)</p>
+<pre><code>Call:
+coxph(formula = Surv(rep(1, 1397L), A) ~ payoff + KW_Normative + 
+    strata(subject_id), data = Bas115_dg %&gt;% subset.data.frame(subset = treatment_id == 
+    &quot;2020Bas115_2a&quot;), method = &quot;exact&quot;)
+
+  n= 1397, number of events= 127 
+
+                coef exp(coef) se(coef)     z Pr(&gt;|z|)    
+payoff       0.66931   1.95288  0.09349 7.159 8.14e-13 ***
+KW_Normative 1.72083   5.58917  0.27691 6.214 5.15e-10 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+             exp(coef) exp(-coef) lower .95 upper .95
+payoff           1.953     0.5121     1.626     2.346
+KW_Normative     5.589     0.1789     3.248     9.617
+
+Concordance= 0.769  (se = 0.021 )
+Likelihood ratio test= 127.9  on 2 df,   p=&lt;2e-16
+Wald test            = 51.42  on 2 df,   p=7e-12
+Score (logrank) test = 82.59  on 2 df,   p=&lt;2e-16</code></pre>
 </div>
 </div>
 <div id="between" class="section level3 tabset">
@@ -595,27 +619,50 @@ Score (logrank) test = 52.33  on 2 df,   p=4e-12</code></pre>
 </div>
 <div id="cha026" class="section level4">
 <h4>2019Cha026</h4>
+<p>Treatment 1</p>
 <pre><code>Call:
-coxph(formula = Surv(rep(1, 6897L), A) ~ payoff + KW_Normative + 
-    strata(subject_id, treatment_id, paper_id), data = Cha026, 
-    method = &quot;exact&quot;)
+coxph(formula = Surv(rep(1, 2497L), A) ~ payoff + KW_Normative + 
+    strata(subject_id), data = Cha026 %&gt;% subset.data.frame(treatment_id == 
+    &quot;2019Cha026_1&quot;), method = &quot;exact&quot;)
 
-  n= 6897, number of events= 627 
+  n= 2497, number of events= 227 
 
-                coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-payoff       0.17685   1.19346  0.01829  9.667   &lt;2e-16 ***
-KW_Normative 2.17277   8.78255  0.20078 10.822   &lt;2e-16 ***
+                 coef exp(coef) se(coef)     z Pr(&gt;|z|)    
+payoff        0.18892   1.20794  0.03229 5.850 4.92e-09 ***
+KW_Normative  2.62115  13.75158  0.35966 7.288 3.15e-13 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
              exp(coef) exp(-coef) lower .95 upper .95
-payoff           1.193     0.8379     1.151     1.237
-KW_Normative     8.783     0.1139     5.925    13.017
+payoff           1.208    0.82786     1.134     1.287
+KW_Normative    13.752    0.07272     6.795    27.829
 
-Concordance= 0.806  (se = 0.011 )
-Likelihood ratio test= 413.8  on 2 df,   p=&lt;2e-16
-Wald test            = 210.3  on 2 df,   p=&lt;2e-16
-Score (logrank) test = 312.2  on 2 df,   p=&lt;2e-16</code></pre>
+Concordance= 0.848  (se = 0.018 )
+Likelihood ratio test= 170.8  on 2 df,   p=&lt;2e-16
+Wald test            = 75.61  on 2 df,   p=&lt;2e-16
+Score (logrank) test = 124.2  on 2 df,   p=&lt;2e-16</code></pre>
+<p>Treatment 2</p>
+<pre><code>Call:
+coxph(formula = Surv(rep(1, 4400L), A) ~ payoff + KW_Normative + 
+    strata(subject_id), data = Cha026 %&gt;% subset.data.frame(treatment_id == 
+    &quot;2019Cha026_2&quot;), method = &quot;exact&quot;)
+
+  n= 4400, number of events= 400 
+
+                coef exp(coef) se(coef)     z Pr(&gt;|z|)    
+payoff       0.17298   1.18884  0.02238 7.729 1.08e-14 ***
+KW_Normative 1.94834   7.01702  0.24428 7.976 1.51e-15 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+             exp(coef) exp(-coef) lower .95 upper .95
+payoff           1.189     0.8412     1.138     1.242
+KW_Normative     7.017     0.1425     4.347    11.326
+
+Concordance= 0.791  (se = 0.015 )
+Likelihood ratio test= 245.6  on 2 df,   p=&lt;2e-16
+Wald test            = 133.4  on 2 df,   p=&lt;2e-16
+Score (logrank) test = 189.3  on 2 df,   p=&lt;2e-16</code></pre>
 </div>
 </div>
 <div id="all-papers-results" class="section level3">
@@ -630,16 +677,22 @@ Estimated Parameters
 ID
 </th>
 <th style="text-align:center;">
+t
+</th>
+<th style="text-align:center;">
+game
+</th>
+<th style="text-align:center;">
 alpha
 </th>
 <th style="text-align:center;">
 beta
 </th>
 <th style="text-align:center;">
-var_alpha
+SE_alpha
 </th>
-<th style="text-align:center;">
-var_beta
+<th style="text-align:left;">
+SE_beta
 </th>
 <th style="text-align:center;">
 MRS
@@ -652,24 +705,62 @@ MRS
 2020Bas115
 </td>
 <td style="text-align:center;">
-0.73
+1
 </td>
 <td style="text-align:center;">
-2.46
+DG
 </td>
 <td style="text-align:center;">
-0.07
+0.76
 </td>
 <td style="text-align:center;">
-0.20
+3.35
 </td>
 <td style="text-align:center;">
-6.76
+0.11
+</td>
+<td style="text-align:left;">
+0.33
+</td>
+<td style="text-align:center;">
+8.78
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;">
+2020Bas115
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+DG
+</td>
+<td style="text-align:center;">
+0.67
+</td>
+<td style="text-align:center;">
+1.72
+</td>
+<td style="text-align:center;">
+0.09
+</td>
+<td style="text-align:left;">
+0.28
+</td>
+<td style="text-align:center;">
+5.14
 </td>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;">
 2016Kim003
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+DG
 </td>
 <td style="text-align:center;">
 0.92
@@ -680,7 +771,7 @@ MRS
 <td style="text-align:center;">
 0.16
 </td>
-<td style="text-align:center;">
+<td style="text-align:left;">
 2.53
 </td>
 <td style="text-align:center;">
@@ -692,24 +783,36 @@ MRS
 2016Kim003
 </td>
 <td style="text-align:center;">
-0.92
+2
 </td>
 <td style="text-align:center;">
-13.73
+UG
 </td>
 <td style="text-align:center;">
-0.16
+0.90
 </td>
 <td style="text-align:center;">
-2.53
+18.23
 </td>
 <td style="text-align:center;">
-29.96
+0.15
+</td>
+<td style="text-align:left;">
+2.23
+</td>
+<td style="text-align:center;">
+40.57
 </td>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;">
 2018Her061
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+DG
 </td>
 <td style="text-align:center;">
 1.87
@@ -720,7 +823,7 @@ MRS
 <td style="text-align:center;">
 0.51
 </td>
-<td style="text-align:center;">
+<td style="text-align:left;">
 1.67
 </td>
 <td style="text-align:center;">
@@ -732,19 +835,51 @@ MRS
 2019Cha026
 </td>
 <td style="text-align:center;">
-0.18
+1
 </td>
 <td style="text-align:center;">
-2.17
+DG
+</td>
+<td style="text-align:center;">
+0.19
+</td>
+<td style="text-align:center;">
+2.62
+</td>
+<td style="text-align:center;">
+0.03
+</td>
+<td style="text-align:left;">
+0.36
+</td>
+<td style="text-align:center;">
+27.75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;">
+2019Cha026
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+DG
+</td>
+<td style="text-align:center;">
+0.17
+</td>
+<td style="text-align:center;">
+1.95
 </td>
 <td style="text-align:center;">
 0.02
 </td>
-<td style="text-align:center;">
-0.20
+<td style="text-align:left;">
+0.24
 </td>
 <td style="text-align:center;">
-24.57
+22.53
 </td>
 </tr>
 </tbody>
@@ -765,255 +900,58 @@ MRS
 <h3 class="tabset">Within-subjects elicitation</h3>
 <div id="bas115-1" class="section level4">
 <h4>2020Bas115</h4>
-<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.0000  0.6047  0.6780  0.6679  0.7421  1.0162 </code></pre>
 <pre><code>Call:
-coxph(formula = Surv(rep(1, 2750L), A) ~ payoff + KW_Normative + 
-    KW_Normative:sdi + KW_Normative:age + KW_Normative:gender + 
-    strata(subject_id), data = Bas115_plus, method = &quot;exact&quot;)
+coxph(formula = Surv(rep(1, 1353L), A) ~ payoff + KW_Normative + 
+    KW_Normative:sdi + strata(subject_id), data = Bas115_plus %&gt;% 
+    subset.data.frame(subset = treatment_id == &quot;2020Bas115_1a&quot;), 
+    method = &quot;exact&quot;)
 
-  n= 2750, number of events= 250 
+  n= 1353, number of events= 123 
 
-                          coef  exp(coef)   se(coef)      z Pr(&gt;|z|)    
-payoff                0.700129   2.014013   0.070930  9.871  &lt; 2e-16 ***
-KW_Normative          4.771528 118.099574   0.738546  6.461 1.04e-10 ***
-KW_Normative:sdi     -3.982285   0.018643   0.871319 -4.570 4.87e-06 ***
-KW_Normative:age      0.009658   1.009705   0.012578  0.768    0.443    
-KW_Normative:gender   0.180880   1.198272   0.190719  0.948    0.343    
+                       coef  exp(coef)   se(coef)      z Pr(&gt;|z|)    
+payoff            7.480e-01  2.113e+00  1.122e-01  6.669 2.58e-11 ***
+KW_Normative      7.031e+00  1.132e+03  1.042e+00  6.749 1.49e-11 ***
+KW_Normative:sdi -5.289e+00  5.045e-03  1.360e+00 -3.889 0.000101 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
-                    exp(coef) exp(-coef) lower .95 upper .95
-payoff                2.01401   0.496521  1.752613    2.3144
-KW_Normative        118.09957   0.008467 27.771355  502.2265
-KW_Normative:sdi      0.01864  53.639454  0.003379    0.1028
-KW_Normative:age      1.00970   0.990388  0.985118    1.0349
-KW_Normative:gender   1.19827   0.834535  0.824546    1.7414
+                 exp(coef) exp(-coef) lower .95 upper .95
+payoff           2.113e+00  4.733e-01 1.696e+00 2.632e+00
+KW_Normative     1.132e+03  8.836e-04 1.469e+02 8.721e+03
+KW_Normative:sdi 5.045e-03  1.982e+02 3.509e-04 7.253e-02
 
-Concordance= 0.822  (se = 0.015 )
-Likelihood ratio test= 334.9  on 5 df,   p=&lt;2e-16
-Wald test            = 167.4  on 5 df,   p=&lt;2e-16
-Score (logrank) test = 245.3  on 5 df,   p=&lt;2e-16</code></pre>
+Concordance= 0.871  (se = 0.022 )
+Likelihood ratio test= 247.7  on 3 df,   p=&lt;2e-16
+Wald test            = 113.3  on 3 df,   p=&lt;2e-16
+Score (logrank) test = 213.8  on 3 df,   p=&lt;2e-16</code></pre>
+<pre><code>Call:
+coxph(formula = Surv(rep(1, 1397L), A) ~ payoff + KW_Normative + 
+    KW_Normative:sdi + strata(subject_id), data = Bas115_plus %&gt;% 
+    subset.data.frame(subset = treatment_id == &quot;2020Bas115_2a&quot;), 
+    method = &quot;exact&quot;)
+
+  n= 1397, number of events= 127 
+
+                       coef  exp(coef)   se(coef)      z Pr(&gt;|z|)    
+payoff             0.646829   1.909477   0.092258  7.011 2.37e-12 ***
+KW_Normative       5.376862 216.342345   1.008117  5.334 9.63e-08 ***
+KW_Normative:sdi  -5.494181   0.004111   1.467194 -3.745 0.000181 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+                 exp(coef) exp(-coef) lower .95 upper .95
+payoff           1.909e+00  5.237e-01 1.594e+00 2.288e+00
+KW_Normative     2.163e+02  4.622e-03 2.999e+01 1.560e+03
+KW_Normative:sdi 4.111e-03  2.433e+02 2.318e-04 7.291e-02
+
+Concordance= 0.802  (se = 0.021 )
+Likelihood ratio test= 143.8  on 3 df,   p=&lt;2e-16
+Wald test            = 65.53  on 3 df,   p=4e-14
+Score (logrank) test = 97.21  on 3 df,   p=&lt;2e-16</code></pre>
 </div>
 </div>
 <div id="between-subjects-elicitation" class="section level3 tabset">
 <h3 class="tabset">Between-subjects elicitation</h3>
-<div id="kim003-1" class="section level4">
-<h4>2016Kim003</h4>
-<pre><code>    paper_id scenarios        subject_id treatment_id Game_type choice A
-1 2016Kim003         0 2016Kim003_7_1913 2016Kim003_7        DG      4 0
-2 2016Kim003         0 2016Kim003_7_2225 2016Kim003_7        DG      7 0
-3 2016Kim003         0 2016Kim003_7_2119 2016Kim003_7        DG      4 0
-4 2016Kim003         0 2016Kim003_7_2218 2016Kim003_7        DG      7 0
-5 2016Kim003         0 2016Kim003_7_2027 2016Kim003_7        DG      6 0
-6 2016Kim003         0 2016Kim003_8_1706 2016Kim003_8        UG      8 0
-  endowment gender  age  Design payoff KW_Normative
-1        16      1   28 Between     16   -0.2718909
-2        16      0   25 Between     16   -0.2718909
-3        16      1   22 Between     16   -0.2718909
-4        16      1   26 Between     16   -0.2718909
-5        16      1   29 Between     16   -0.2718909
-6        16      0 1991 Between     16   -0.2718909</code></pre>
-<pre><code>Call:
-coxph(formula = Surv(rep(1, 2295L), A) ~ payoff + KW_Normative + 
-    strata(subject_id), data = Kim003, method = &quot;exact&quot;)
-
-  n= 2295, number of events= 133 
-
-                  coef exp(coef)  se(coef)     z Pr(&gt;|z|)    
-payoff       9.637e-01 2.621e+00 1.111e-01 8.670   &lt;2e-16 ***
-KW_Normative 1.655e+01 1.535e+07 1.693e+00 9.772   &lt;2e-16 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-             exp(coef) exp(-coef) lower .95 upper .95
-payoff       2.621e+00  3.815e-01 2.108e+00 3.259e+00
-KW_Normative 1.535e+07  6.516e-08 5.556e+05 4.239e+08
-
-Concordance= 0.834  (se = 0.018 )
-Likelihood ratio test= 208.4  on 2 df,   p=&lt;2e-16
-Wald test            = 106.8  on 2 df,   p=&lt;2e-16
-Score (logrank) test = 127.1  on 2 df,   p=&lt;2e-16</code></pre>
-</div>
-<div id="her061-1" class="section level4">
-<h4>2018Her061</h4>
-<pre><code>Call:
-coxph(formula = Surv(rep(1, 418L), A) ~ payoff + KW_Normative + 
-    strata(subject_id), data = Her061, method = &quot;exact&quot;)
-
-  n= 418, number of events= 38 
-
-                 coef exp(coef) se(coef)     z Pr(&gt;|z|)    
-payoff         1.8670    6.4689   0.5111 3.653 0.000259 ***
-KW_Normative   4.9146  136.2670   1.6665 2.949 0.003187 ** 
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-             exp(coef) exp(-coef) lower .95 upper .95
-payoff           6.469   0.154586     2.376     17.61
-KW_Normative   136.267   0.007339     5.198   3572.03
-
-Concordance= 0.858  (se = 0.035 )
-Likelihood ratio test= 67.01  on 2 df,   p=3e-15
-Wald test            = 27.24  on 2 df,   p=1e-06
-Score (logrank) test = 52.33  on 2 df,   p=4e-12</code></pre>
-</div>
-<div id="cha026-1" class="section level4">
-<h4>2019Cha026</h4>
-<pre><code>Call:
-coxph(formula = Surv(rep(1, 6897L), A) ~ payoff + KW_Normative + 
-    strata(subject_id, treatment_id, paper_id), data = Cha026, 
-    method = &quot;exact&quot;)
-
-  n= 6897, number of events= 627 
-
-                coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-payoff       0.17685   1.19346  0.01829  9.667   &lt;2e-16 ***
-KW_Normative 2.17277   8.78255  0.20078 10.822   &lt;2e-16 ***
----
-Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-
-             exp(coef) exp(-coef) lower .95 upper .95
-payoff           1.193     0.8379     1.151     1.237
-KW_Normative     8.783     0.1139     5.925    13.017
-
-Concordance= 0.806  (se = 0.011 )
-Likelihood ratio test= 413.8  on 2 df,   p=&lt;2e-16
-Wald test            = 210.3  on 2 df,   p=&lt;2e-16
-Score (logrank) test = 312.2  on 2 df,   p=&lt;2e-16</code></pre>
-</div>
-</div>
-<div id="all-papers-results-1" class="section level3">
-<h3>All papers results</h3>
-<table class="table" style="width: auto !important; ">
-<caption>
-Estimated Parameters
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-ID
-</th>
-<th style="text-align:center;">
-alpha
-</th>
-<th style="text-align:center;">
-beta
-</th>
-<th style="text-align:center;">
-var_alpha
-</th>
-<th style="text-align:center;">
-var_beta
-</th>
-<th style="text-align:center;">
-MRS
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-2020Bas115
-</td>
-<td style="text-align:center;">
-0.73
-</td>
-<td style="text-align:center;">
-2.46
-</td>
-<td style="text-align:center;">
-0.07
-</td>
-<td style="text-align:center;">
-0.20
-</td>
-<td style="text-align:center;">
-6.76
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-2016Kim003
-</td>
-<td style="text-align:center;">
-0.96
-</td>
-<td style="text-align:center;">
-16.55
-</td>
-<td style="text-align:center;">
-0.11
-</td>
-<td style="text-align:center;">
-1.69
-</td>
-<td style="text-align:center;">
-34.34
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-2018Her061
-</td>
-<td style="text-align:center;">
-1.87
-</td>
-<td style="text-align:center;">
-4.91
-</td>
-<td style="text-align:center;">
-0.51
-</td>
-<td style="text-align:center;">
-1.67
-</td>
-<td style="text-align:center;">
-5.26
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-2019Cha026
-</td>
-<td style="text-align:center;">
-0.18
-</td>
-<td style="text-align:center;">
-2.17
-</td>
-<td style="text-align:center;">
-0.02
-</td>
-<td style="text-align:center;">
-0.20
-</td>
-<td style="text-align:center;">
-24.57
-</td>
-</tr>
-<tr>
-<td style="text-align:left;font-weight: bold;">
-2019Cha026
-</td>
-<td style="text-align:center;">
-0.18
-</td>
-<td style="text-align:center;">
-2.17
-</td>
-<td style="text-align:center;">
-0.02
-</td>
-<td style="text-align:center;">
-0.20
-</td>
-<td style="text-align:center;">
-24.57
-</td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div id="individual-analysis-of-norm-compliance" class="section level2 tabset">
@@ -1546,8 +1484,8 @@ no check
 </tbody>
 </table>
 <pre class="r"><code>datatable(master %&gt;% subset.data.frame(select = c(PaperID, TreatmentCode, Game_type, Avg_coop, SD_NE, Sd_Avg_NE, Norm_Strength, Delta)),rownames = F) %&gt;% formatRound(columns = c(&quot;Avg_coop&quot;, &quot;Avg_coop&quot;, &quot;SD_NE&quot;, &quot;Sd_Avg_NE&quot;, &quot;Norm_Strength&quot;, &quot;Delta&quot;), digits = 2)</code></pre>
-<div id="htmlwidget-0e5b34e663b144c98245" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0e5b34e663b144c98245">{"x":{"filter":"none","vertical":false,"data":[["2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2017Sen116","2017Sen116","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020And089","2020And089","2019Dro082","2018Her061","2019Tjo060","2019Tjo060","2017Ves049","2017Ves049","2017Ves049","2018Kim038","2018Kim038","2015Ves034","2015Ves034","2017Tho028","2017Tho028","2019Cha026","2019Cha026","2016Kim003","2016Kim003","2016Kim003","2016Kim003"],["10","9","8","7","4","3","2","1","2","1","2c","1c","2b","1b","2a","1a","2","1","1a","9","9","8","1a","2a","3a","2","1","4","1","2","1","2","1","9","8","6","7"],["DG","DG","DG","DG","DG","DG","DG","DG","DG","DG","UG","UG","DG Tax","DG Tax","DG","DG","Donation Game","Donation Game","Donation Game","DG","DG","DG","PGG","PGG","PGG","DG","DG","UG","UG","DG","DG","DG","DG","PGG","UG","TG","DG"],[null,null,null,null,null,null,null,null,0.336315789473684,0.256363636363636,0.419047619047619,0.473333333333333,0.295275590551181,0.45630081300813,0.265354330708661,0.420325203252033,0.567213114754098,0.601047120418848,0.0870719851107995,0.144736842105263,null,null,0.425735294117647,0.4875,0.425735294117647,0.206764705882353,0.199090909090909,null,null,0.373333333333333,0.409433962264151,0.2935,0.287224669603524,null,0.433976449275362,0.509114583333333,0.250466417910448],[0.423018752627756,0.447115679653279,0.420800736778419,0.424864901652734,0.429093153186764,0.505452847832582,0.50599823036666,0.467073060109354,null,null,0.512375286236326,0.408884407565064,0.573503606528906,0.597004830320797,0.309334833142221,0.286112895720718,0.283994756012316,0.387509702086784,0.484832847763975,0.429657605879227,0.522703905877288,0.568246692357634,0.663101814892192,0.656824512115917,0.69923292977306,null,null,0.18935242733246,0.218023313389243,0.374634324632677,0.466590635868752,0.610461563700156,0.336374714047043,0.464546322310086,0.438221404389617,0.3890391923742,0.411130757118591],[0.147154988136432,0.167234078733472,0.122994843833903,0.156388661577107,0.07049575265793,0.125043858780669,0.146211665880905,0.180860011878382,null,null,0.443002383486761,0.482248634758201,0.438512342569909,0.40938794113984,0.484479185015093,0.509559921748546,0.471711324937269,0.464942406445931,0.460886022048567,0.536055547457004,0.169803808359334,0.208777305162587,0.382297566122727,0.378075256905631,0.305639515220348,null,null,0.593240283712889,0.559799941296557,0.994670820746978,0.939539285535056,0.0244262181128532,0.0329178922902668,0.181778751569637,0.181330864398765,0.161278383675337,0.175132328525287],[9.15951764806779,8.21620013618474,10.5068438231499,8.7480148212147,16.5157480539615,9.97561793350188,8.8156910341424,7.67013087125184,null,null,4.20901864315297,4.51929811947264,4.02410572007823,4.11769919743673,5.29681511102743,5.45760156321707,5.64113240133798,4.73138457640489,4.23230036426128,4.19291296711409,7.80227842143774,6.54959171029103,4.12382748586228,4.16745272714305,4.70196684463745,null,null,6.96681515559355,6.37301791141948,3.67462729457275,3.20755776980859,42.5777211856025,33.35149077931,7.65383088131606,7.79673248892369,8.77089407743471,8.14228424562102],[null,null,null,null,null,null,null,null,null,null,0.080952380952381,0.026666666666667,0.288057742782152,0.127032520325203,0.234645669291339,0.079674796747967,0.432786885245902,0.398952879581152,0.0667741687353545,0.355263157894737,null,null,0.574264705882353,0.5125,0.574264705882353,null,null,null,null,0.626666666666667,0.590566037735849,0.2065,0.212775330396476,null,0.066023550724638,-0.00911458333333304,0.249533582089552]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>PaperID<\/th>\n      <th>TreatmentCode<\/th>\n      <th>Game_type<\/th>\n      <th>Avg_coop<\/th>\n      <th>SD_NE<\/th>\n      <th>Sd_Avg_NE<\/th>\n      <th>Norm_Strength<\/th>\n      <th>Delta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":5,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":6,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":7,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"className":"dt-right","targets":[3,4,5,6,7]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render","options.columnDefs.3.render","options.columnDefs.4.render","options.columnDefs.5.render"],"jsHooks":[]}</script>
+<div id="htmlwidget-09a533ec68573955ebf8" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-09a533ec68573955ebf8">{"x":{"filter":"none","vertical":false,"data":[["2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2021Kon127","2017Sen116","2017Sen116","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020Bas115","2020And089","2020And089","2019Dro082","2018Her061","2019Tjo060","2019Tjo060","2017Ves049","2017Ves049","2017Ves049","2018Kim038","2018Kim038","2015Ves034","2015Ves034","2017Tho028","2017Tho028","2019Cha026","2019Cha026","2016Kim003","2016Kim003","2016Kim003","2016Kim003"],["10","9","8","7","4","3","2","1","2","1","2c","1c","2b","1b","2a","1a","2","1","1a","9","9","8","1a","2a","3a","2","1","4","1","2","1","2","1","9","8","6","7"],["DG","DG","DG","DG","DG","DG","DG","DG","DG","DG","UG","UG","DG Tax","DG Tax","DG","DG","Donation Game","Donation Game","Donation Game","DG","DG","DG","PGG","PGG","PGG","DG","DG","UG","UG","DG","DG","DG","DG","PGG","UG","TG","DG"],[null,null,null,null,null,null,null,null,0.336315789473684,0.256363636363636,0.419047619047619,0.473333333333333,0.295275590551181,0.45630081300813,0.265354330708661,0.420325203252033,0.567213114754098,0.601047120418848,0.0870719851107995,0.144736842105263,null,null,0.425735294117647,0.4875,0.425735294117647,0.206764705882353,0.199090909090909,null,null,0.373333333333333,0.409433962264151,0.2935,0.287224669603524,null,0.433976449275362,0.509114583333333,0.250466417910448],[0.423018752627756,0.447115679653279,0.420800736778419,0.424864901652734,0.429093153186764,0.505452847832582,0.50599823036666,0.467073060109354,null,null,0.512375286236326,0.408884407565064,0.573503606528906,0.597004830320797,0.309334833142221,0.286112895720718,0.283994756012316,0.387509702086784,0.484832847763975,0.429657605879227,0.522703905877288,0.568246692357634,0.663101814892192,0.656824512115917,0.69923292977306,null,null,0.18935242733246,0.218023313389243,0.374634324632677,0.466590635868752,0.610461563700156,0.336374714047043,0.464546322310086,0.438221404389617,0.3890391923742,0.411130757118591],[0.147154988136432,0.167234078733472,0.122994843833903,0.156388661577107,0.07049575265793,0.125043858780669,0.146211665880905,0.180860011878382,null,null,0.443002383486761,0.482248634758201,0.438512342569909,0.40938794113984,0.484479185015093,0.509559921748546,0.471711324937269,0.464942406445931,0.460886022048567,0.536055547457004,0.169803808359334,0.208777305162587,0.382297566122727,0.378075256905631,0.305639515220348,null,null,0.593240283712889,0.559799941296557,0.994670820746978,0.939539285535056,0.0244262181128532,0.0329178922902668,0.181778751569637,0.181330864398765,0.161278383675337,0.175132328525287],[9.15951764806779,8.21620013618474,10.5068438231499,8.7480148212147,16.5157480539615,9.97561793350188,8.8156910341424,7.67013087125184,null,null,4.20901864315297,4.51929811947264,4.02410572007823,4.11769919743673,5.29681511102743,5.45760156321707,5.64113240133798,4.73138457640489,4.23230036426128,4.19291296711409,7.80227842143774,6.54959171029103,4.12382748586228,4.16745272714305,4.70196684463745,null,null,6.96681515559355,6.37301791141948,3.67462729457275,3.20755776980859,42.5777211856025,33.35149077931,7.65383088131606,7.79673248892369,8.77089407743471,8.14228424562102],[null,null,null,null,null,null,null,null,null,null,0.080952380952381,0.026666666666667,0.288057742782152,0.127032520325203,0.234645669291339,0.079674796747967,0.432786885245902,0.398952879581152,0.0667741687353545,0.355263157894737,null,null,0.574264705882353,0.5125,0.574264705882353,null,null,null,null,0.626666666666667,0.590566037735849,0.2065,0.212775330396476,null,0.066023550724638,-0.00911458333333304,0.249533582089552]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>PaperID<\/th>\n      <th>TreatmentCode<\/th>\n      <th>Game_type<\/th>\n      <th>Avg_coop<\/th>\n      <th>SD_NE<\/th>\n      <th>Sd_Avg_NE<\/th>\n      <th>Norm_Strength<\/th>\n      <th>Delta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":5,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":6,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":7,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"className":"dt-right","targets":[3,4,5,6,7]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render","options.columnDefs.3.render","options.columnDefs.4.render","options.columnDefs.5.render"],"jsHooks":[]}</script>
 </div>
 <div id="conditional-logit-model-overall-model" class="section level2">
 <h2>Conditional logit model (Overall model)</h2>

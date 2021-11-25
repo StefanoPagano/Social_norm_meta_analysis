@@ -236,7 +236,7 @@ $U_{ij} = \alpha \pi_j + \beta S_{j}$
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
-dataframe_betas <- data.frame(ID=NA, alpha=NA, beta=NA,var_alpha=NA,var_beta=NA)
+dataframe_betas <- data.frame(ID=NA, t=NA, game=NA,alpha=NA, beta=NA,SE_alpha=NA,SE_beta=NA)
 i=0
 ```
 
@@ -249,12 +249,24 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
 
 #### 2020Bas115
+
+Treatment 1 ("Social")
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-Bas115 = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="DG") %>% mutate(payoff=endowment-scenarios)
-clogit.bas <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115)
-summary(clogit.bas)
-dataframe_betas[i,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],sqrt(clogit.bas$var[1,1]),sqrt(clogit.bas$var[2,2]))
+Bas115_dg = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="DG") %>% mutate(payoff=endowment-scenarios)
+clogit.bas_dg_1 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_1a"))
+summary(clogit.bas_dg_1)
+dataframe_betas[i,] <- c("2020Bas115",1,"DG",clogit.bas_dg_1$coefficients["payoff"],clogit.bas_dg_1$coefficients["KW_Normative"],sqrt(clogit.bas_dg_1$var[1,1]),sqrt(clogit.bas_dg_1$var[2,2]))
+```
+
+Treatment 2 ("Private")
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+clogit.bas_dg_2 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_2a"))
+summary(clogit.bas_dg_2)
+dataframe_betas[i,] <- c("2020Bas115",2, "DG",clogit.bas_dg_2$coefficients["payoff"],clogit.bas_dg_2$coefficients["KW_Normative"],sqrt(clogit.bas_dg_2$var[1,1]),sqrt(clogit.bas_dg_2$var[2,2]))
 ```
 
 ### Between {.tabset}
@@ -276,9 +288,9 @@ Kim003_dg = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_ty
 
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
-clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_dg)
-summary(clogit.kim)
-dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
+clogit.kim_dg <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_dg)
+summary(clogit.kim_dg)
+dataframe_betas[i,] <- c("2016Kim003",1,"DG",clogit.kim_dg$coefficients["payoff"],clogit.kim_dg$coefficients["KW_Normative"],sqrt(clogit.kim_dg$var[1,1]),sqrt(clogit.kim_dg$var[2,2]))
 ```
 
 For UG game
@@ -293,7 +305,7 @@ Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_ty
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
 clogit.kim_ug <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_ug)
 summary(clogit.kim_ug)
-dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
+dataframe_betas[i,] <- c("2016Kim003",2,"UG",clogit.kim_ug$coefficients["payoff"],clogit.kim_ug$coefficients["KW_Normative"],sqrt(clogit.kim_ug$var[1,1]),sqrt(clogit.kim_ug$var[2,2]))
 ```
 
 #### 2018Her061
@@ -307,11 +319,14 @@ Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutat
 clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
 #summary(mlogit.her)
 summary(clogit.her)
-dataframe_betas[i,] <- c("2018Her061",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]))
+dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]))
 
 ```
 
 #### 2019Cha026
+
+Treatment 1
+
 ``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
@@ -319,19 +334,29 @@ Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutat
 #            idx = c("subject_id","scenarios"), 
 #            idpkg = "mlogit")
 
-clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Cha026)
-summary(clogit.cha)
+clogit.cha_1 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Cha026%>% subset.data.frame(treatment_id=="2019Cha026_1"))
+summary(clogit.cha_1)
 #mlogit.cha <- mlogit(A~ 0+payoff + KW_Normative, data = Cha026_m)
 #summary(mlogit.cha)
-dataframe_betas[i,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],sqrt(clogit.cha$var[1,1]),sqrt(clogit.cha$var[2,2]))
+dataframe_betas[i,] <- c("2019Cha026",1, "DG", clogit.cha_1$coefficients["payoff"],clogit.cha_1$coefficients["KW_Normative"],sqrt(clogit.cha_1$var[1,1]),sqrt(clogit.cha_1$var[2,2]))
+```
+
+
+Treatment 2
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+clogit.cha_2 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Cha026%>% subset.data.frame(treatment_id=="2019Cha026_2"))
+summary(clogit.cha_2)
+dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff"],clogit.cha_2$coefficients["KW_Normative"],sqrt(clogit.cha_2$var[1,1]),sqrt(clogit.cha_2$var[2,2]))
 ```
 
 ### All papers results
 ```{r echo=F, message=FALSE, warning=FALSE}
 opts <- options(knitr.kable.NA = "")
-kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
+kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
   kable_styling(position = "left", full_width = F) %>%
-  column_spec(1, bold = T) 
+  column_spec(1, bold = T)
 ```
 
 ## Augmented Utility framework {.tabset}
@@ -356,78 +381,36 @@ $U_{ij} = \alpha \pi_j + \beta S_{j} + \eta SD(S_{ij})_i$
 #### 2020Bas115
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=1
-SDi= Bas115 %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
-Bas115_plus <- Bas115 %>% merge.data.frame(SDi)
-summary(Bas115_plus$sdi)
-#Bas115_plus_m <- dfidx(Bas115_plus %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
+SDi= Bas115_dg %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
+Bas115_plus <- Bas115_dg %>% merge.data.frame(SDi)
+clogit.bas_plus_1 <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_plus%>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"))
+summary(clogit.bas_plus_1)
+dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha=clogit.bas_plus_1$coefficients["payoff"],
+                                        beta=clogit.bas_plus_1$coefficients["KW_Normative"],
+                                        gamma=clogit.bas_plus_1$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(clogit.bas_plus_1$var[1,1]),
+                                        SE_beta=sqrt(clogit.bas_plus_1$var[2,2]),
+                                        SE_gamma=sqrt(clogit.bas_plus_1$var[3,3]), row.names = NULL
+                                        )
+```
 
-clogit.bas_plus <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + KW_Normative:age + KW_Normative:gender + strata(subject_id), data = Bas115_plus)
-summary(clogit.bas_plus)
 
-dataframe_betas[i,] <- c("2020Bas115",clogit.bas$coefficients["payoff"],clogit.bas$coefficients["KW_Normative"],sqrt(clogit.bas$var[1,1]),sqrt(clogit.bas$var[2,2]))
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+clogit.bas_plus_2 <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_plus%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
+summary(clogit.bas_plus_2)
+dataframe_betas_augmented[i,] <- c(ID="2020Bas115",t=2,game_type="DG",alpha=clogit.bas_plus_2$coefficients["payoff"],
+                                        beta=clogit.bas_plus_2$coefficients["KW_Normative"],
+                                        gamma=clogit.bas_plus_2$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(clogit.bas_plus_2$var[1,1]),
+                                        SE_beta=sqrt(clogit.bas_plus_2$var[2,2]),
+                                        SE_gamma=sqrt(clogit.bas_plus_2$var[3,3])
+                                        )
+
 ```
 
 ### Between-subjects elicitation {.tabset}
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
-choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
-individual_db_b <- merge.data.frame(choices_b, beliefs_b)
-```
 
-#### 2016Kim003
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-i=i+1
-Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
-#Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
-head(Kim003)
-#mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
-#summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
-clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
-summary(clogit.kim)
-dataframe_betas[i,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],sqrt(clogit.kim$var[1,1]),sqrt(clogit.kim$var[2,2]))
-```
-
-#### 2018Her061
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-i=i+1
-Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
-#Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
-#mlogit.her <- mlogit(A~ payoff + KW_Normative|0, data = Her061_m)
-clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
-#summary(mlogit.her)
-summary(clogit.her)
-dataframe_betas[i,] <- c("2018Her061",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]))
-
-```
-
-#### 2019Cha026
-``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-i=i+1
-Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
-#Cha026_m <- dfidx(Cha026 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
-
-clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Cha026)
-summary(clogit.cha)
-#mlogit.cha <- mlogit(A~ 0+payoff + KW_Normative, data = Cha026_m)
-#summary(mlogit.cha)
-dataframe_betas[i,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],sqrt(clogit.cha$var[1,1]),sqrt(clogit.cha$var[2,2]))
-```
-
-### All papers results
-```{r echo=F, message=FALSE, warning=FALSE}
-opts <- options(knitr.kable.NA = "")
-kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
-  kable_styling(position = "left", full_width = F) %>%
-  column_spec(1, bold = T) 
-```
 
 ## Individual analysis of norm compliance {.tabset}
 
@@ -500,5 +483,5 @@ datatable(master %>% subset.data.frame(select = c(PaperID, TreatmentCode, Game_t
 i=i+1
 between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id), data = individual_db_b)
 summary(between)
-dataframe_betas[i,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
+#dataframe_betas[i,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```
