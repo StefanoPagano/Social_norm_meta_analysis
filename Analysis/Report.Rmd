@@ -311,12 +311,15 @@ dataframe_betas[5,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.c
 ```
 
 ```{r}
-kable(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2)
+opts <- options(knitr.kable.NA = "")
+kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T) 
 ```
 
 ## Individual analysis of norm compliance
 
-```{r}
+
 # bas155
 bas115_strenght <- Bas115 %>% group_by(subject_id) %>% summarise(specificity = sd(KW_Normative))
 data_bas115 <- Bas115 %>% merge.data.frame(bas115_strenght)
@@ -324,7 +327,7 @@ data_bas115_m <- dfidx(data_bas115 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
             idpkg = "mlogit")
 summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))
-```
+
 
 # Appendix : Effect of varibility on norms and actions
 
