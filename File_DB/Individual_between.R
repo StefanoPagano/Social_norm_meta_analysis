@@ -73,15 +73,19 @@ for (x in dbbase$n) {
 
 Individual_Her061_DB <- Individual_Her061_DB %>%
   subset.data.frame(subset = endowment > 0)
+  
 
 for (y in Individual_Her061_DB$p) {
   if (Individual_Her061_DB$choice[y] == Individual_Her061_DB$scenarios[y]) {Individual_Her061_DB$A[y] = 1}
   else {Individual_Her061_DB$A[y] = 0}
 }
 
+Individual_Her061_DB <- Individual_Her061_DB %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design) 
+
 Her061_output <- Individual_Her061_DB %>% 
   merge.data.frame(Her061_KW_score, by = c("scenarios")) %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
@@ -175,16 +179,19 @@ for (x in dbbase$n) {
 }
 
 Individual_Cha026_DB_1 <- Individual_Cha026_DB_1 %>%
-  subset.data.frame(subset = endowment > 0)
+  subset.data.frame(subset = endowment > 0) 
 
 for (y in Individual_Cha026_DB_1$p) {
   if (Individual_Cha026_DB_1$choice[y] == Individual_Cha026_DB_1$scenarios[y]) {Individual_Cha026_DB_1$A[y] = 1}
   else {Individual_Cha026_DB_1$A[y] = 0}
 }
 
+Individual_Cha026_DB_1 <- Individual_Cha026_DB_1 %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design)
+
 Cha026_output_1 <- Individual_Cha026_DB_1 %>% 
   merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
@@ -254,9 +261,12 @@ for (y in Individual_Cha026_DB_2$p) {
   else {Individual_Cha026_DB_2$A[y] = 0}
 }
 
+Individual_Cha026_DB_2 <- Individual_Cha026_DB_2 %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design)
+
 Cha026_output_2 <- Individual_Cha026_DB_2 %>%
   merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
@@ -271,7 +281,8 @@ Cha026_output_2 <- Individual_Cha026_DB_2 %>%
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
 
 # choice file
-Kim003=read.csv("DG_Data.csv", sep="\t")
+Kim003_dg=read.csv("DG_Data.csv", sep="\t")
+Kim003_ug=read.table("UG_Data.txt", header = T)
 
 # norms file
 Kim003_db_norms=read.csv("Norm_Elicitation_Data.csv", sep = ",")
@@ -314,15 +325,13 @@ Kim003_db_norms <- Kim003_db_norms %>%
          ANSW39 = recode(answers.39., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
          ANSW40 = recode(answers.40., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
          ANSW41 = recode(answers.41., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-         ANSW42 = recode(answers.42., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1)) %>%
-  subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143))
+         ANSW42 = recode(answers.42., `0` = 0,`1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
 
-# Subject ID (treatment neutrally 106, tax 266, tot 372)
+
+# DG
 coldg = c("subj_id", "role", "sent", "gender", "age")
 
-# treatment neutrally
-# n_progr_1 <- c(1:227)
-Kim003_sub_1 <- Kim003 %>%
+Kim003_sub_1 <- Kim003_dg %>%
   subset.data.frame(select = coldg, subset = role == 1) %>%
   mutate(endowment = 16) %>%
   mutate(coop = sent/endowment) %>%
@@ -336,28 +345,120 @@ Kim003_sub_1 <- Kim003_sub_1 %>%
   subset.data.frame(select = -c(subj_id, role, year_sub)) %>% 
   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
 
-Choice_Kim003_DB <- Kim003_sub_1
+Choice_Kim003_dg_DB <- Kim003_sub_1
 
-Kim003_KW_score <- Kim003_db_norms %>%
+Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143))
+
+Kim003_KW_score_dg <- Kim003_db_norms_dg %>%
   pivot_longer(!c(X140626_1150, session, Subject), names_to = "scenarios", values_to = "KW_score") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `ANSW01` = 0, `ANSW02` = 2, `ANSW03` = 4, `ANSW04` = 6, `ANSW05` = 8, `ANSW06` = 10, `ANSW07` = 12, `ANSW08` = 14, `ANSW09` = 16))) %>%
   subset.data.frame(select = -c(X140626_1150, session, Subject)) %>%
   group_by(scenarios) %>%
   summarise(KW_Normative = mean(KW_score))
 
-Kim003_KW_score_add <- data.frame(scenarios = seq(1,15,2), KW_Normative = NA)
-Kim003_KW_score_add$KW_Normative[1] = mean(c(Kim003_KW_score$KW_Normative[1],Kim003_KW_score$KW_Normative[2]))
-Kim003_KW_score_add$KW_Normative[2] = mean(c(Kim003_KW_score$KW_Normative[2],Kim003_KW_score$KW_Normative[3]))
-Kim003_KW_score_add$KW_Normative[3] = mean(c(Kim003_KW_score$KW_Normative[3],Kim003_KW_score$KW_Normative[4]))
-Kim003_KW_score_add$KW_Normative[4] = mean(c(Kim003_KW_score$KW_Normative[4],Kim003_KW_score$KW_Normative[5]))
-Kim003_KW_score_add$KW_Normative[5] = mean(c(Kim003_KW_score$KW_Normative[5],Kim003_KW_score$KW_Normative[6]))
-Kim003_KW_score_add$KW_Normative[6] = mean(c(Kim003_KW_score$KW_Normative[6],Kim003_KW_score$KW_Normative[7]))
-Kim003_KW_score_add$KW_Normative[7] = mean(c(Kim003_KW_score$KW_Normative[7],Kim003_KW_score$KW_Normative[8]))
-Kim003_KW_score_add$KW_Normative[8] = mean(c(Kim003_KW_score$KW_Normative[8],Kim003_KW_score$KW_Normative[9]))
+Kim003_KW_score_dg_add <- data.frame(scenarios = seq(1,15,2), KW_Normative = NA)
+Kim003_KW_score_dg_add$KW_Normative[1] = mean(c(Kim003_KW_score_dg$KW_Normative[1],Kim003_KW_score_dg$KW_Normative[2]))
+Kim003_KW_score_dg_add$KW_Normative[2] = mean(c(Kim003_KW_score_dg$KW_Normative[2],Kim003_KW_score_dg$KW_Normative[3]))
+Kim003_KW_score_dg_add$KW_Normative[3] = mean(c(Kim003_KW_score_dg$KW_Normative[3],Kim003_KW_score_dg$KW_Normative[4]))
+Kim003_KW_score_dg_add$KW_Normative[4] = mean(c(Kim003_KW_score_dg$KW_Normative[4],Kim003_KW_score_dg$KW_Normative[5]))
+Kim003_KW_score_dg_add$KW_Normative[5] = mean(c(Kim003_KW_score_dg$KW_Normative[5],Kim003_KW_score_dg$KW_Normative[6]))
+Kim003_KW_score_dg_add$KW_Normative[6] = mean(c(Kim003_KW_score_dg$KW_Normative[6],Kim003_KW_score_dg$KW_Normative[7]))
+Kim003_KW_score_dg_add$KW_Normative[7] = mean(c(Kim003_KW_score_dg$KW_Normative[7],Kim003_KW_score_dg$KW_Normative[8]))
+Kim003_KW_score_dg_add$KW_Normative[8] = mean(c(Kim003_KW_score_dg$KW_Normative[8],Kim003_KW_score_dg$KW_Normative[9]))
 
-Kim003_KW_score <- Kim003_KW_score_add %>% rbind.data.frame(Kim003_KW_score) %>% arrange(scenarios)
+Kim003_KW_score_dg <- Kim003_KW_score_dg_add %>% rbind.data.frame(Kim003_KW_score_dg) %>% arrange(scenarios)
 
-Individual_Kim003_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA, Design = NA)
+Individual_Kim003_dg_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA, Design = NA)
+dbbase <- Choice_Kim003_dg_DB %>%
+  mutate(n = c(1:length(Choice_Kim003_dg_DB$subject_id)))
+
+j = 1
+
+for (x in dbbase$n) {
+  ewt = dbbase$endowment[x]
+  for (i in 0:ewt) {
+    new_line_DB <- data.frame(p = j,
+                              subject_id = dbbase$subject_id[x], 
+                              treatment_id = dbbase$treatment_id[x],
+                              paper_id = dbbase$paper_id[x],
+                              scenarios = i, 
+                              choice = dbbase$choice[x],
+                              endowment = dbbase$endowment[x],
+                              A = 0,
+                              gender = dbbase$gender,
+                              age = dbbase$age,
+                              Design = "Between")
+    
+    Individual_Kim003_dg_DB <- new_line_DB %>% rbind.data.frame(Individual_Kim003_dg_DB) %>% arrange(p)
+    j = j+1
+    
+  }
+  
+}
+
+Individual_Kim003_dg_DB <- Individual_Kim003_dg_DB %>%
+  subset.data.frame(subset = endowment > 0)
+
+for (y in Individual_Kim003_dg_DB$p) {
+  if (Individual_Kim003_dg_DB$choice[y] == Individual_Kim003_dg_DB$scenarios[y]) {Individual_Kim003_dg_DB$A[y] = 1}
+  else {Individual_Kim003_dg_DB$A[y] = 0}
+}
+
+Individual_Kim003_dg_DB <- Individual_Kim003_dg_DB %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design)
+
+Kim003_dg_output <- Individual_Kim003_dg_DB %>%
+  merge.data.frame(Kim003_KW_score_dg, by = c("scenarios")) %>%
+  arrange(subject_id, scenarios) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  subset.data.frame(select = -c(p)) %>%
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA)
+
+# UG
+colug = c("exp_id","exp_num","subj_id","subj", "role", "sent", "gender", "age")
+
+Kim003_sub_2 <- Kim003_ug %>%
+  subset.data.frame(select = colug, subset = role == 1) %>%
+  mutate(endowment = 16) %>%
+  mutate(coop = sent/endowment) %>%
+  mutate(agex= 2016-age) %>%
+  mutate(subject_id = paste("2016Kim003", "8", subj_id, sep = "_")) %>%
+  mutate(treatment_id = paste("2016Kim003", "8", sep = "_"), paper_id = "2016Kim003")
+
+colnames(Kim003_sub_2) <- c("exp_id", "exp_num", "subj_id", "subj", "role", "choice", "gender", "year_sub", "endowment", "cooperation", "age", "subject_id", "treatment_id", "paper_id")
+
+Kim003_sub_2 <- Kim003_sub_2 %>%
+  subset.data.frame(select = -c(exp_id, exp_num, subj_id, subj, role, year_sub)) %>% 
+  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
+
+Choice_Kim003_DB <- Kim003_sub_2
+
+Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163))
+
+Kim003_KW_score_ug <- Kim003_db_norms_ug %>%
+  pivot_longer(!c(X140626_1150, session, Subject), names_to = "scenarios", values_to = "KW_score") %>%
+  mutate(scenarios = as.numeric(recode(scenarios, `ANSW23` = 0, `ANSW24` = 2, `ANSW25` = 4, `ANSW26` = 6, `ANSW27` = 8, `ANSW28` = 10, `ANSW29` = 12, `ANSW30` = 14, `ANSW31` = 16))) %>%
+  subset.data.frame(select = -c(X140626_1150, session, Subject)) %>%
+  group_by(scenarios) %>%
+  summarise(KW_Normative = mean(KW_score))
+
+Kim003_KW_score_ug_add <- data.frame(scenarios = seq(1,15,2), KW_Normative = NA)
+Kim003_KW_score_ug_add$KW_Normative[1] = mean(c(Kim003_KW_score_ug$KW_Normative[1],Kim003_KW_score_ug$KW_Normative[2]))
+Kim003_KW_score_ug_add$KW_Normative[2] = mean(c(Kim003_KW_score_ug$KW_Normative[2],Kim003_KW_score_ug$KW_Normative[3]))
+Kim003_KW_score_ug_add$KW_Normative[3] = mean(c(Kim003_KW_score_ug$KW_Normative[3],Kim003_KW_score_ug$KW_Normative[4]))
+Kim003_KW_score_ug_add$KW_Normative[4] = mean(c(Kim003_KW_score_ug$KW_Normative[4],Kim003_KW_score_ug$KW_Normative[5]))
+Kim003_KW_score_ug_add$KW_Normative[5] = mean(c(Kim003_KW_score_ug$KW_Normative[5],Kim003_KW_score_ug$KW_Normative[6]))
+Kim003_KW_score_ug_add$KW_Normative[6] = mean(c(Kim003_KW_score_ug$KW_Normative[6],Kim003_KW_score_ug$KW_Normative[7]))
+Kim003_KW_score_ug_add$KW_Normative[7] = mean(c(Kim003_KW_score_ug$KW_Normative[7],Kim003_KW_score_ug$KW_Normative[8]))
+Kim003_KW_score_ug_add$KW_Normative[8] = mean(c(Kim003_KW_score_ug$KW_Normative[8],Kim003_KW_score_ug$KW_Normative[9]))
+
+Kim003_KW_score_ug <- Kim003_KW_score_ug_add %>% rbind.data.frame(Kim003_KW_score_ug) %>% arrange(scenarios)
+
+Individual_Kim003_ug_DB <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, gender = NA, age = NA, Design = NA)
 dbbase <- Choice_Kim003_DB %>%
   mutate(n = c(1:length(Choice_Kim003_DB$subject_id)))
 
@@ -374,28 +475,31 @@ for (x in dbbase$n) {
                               choice = dbbase$choice[x],
                               endowment = dbbase$endowment[x],
                               A = 0,
-                              gender = NA,
-                              age = NA,
+                              gender = dbbase$gender,
+                              age = dbbase$age,
                               Design = "Between")
     
-    Individual_Kim003_DB <- new_line_DB %>% rbind.data.frame(Individual_Kim003_DB) %>% arrange(p)
+    Individual_Kim003_ug_DB <- new_line_DB %>% rbind.data.frame(Individual_Kim003_ug_DB) %>% arrange(p)
     j = j+1
     
   }
   
 }
 
-Individual_Kim003_DB <- Individual_Kim003_DB %>%
-  subset.data.frame(subset = endowment > 0)
+Individual_Kim003_ug_DB <- Individual_Kim003_ug_DB %>%
+  subset.data.frame(subset = endowment > 0) 
 
-for (y in Individual_Kim003_DB$p) {
-  if (Individual_Kim003_DB$choice[y] == Individual_Kim003_DB$scenarios[y]) {Individual_Kim003_DB$A[y] = 1}
-  else {Individual_Kim003_DB$A[y] = 0}
+for (y in Individual_Kim003_ug_DB$p) {
+  if (Individual_Kim003_ug_DB$choice[y] == Individual_Kim003_ug_DB$scenarios[y]) {Individual_Kim003_ug_DB$A[y] = 1}
+  else {Individual_Kim003_ug_DB$A[y] = 0}
 }
 
-Kim003_output <- Individual_Kim003_DB %>%
-  merge.data.frame(Kim003_KW_score, by = c("scenarios")) %>%
+Individual_Kim003_ug_DB <- Individual_Kim003_ug_DB %>%
   merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design)
+
+Kim003_ug_output <- Individual_Kim003_ug_DB %>%
+  merge.data.frame(Kim003_KW_score_ug, by = c("scenarios")) %>%
   arrange(subject_id, scenarios) %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
