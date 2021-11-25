@@ -12,7 +12,7 @@ output:
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-library(mclogit)
+library(mlogit)
 library(sjmisc)
 library(ggrepel)
 library(readxl)
@@ -21,6 +21,7 @@ library(survival)
 library(sjPlot)
 library(kableExtra)
 library(car)
+
 
 setwd("../")
 
@@ -59,7 +60,7 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 <br>
 
-## HP3 : Is compliance related to norm strength?
+## HP2 : Is compliance related to norm strength?
 
 We compute norm strength as:
 
@@ -113,7 +114,7 @@ DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG")
 ```
 
-## HP4: Effect of punishment on norms and actions
+## HP3: Effect of punishment on norms and actions
 
 ### Cooperation, Delta and Strength Comparison between DG and UG
 
@@ -209,22 +210,24 @@ ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var
 ciao questo è il risultato `r F_test_spec$p.value`
 
 
-# Individual-level analysis
+# Individual-level analysis (Utility framework)
 
 ## Analysis plan
-Here we estimate a random utility model.
-We split our individual-level analysis into 2 steps: 
+Here we estimate a random utility model using a conditional logit model (McFadden 1975).
+We split our individual-level analysis into 2 steps:
 
-1. *Within subject design belief elicitation papers*: we estimate the utility function when beliefs and actions are elicited for the same subject
-2. *Between subject design belief elicitation papers*: we estimate the utility function when beliefs and actions are elicited using distinct subjects
+1. *Within subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited for the same subject
+2. *Between subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited using distinct subjects
 
 
 For 1., the model we estimate is the following:
+
 <center>
 $U_{ij} = \alpha \pi_j + \beta S_{ij}$ 
 </center>
 
 while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
+
 <center>
 $U_{ij} = \alpha \pi_j + \beta S_{j}$ 
 </center>
@@ -260,8 +263,7 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-between <-clogit(A~ payoff + KW_Normative, data = individual_db_b)
-betas=between$coefficients
+between <-clogit(A~ payoff + KW_Normative + KW_Normative:paper_id + strata(subject_id), data = individual_db_b)
 summary(between)
 dataframe_betas[2,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```
@@ -269,36 +271,60 @@ dataframe_betas[2,] <- c("Avg. Between",between$coefficients["payoff"],between$c
 ### 2016Kim003
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Kim003 = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
-Kim003 <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
+Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
             idpkg = "mlogit")
 head(Kim003)
-mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003)
-summary(mlogit.kim)$CoefTable[1,2] ### SUCA
-dataframe_etas[3,] <- c("2016Kim003",mlogit.kim$coefficients["payoff"],mlogit.kim$coefficients["KW_Normative"],mlogit.kim$[1,1],between$var[2,2])
+mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
+summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
+clogit.kim <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003)
+summary(clogit.kim)
+dataframe_betas[3,] <- c("2016Kim003",clogit.kim$coefficients["payoff"],clogit.kim$coefficients["KW_Normative"],clogit.kim$var[1,1],clogit.kim$var[2,2])
 ```
 
 ### 2018Her061
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
-Her061 <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
+Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
             idx = c("subject_id","scenarios"), 
             idpkg = "mlogit")
-mlogit.her <- mlogit(A~ 0+payoff + KW_Normative, data = Her061)
+mlogit.her <- mlogit(A~ payoff + KW_Normative|0, data = Her061_m)
+clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
 summary(mlogit.her)
+summary(clogit.her)
+dataframe_betas[4,] <- c("2018Her061",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],clogit.her$var[1,1],clogit.her$var[2,2])
 
 ```
 
 ### 2019Cha026
 ``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
+Cha026_m <- dfidx(Cha026 %>% mutate(scenarios=as.factor(scenarios)),
+            idx = c("subject_id","scenarios"), 
+            idpkg = "mlogit")
+
 clogit.cha <- clogit(A~ payoff + KW_Normative + strata(subject_id, treatment_id, paper_id), data = Cha026)
 summary(clogit.cha)
-betas=clogit.cha$coefficients
-sigma=sqrt(clogit.cha$var) # diagonal is variance; others are covariance
-plot_model(model = clogit.cha, title = "2019Cha026: Conditional Logit Model")
+mlogit.cha <- mlogit(A~ 0+payoff + KW_Normative, data = Cha026_m)
+summary(mlogit.cha)
+dataframe_betas[5,] <- c("2019Cha026",clogit.cha$coefficients["payoff"],clogit.cha$coefficients["KW_Normative"],clogit.cha$var[1,1],clogit.cha$var[2,2])
 ```
 
+```{r}
+kable(dataframe_betas %>% mutate_at(.vars = vars(alpha:var_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2)
+```
+
+## Individual analysis of norm compliance
+
+```{r}
+# bas155
+bas115_strenght <- Bas115 %>% group_by(subject_id) %>% summarise(specificity = sd(KW_Normative))
+data_bas115 <- Bas115 %>% merge.data.frame(bas115_strenght)
+data_bas115_m <- dfidx(data_bas115 %>% mutate(scenarios=as.factor(scenarios)),
+            idx = c("subject_id","scenarios"), 
+            idpkg = "mlogit")
+summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))
+```
 
 # Appendix : Effect of varibility on norms and actions
 
