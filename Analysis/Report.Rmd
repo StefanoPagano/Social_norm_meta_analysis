@@ -12,7 +12,7 @@ output:
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-#library(mlogit)
+library(mlogit)
 library(sjmisc)
 library(ggrepel)
 library(readxl)
@@ -68,7 +68,7 @@ $$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
 where:
 
-* $NE_{Specificity} = {1 \over \sigma_{j}}$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions $j$
+* $NE_{Specificity} = {1 \over \sigma_{J}}$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions $j$
 
 * $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
 
@@ -207,7 +207,7 @@ ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var
 
 ```
 
-ciao questo è il risultato `r F_test_spec$p.value`
+Questo è il risultato `r F_test_spec$p.value`
 
 
 # Individual-level analysis {.tabset}
@@ -250,23 +250,42 @@ individual_db_w <- merge.data.frame(choices_w, beliefs_w)
 
 #### 2020Bas115
 
-Treatment 1 ("Social")
+DG - Treatment 1 ("Social")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Bas115_dg = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="DG") %>% mutate(payoff=endowment-scenarios)
-clogit.bas_dg_1 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_1a"))
-summary(clogit.bas_dg_1)
-dataframe_betas[i,] <- c("2020Bas115",1,"DG",clogit.bas_dg_1$coefficients["payoff"],clogit.bas_dg_1$coefficients["KW_Normative"],sqrt(clogit.bas_dg_1$var[1,1]),sqrt(clogit.bas_dg_1$var[2,2]))
+model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_1a"))
+summary(model)
+dataframe_betas[i,] <- c("2020Bas115",1,"DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
 ```
 
-Treatment 2 ("Private")
+DG - Treatment 2 ("Private")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-clogit.bas_dg_2 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_2a"))
-summary(clogit.bas_dg_2)
-dataframe_betas[i,] <- c("2020Bas115",2, "DG",clogit.bas_dg_2$coefficients["payoff"],clogit.bas_dg_2$coefficients["KW_Normative"],sqrt(clogit.bas_dg_2$var[1,1]),sqrt(clogit.bas_dg_2$var[2,2]))
+model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_2a"))
+summary(model)
+dataframe_betas[i,] <- c("2020Bas115",2, "DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+```
+
+UG - Treatment 1 ("Social")
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+Bas115_ug = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="UG") %>% mutate(payoff=endowment-scenarios)
+model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_1c"))
+summary(model)
+dataframe_betas[i,] <- c("2020Bas115",3,"UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+```
+
+UG - Treatment 2 ("Private")
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_2c"))
+summary(model)
+dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
 ```
 
 ### Between {.tabset}
@@ -282,24 +301,17 @@ For DG game
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Kim003_dg = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="DG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
-#Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
-
-#mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
-#summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
 clogit.kim_dg <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_dg)
 summary(clogit.kim_dg)
 dataframe_betas[i,] <- c("2016Kim003",1,"DG",clogit.kim_dg$coefficients["payoff"],clogit.kim_dg$coefficients["KW_Normative"],sqrt(clogit.kim_dg$var[1,1]),sqrt(clogit.kim_dg$var[2,2]))
 ```
 
+
 For UG game
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="UG") %>% mutate(payoff=endowment-scenarios)
-#Kim003_m <- dfidx(Kim003 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
+Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="UG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subject_id!="2016Kim003_8_1804" & subject_id!="2016Kim003_8_2411")
+  
 
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
@@ -308,19 +320,40 @@ summary(clogit.kim_ug)
 dataframe_betas[i,] <- c("2016Kim003",2,"UG",clogit.kim_ug$coefficients["payoff"],clogit.kim_ug$coefficients["KW_Normative"],sqrt(clogit.kim_ug$var[1,1]),sqrt(clogit.kim_ug$var[2,2]))
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# Kim003_m <- dfidx(Kim003_ug %>% mutate(scenarios=as.factor(scenarios)),
+#             idx = c("subject_id","scenarios"), 
+#             idpkg = "mlogit")
+# mlogit.kim <- mlogit(A~payoff+KW_Normative|-1, data = Kim003_m, rpar = c(KW_Normative="n", payoff="n"))
+# #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
+# mxcl <- update(mlogit.kim, correlation=T)
+# kw_n <- rpar(mxcl,"KW_Normative", norm="payoff")
+# #summary(kw_n)
+# p=fitted(mxcl,type = "parameters")
+# ggplot(data.frame(betas=p[,2]), aes(x=betas)) + geom_density()
+```
+
 #### 2018Her061
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
-#Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
-#            idx = c("subject_id","scenarios"), 
-#            idpkg = "mlogit")
-#mlogit.her <- mlogit(A~ payoff + KW_Normative|0, data = Her061_m)
 clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
-#summary(mlogit.her)
 summary(clogit.her)
 dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]))
+```
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
+#             idx = c("subject_id","scenarios"), 
+#             idpkg = "mlogit")
+# mlogit.her <- mlogit(A~ payoff + KW_Normative|0, data = Her061_m, rpar = c(payoff="n", KW_Normative="n"))
+# mxcl <- update(mlogit.her, correlation=T)
+# kw_n <- rpar(mxcl,"KW_Normative", norm="payoff")
+# summary(mlogit.her)
+# p=fitted(mxcl,type = "parameters")
+# ggplot(data.frame(betas=p[,2]), aes(x=betas)) + geom_density()
+# mean(data.frame(betas=p[,2])$betas, na.rm = T)
 ```
 
 #### 2019Cha026
@@ -357,6 +390,11 @@ opts <- options(knitr.kable.NA = "")
 kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T)
+
+ggplot(dataframe_betas %>% mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% mutate(uniqueID=paste(ID,t,sep = "_t")) %>% arrange(beta), aes(x=beta,y=uniqueID,color=ID)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+
 ```
 
 ## Augmented Utility framework {.tabset}
@@ -372,44 +410,79 @@ where $\sigma(\cdot)$ is the standard deviation of $S_{ij}$ representing uncerta
 
 
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta SD(S_{ij})_i$ 
+$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta S_{j}*\sigma_j(S_{ij})$ 
 </center>
 
 
 ### Within-subjects elicitation {.tabset}
 
 #### 2020Bas115
+
+DG - T1
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=1
 SDi= Bas115_dg %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
-Bas115_plus <- Bas115_dg %>% merge.data.frame(SDi)
-clogit.bas_plus_1 <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_plus%>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"))
-summary(clogit.bas_plus_1)
-dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha=clogit.bas_plus_1$coefficients["payoff"],
-                                        beta=clogit.bas_plus_1$coefficients["KW_Normative"],
-                                        gamma=clogit.bas_plus_1$coefficients["KW_Normative:sdi"],
-                                        SE_alpha=sqrt(clogit.bas_plus_1$var[1,1]),
-                                        SE_beta=sqrt(clogit.bas_plus_1$var[2,2]),
-                                        SE_gamma=sqrt(clogit.bas_plus_1$var[3,3]), row.names = NULL
+Bas115_dg <- Bas115_dg %>% merge.data.frame(SDi)
+model <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"))
+summary(model)
+dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha=model$coefficients["payoff"],
+                                        beta=model$coefficients["KW_Normative"],
+                                        gamma=model$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(model$var[1,1]),
+                                        SE_beta=sqrt(model$var[2,2]),
+                                        SE_gamma=sqrt(model$var[3,3]), row.names = NULL
                                         )
 ```
 
-
+DG - T2
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-clogit.bas_plus_2 <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_plus%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
-summary(clogit.bas_plus_2)
-dataframe_betas_augmented[i,] <- c(ID="2020Bas115",t=2,game_type="DG",alpha=clogit.bas_plus_2$coefficients["payoff"],
-                                        beta=clogit.bas_plus_2$coefficients["KW_Normative"],
-                                        gamma=clogit.bas_plus_2$coefficients["KW_Normative:sdi"],
-                                        SE_alpha=sqrt(clogit.bas_plus_2$var[1,1]),
-                                        SE_beta=sqrt(clogit.bas_plus_2$var[2,2]),
-                                        SE_gamma=sqrt(clogit.bas_plus_2$var[3,3])
+model <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
+summary(model)
+dataframe_betas_augmented[i,] <- c(ID="2020Bas115",t=2,game_type="DG",alpha=model$coefficients["payoff"],
+                                        beta=model$coefficients["KW_Normative"],
+                                        gamma=model$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(model$var[1,1]),
+                                        SE_beta=sqrt(model$var[2,2]),
+                                        SE_gamma=sqrt(model$var[3,3])
                                         )
 
 ```
 
 ### Between-subjects elicitation {.tabset}
+
+#### 2016Kim003
+
+DG game
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+SDj= beliefs %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(sdj=sd(KW_Normative))
+i=i+1
+Kim003_dg = Kim003_dg %>% merge.data.frame(SDj)
+model <- clogit(A~payoff+KW_Normative + KW_Normative:sdj + strata(subject_id), data = Kim003_dg)
+summary(model)
+dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=1,game_type="DG",
+                                   alpha=model$coefficients["payoff"],
+                                        beta=model$coefficients["KW_Normative"],
+                                        gamma=model$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(model$var[1,1]),
+                                        SE_beta=sqrt(model$var[2,2]),
+                                        SE_gamma=sqrt(model$var[3,3]))
+```
+
+For UG game
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+i=i+1
+SDj= Kim003_ug %>% group_by(scenarios) %>% summarise(sdj=sd(KW_Normative))
+Kim003_ug = Kim003_ug %>% merge.data.frame(SDj)
+model <- clogit(A~payoff+KW_Normative + KW_Normative*sdj + strata(subject_id), data = Kim003_ug)
+summary(model)
+dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=2,game_type="UG",alpha=model$coefficients["payoff"],
+                                        beta=model$coefficients["KW_Normative"],
+                                        gamma=model$coefficients["KW_Normative:sdi"],
+                                        SE_alpha=sqrt(model$var[1,1]),
+                                        SE_beta=sqrt(model$var[2,2]),
+                                        SE_gamma=sqrt(model$var[3,3]))
+```
 
 
 ## Individual analysis of norm compliance {.tabset}
