@@ -1,6 +1,9 @@
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
 
+df_merge_game_type = read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+  subset.data.frame(select = c(treatment_id, Game_type))
+
 #### BETWEEN SUBJECTS DESIGN ----
 #### Paper: 2018Her061 ----
 
@@ -76,14 +79,17 @@ for (y in Individual_Her061_DB$p) {
   else {Individual_Her061_DB$A[y] = 0}
 }
 
-Her061_output <- Individual_Her061_DB %>% merge.data.frame(Her061_KW_score, by = c("scenarios")) %>%
+Her061_output <- Individual_Her061_DB %>% 
+  merge.data.frame(Her061_KW_score, by = c("scenarios")) %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
   mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,
          Bicchieri_Normative = NA,
          Bicchieri_Personal = NA)
+
 
 #### Paper: 2019Cha026 ----
 
@@ -176,9 +182,11 @@ for (y in Individual_Cha026_DB_1$p) {
   else {Individual_Cha026_DB_1$A[y] = 0}
 }
 
-Cha026_output_1 <- Individual_Cha026_DB_1 %>% merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
+Cha026_output_1 <- Individual_Cha026_DB_1 %>% 
+  merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
   mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,
@@ -246,9 +254,11 @@ for (y in Individual_Cha026_DB_2$p) {
   else {Individual_Cha026_DB_2$A[y] = 0}
 }
 
-Cha026_output_2 <- Individual_Cha026_DB_2 %>% merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
+Cha026_output_2 <- Individual_Cha026_DB_2 %>%
+  merge.data.frame(Cha026_KW_score_1, by = c("scenarios")) %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
   mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,
@@ -383,9 +393,11 @@ for (y in Individual_Kim003_DB$p) {
   else {Individual_Kim003_DB$A[y] = 0}
 }
 
-Kim003_output <- Individual_Kim003_DB %>% merge.data.frame(Kim003_KW_score, by = c("scenarios")) %>%
+Kim003_output <- Individual_Kim003_DB %>%
+  merge.data.frame(Kim003_KW_score, by = c("scenarios")) %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
   mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,

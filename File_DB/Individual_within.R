@@ -260,9 +260,11 @@ for (y in Individual_Within_DB$p) {
   else {Individual_Within_DB$A[y] = 0}
 }
 
-Bas115_output <- Individual_Within_DB %>% merge.data.frame(Bas115_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
+Bas115_output <- Individual_Within_DB %>% 
+  merge.data.frame(Bas115_norms_all, by = c("subject_id", "scenarios", "treatment_id", "paper_id")) %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   arrange(subject_id, scenarios) %>%
-  relocate(p, subject_id, treatment_id, paper_id, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
+  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age, Design, KW_Normative) %>%
   subset.data.frame(select = -c(p)) %>%
   mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,
