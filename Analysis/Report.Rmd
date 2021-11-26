@@ -118,26 +118,6 @@ UG <- master %>% subset.data.frame(Game_type=="UG")
 
 ### Cooperation, Delta and Strength Comparison between DG and UG
 
-We test the hypothesis whether :
-
-* **Cooperation** ($Coop_{avg}$) in DG and Donation Game is lower then UG.
-
-  + The p-value of Mann-Whitney-Wilcoxon Test is *0.0088*, therefore we *can* reject the null hypothesis (at .05 significance level).
-
-* **Normative Expectation** ($NE_{avg}$) in DG and Donation Game is lower then UG.
-
-  + The p-value of Mann-Whitney-Wilcoxon Test is *0.4923*, therefore we *can't* reject the null hypothesis (at .05 significance level).
-  
-* **Delta** in DG and Donation Game is lower then UG.
-  + *Delta* is computed as $NE_{avg}-Coop_{avg}$ 
-  + The p-value of Mann-Whitney-Wilcoxon Test is *0.0242*, therefore we *can* reject the null hypothesis (at .05 significance level).
-  
-* **Norm Strength** in DG and Donation Game is lower then UG.
-
-  + The p-value of Mann-Whitney-Wilcoxon Test is *0.1989*, therefore we *can't* reject the null hypothesis (at .05 significance level).
-  
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4_mean <- master %>% 
   subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")&Choice_Method != "OnlyNorms") %>%
@@ -157,7 +137,28 @@ wilc_coop = wilcox.test(Avg_coop ~ Macro_game_type, data = master_test)
 wilc_norm = wilcox.test(Avg_NE ~ Macro_game_type, data = master_test)
 
 hp4plus_mean <- hp4_mean %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+```
 
+We test the hypothesis whether :
+
+* **Cooperation** ($Coop_{avg}$) in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_coop$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
+
+* **Normative Expectation** ($NE_{avg}$) in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_norm$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level).
+  
+* **Delta** in DG and Donation Game is lower then UG.
+  + *Delta* is computed as $NE_{avg}-Coop_{avg}$ 
+  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_delta$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
+  
+* **Norm Strength** in DG and Donation Game is lower then UG.
+
+  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_strength$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level).
+  
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 opts <- options(knitr.kable.NA = "")
 kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, caption = "Average and Mann-Whitney-Wilcoxon Test") %>%
   kable_styling(position = "left", full_width = F) %>%
@@ -207,7 +208,6 @@ ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var
 
 ```
 
-Questo è il risultato `r F_test_spec$p.value`
 
 
 # Individual-level analysis {.tabset}
@@ -226,12 +226,14 @@ For 1., the model we estimate is the following:
 $U_{ij} = \alpha \pi_j + \beta S_{ij}$ 
 </center>
 
+<br>
 while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
 
 <center>
 $U_{ij} = \alpha \pi_j + \beta S_{j}$ 
 </center>
 
+<br>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
@@ -510,7 +512,9 @@ summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))
 
 <br>
 
-to do so we computed VAR NE as ...
+to do so we computed VAR_NE ($NE_{var}$) as:
+
+$$ NE_{var} = \sigma^2_{i}(max\{\mu_j(NE)\}) $$
 
 <h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
 
@@ -523,6 +527,7 @@ ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("Fig. 4 H2a : Correlation Between Average Cooperation and Norm Variance (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman") + geom_smooth(method="lm")
 
 ```
+
 <br>
 
 <h4><i>b. Does a higher norm variability lead to higher cooperation var.?</i></h4>

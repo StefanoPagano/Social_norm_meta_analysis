@@ -367,7 +367,7 @@ Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns 
   mutate(treatment_id = paste("2016Kim003", "7", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_dg <- Kim003_db_norms_dg %>%
-  pivot_longer(!c(X140626_1150, session, Subject, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_score") %>%
+  pivot_longer(!c(X140626_1150, session, Subject, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `ANSW01` = 0, `ANSW02` = 2, `ANSW03` = 4, `ANSW04` = 6, `ANSW05` = 8, `ANSW06` = 10, `ANSW07` = 12, `ANSW08` = 14, `ANSW09` = 16))) %>%
   subset.data.frame(select = -c(X140626_1150, session, Subject)) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
@@ -471,7 +471,7 @@ Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns 
   mutate(treatment_id = paste("2016Kim003", "8", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_ug <- Kim003_db_norms_ug %>%
-  pivot_longer(!c(X140626_1150, session, Subject, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_score") %>%
+  pivot_longer(!c(X140626_1150, session, Subject, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `ANSW23` = 0, `ANSW24` = 2, `ANSW25` = 4, `ANSW26` = 6, `ANSW27` = 8, `ANSW28` = 10, `ANSW29` = 12, `ANSW30` = 14, `ANSW31` = 16))) %>%
   subset.data.frame(select = -c(X140626_1150, session, Subject)) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%

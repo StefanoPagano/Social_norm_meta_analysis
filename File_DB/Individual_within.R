@@ -177,7 +177,7 @@ Bas115_norms_ug <- rbind.data.frame(Bas115_norms_1c, Bas115_norms_2c)%>%
   subset.data.frame(select = -c(code, social))
 
 ### Merge pivot
-Bas115_norms_all <- rbind(Bas115_norms_dg, Bas115_norms_ug) %>%
+Bas115_beliefs <- rbind(Bas115_norms_dg, Bas115_norms_ug) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
   mutate(gender = NA, 
          age = NA, 
@@ -231,7 +231,7 @@ Bas115_choice <- Bas115_choice %>%
   merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age) %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(p, Separate_sample_beliefs))
+  subset.data.frame(select = -c(Separate_sample_beliefs))
 
 
 
