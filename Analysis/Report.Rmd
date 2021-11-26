@@ -246,7 +246,7 @@ i=0
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
-individual_db_w <- merge.data.frame(choices_w, beliefs_w)
+individual_db_w <- merge.data.frame(choices_w, beliefs_w) 
 ```
 
 
@@ -388,8 +388,13 @@ dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff
 
 ### All papers results
 ```{r echo=F, message=FALSE, warning=FALSE}
+allpaperdata <- dataframe_betas %>% 
+  mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% 
+  mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)) %>%
+  
+
 opts <- options(knitr.kable.NA = "")
-kbl(dataframe_betas %>% mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)), digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
+kbl(allpaperdata, digits = 2, booktabs = T, align = "lccccc", centering = F, caption = "Estimated Parameters") %>%
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T)
 
