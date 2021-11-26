@@ -12,9 +12,11 @@ dg=read_excel("data.xls", sheet = "Sheet1",
 
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms <- dg %>% 
-  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, norm), 
+  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order,  norm), 
                     subset = elicit_norms == 1) %>%
-  subset.data.frame(subset = endowment == 10)
+  subset.data.frame(subset = endowment == 10) %>%
+  subset.data.frame(subset = order == 1)
+  
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2019Cha026", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -30,12 +32,13 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 ## frame_tax: treatment subject was in. 0 = Neutrally-framed, 1 = Tax-framed
 ## endowment : we take only rounds where the dictator had 10 tokens
 ## keep: for subjects in the choice experiment, the number of tokens they kept for themselves.
-coldg = c("subject","elicit_norms","frame_tax","endowment", "keep")
+coldg = c("subject","elicit_norms", "order", "frame_tax","endowment", "keep")
 
 # 1. Choice dataframe ----
 dgn_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
   subset.data.frame(subset = endowment == 10) %>%
+  subset.data.frame(subset = order == 1) %>%  
   mutate(cooperation = (endowment - keep)/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
@@ -52,7 +55,7 @@ dgn_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 0
 
 label_col = as.character(seq(0,10,1))
 n_sub_N = norms %>%
-  subset.data.frame(subset = frame_tax == 0) %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = frame_tax == 0 & order == 1 & endowment == 10 & elicit_norms == 1) %>% summarise(n_sub_N = n()/11)
 
 ## compute norm 
 dgn_appropriateness_sum <- norms %>%
@@ -96,11 +99,11 @@ finaldf <- meta_dataset %>%
 ## frame_tax: treatment subject was in. 0 = Neutrally-framed, 1 = Tax-framed
 ## endowment : we take only rounds where the dictator had 10 tokens
 ## keep: for subjects in the choice experiment, the number of tokens they kept for themselves.
-coldg = c("subject","elicit_norms","frame_tax","endowment", "keep")
 
 # 1. Choice dataframe ----
 dgt_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 1) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
+  subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
   mutate(cooperation = (endowment - keep)/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
@@ -118,7 +121,7 @@ dgt_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 1
 
 label_col = as.character(seq(0,10,1))
 n_sub_N = norms %>%
-  subset.data.frame(subset = frame_tax == 1) %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = frame_tax == 1 & order == 1 & endowment == 10 & elicit_norms == 1) %>% summarise(n_sub_N = n()/11)
 
 ## compute norm 
 dgt_appropriateness_sum <- norms %>%
