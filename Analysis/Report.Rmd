@@ -92,26 +92,25 @@ summary(master$Norm_Strength)
 <b>Distribution</b>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-ggplot(data=master, aes(x=Norm_Strength)) +
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
 geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Macro_game_type)
-
 ```
 
   
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 
-ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
 
-ggplot(data=master, aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method== "Direct")
+DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method!= "OnlyNorms")
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
-UG <- master %>% subset.data.frame(Game_type=="UG")
+UG <- master %>% subset.data.frame(Game_type=="UG"& Choice_Method!= "OnlyNorms")
 ```
 
 ## HP3: Effect of punishment on norms and actions
@@ -244,9 +243,9 @@ i=0
 
 ### Within-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
-choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
-individual_db_w <- merge.data.frame(choices_w, beliefs_w, by = ) 
+beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within") %>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,KW_Normative,Game_type))
+choices_w <- choices %>% subset.data.frame(subset = Design=="Within") %>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,A,choice,Game_type, endowment))
+individual_db_w <- choices_w %>% merge.data.frame(beliefs_w)
 ```
 
 
@@ -292,9 +291,13 @@ dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model
 
 ### Between-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003") %>% 
+  rbind.data.frame(data.frame(paper_id="2016Kim003", scenarios=seq(1,15,2), KW_Normative=NA)) %>% 
+  arrange(scenarios) %>%
+  mutate(KW_Normative = na.approx(KW_Normative, maxgap = 1, rule = 1))
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
-individual_db_b <- merge.data.frame(choices_b, beliefs_b)
+individual_db_b <- merge.data.frame(choices_b, beliefs_b, all.x = T)
 ```
 
 #### 2016Kim003
