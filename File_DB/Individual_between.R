@@ -363,7 +363,7 @@ Choice_Kim003_dg_DB <- Kim003_sub_1
 
 ## norms 
 Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143)) %>% 
-  mutate(subject_id = paste("2016Kim003", "7","norms", Subject, sep = "_")) %>%
+  mutate(subject_id = paste("2016Kim003", "7","norms", session, Subject, sep = "_")) %>%
   mutate(treatment_id = paste("2016Kim003", "7", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_dg <- Kim003_db_norms_dg %>%
@@ -467,7 +467,7 @@ Kim003_sub_2 <- Kim003_sub_2 %>%
 Choice_Kim003_DB <- Kim003_sub_2
 
 Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163)) %>% 
-  mutate(subject_id = paste("2016Kim003", "8","norms", Subject, sep = "_")) %>%
+  mutate(subject_id = paste("2016Kim003", "8","norms", session, Subject, sep = "_")) %>%
   mutate(treatment_id = paste("2016Kim003", "8", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_ug <- Kim003_db_norms_ug %>%
@@ -525,3 +525,16 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age) %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
+
+rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
+                             "Kim003_choice_dg", 
+                             "Kim003_beliefs_ug",
+                             "Kim003_beliefs_dg",
+                             "Cha026_choice_1",
+                             "Cha026_beliefs_1",
+                             "Cha026_choice_2",
+                             "Cha026_beliefs_2",
+                             "Her061_choice",
+                             "Her061_beliefs",
+                             "Bas115_beliefs",
+                             "Bas115_choice"))])
