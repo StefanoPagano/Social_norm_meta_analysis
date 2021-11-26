@@ -16,7 +16,7 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 Bas115=read.csv("Basic_Verrina_2021.csv", sep=",")
 
 # norms file
-ns_column = c(1,16,18,21:61)
+ns_column = c(1,3,6,16,18,21:61)
 Bas115_db_norms <- Bas115 %>% subset.data.frame(select = ns_column)
 
 # recoding
@@ -70,7 +70,7 @@ Bas115_sub_1a <- Bas115_sub_1a %>%
 Choice_Within_DB <- Bas115_sub_1a
 
 ### beliefs
-Bas115_norms_1a <- Bas115_db_norms[, c(1:2,4,23:33)] %>%
+Bas115_norms_1a <- Bas115_db_norms[, c(1:4,6,25:35)] %>%
   subset.data.frame(subset = social == 1) %>%
   subset.data.frame(subset = role_DG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "1a", code, sep = "_")) %>%
@@ -80,6 +80,8 @@ Bas115_norms_1a <- Bas115_db_norms[, c(1:2,4,23:33)] %>%
   relocate(subject_id)
 
 colnames(Bas115_norms_1a)[colnames(Bas115_norms_1a)=="role_DG"] = "role"
+colnames(Bas115_norms_1a)[colnames(Bas115_norms_1a)=="demo_age"] = "age"
+colnames(Bas115_norms_1a)[colnames(Bas115_norms_1a)=="demo_gender"] = "gender"
 
 ## treatment private
 ### choices
@@ -101,7 +103,7 @@ Choice_Within_DB <- Bas115_sub_2a %>%
   rbind.data.frame(Choice_Within_DB)
 
 ### beliefs
-Bas115_norms_2a <- Bas115_db_norms[,c(1,2,4,23:33)] %>%
+Bas115_norms_2a <- Bas115_db_norms[,c(1:4,6,25:35)] %>%
   subset.data.frame(subset = social == 0) %>%
   subset.data.frame(subset = role_DG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "2a", code, sep = "_")) %>%
@@ -111,10 +113,14 @@ Bas115_norms_2a <- Bas115_db_norms[,c(1,2,4,23:33)] %>%
   relocate(subject_id)
 
 colnames(Bas115_norms_2a)[colnames(Bas115_norms_2a)=="role_DG"] = "role"
+colnames(Bas115_norms_2a)[colnames(Bas115_norms_2a)=="demo_age"] = "age"
+colnames(Bas115_norms_2a)[colnames(Bas115_norms_2a)=="demo_gender"] = "gender"
+
+
 
 ### PIVOT for DG 
 Bas115_norms_dg <- rbind.data.frame(Bas115_norms_1a, Bas115_norms_2a) %>%
-  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social, role), names_to = "scenarios", values_to = "KW_Normative") %>%
+  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social, role, gender, age), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `DG_SN_1` = 0, `DG_SN_2` = 1, `DG_SN_3` = 2, `DG_SN_4` = 3, `DG_SN_5` = 4, `DG_SN_6` = 5, `DG_SN_7` = 6, `DG_SN_8` = 7, `DG_SN_9` = 8, `DG_SN_10` = 9, `DG_SN_11` = 10))) %>%
   subset.data.frame(select = -c(code, social, role))
 
@@ -142,7 +148,7 @@ Choice_Within_DB <- Bas115_sub_1c %>%
   rbind.data.frame(Choice_Within_DB)
 
 ### beliefs
-Bas115_norms_1c <- Bas115_db_norms[, c(1,3,4,34:44)] %>%
+Bas115_norms_1c <- Bas115_db_norms[, c(1:3,5:6,36:46)] %>%
   subset.data.frame(subset = social == 1) %>%
   subset.data.frame(subset = role_UG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "1c", code, sep = "_")) %>%
@@ -152,6 +158,8 @@ Bas115_norms_1c <- Bas115_db_norms[, c(1,3,4,34:44)] %>%
   relocate(subject_id)
 
 colnames(Bas115_norms_1c)[colnames(Bas115_norms_1c)=="role_UG"] = "role"
+colnames(Bas115_norms_1c)[colnames(Bas115_norms_1c)=="demo_age"] = "age"
+colnames(Bas115_norms_1c)[colnames(Bas115_norms_1c)=="demo_gender"] = "gender"
 
 ## treatment private
 ### choices
@@ -173,7 +181,7 @@ Choice_Within_DB <- Bas115_sub_2c %>%
   rbind.data.frame(Choice_Within_DB)
 
 ### beliefs
-Bas115_norms_2c <- Bas115_db_norms[, c(1,3,4,34:44)] %>%
+Bas115_norms_2c <- Bas115_db_norms[, c(1:3,5:6,36:46)] %>%
   subset.data.frame(subset = social == 0) %>%
   subset.data.frame(subset = role_UG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "2c", code, sep = "_")) %>%
@@ -183,19 +191,19 @@ Bas115_norms_2c <- Bas115_db_norms[, c(1,3,4,34:44)] %>%
   relocate(subject_id)
 
 colnames(Bas115_norms_2c)[colnames(Bas115_norms_2c)=="role_UG"] = "role"
+colnames(Bas115_norms_2c)[colnames(Bas115_norms_2c)=="demo_age"] = "age"
+colnames(Bas115_norms_2c)[colnames(Bas115_norms_2c)=="demo_gender"] = "gender"
 
 ### PIVOT for UG 
 Bas115_norms_ug <- rbind.data.frame(Bas115_norms_1c, Bas115_norms_2c)%>%
-  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social, role), names_to = "scenarios", values_to = "KW_Normative") %>%
+  pivot_longer(!c(subject_id, treatment_id, paper_id, code, social, role, gender, age), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `UG_SN_1` = 0, `UG_SN_2` = 1, `UG_SN_3` = 2, `UG_SN_4` = 3, `UG_SN_5` = 4, `UG_SN_6` = 5, `UG_SN_7` = 6, `UG_SN_8` = 7, `UG_SN_9` = 8, `UG_SN_10` = 9, `UG_SN_11` = 10))) %>%
   subset.data.frame(select = -c(code, social, role))
 
 ### Merge pivot
 Bas115_beliefs <- rbind(Bas115_norms_dg, Bas115_norms_ug) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
-  mutate(gender = NA, 
-         age = NA, 
-         KW_Personal = NA,
+  mutate(KW_Personal = NA,
          Bicchieri_Empirical = NA,
          Bicchieri_Normative = NA,
          Bicchieri_Personal = NA,
