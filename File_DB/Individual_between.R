@@ -36,7 +36,7 @@ Her061_sub_1 <- Her061_sub_1 %>%
 Choice_Her061_DB <- Her061_sub_1
 
 Her061_db_norms <- Her061_db_norms %>%
-  mutate(subject_id = paste("2018Her061", "9", SUBJECTS, sep = "_")) %>%
+  mutate(subject_id = paste("2018Her061", "9", "norms", SUBJECTS, sep = "_")) %>%
   mutate(treatment_id = paste("2018Her061", "9", sep = "_"), paper_id = "2018Her061")
 
 Her061_beliefs <- Her061_db_norms %>%
