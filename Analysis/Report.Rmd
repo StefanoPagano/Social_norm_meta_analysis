@@ -388,9 +388,14 @@ dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff
 
 ### All papers results
 ```{r echo=F, message=FALSE, warning=FALSE}
+
 allpaperdata <- dataframe_betas %>% 
   mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% 
-  mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)) %>%
+  mutate(MRS = 2*as.numeric(beta)/as.numeric(alpha)) 
+
+averages <- allpaperdata %>% summarise_at(.vars = vars(alpha:SE_beta), mean)
+
+allpaperdata <- allpaperdata %>% add_row(ID="Average",t= "",game="", alpha=averages$alpha, beta=averages$beta, SE_alpha=averages$SE_alpha, SE_beta=averages$SE_beta, MRS=2*averages$beta/averages$alpha)
   
 
 opts <- options(knitr.kable.NA = "")
@@ -398,7 +403,7 @@ kbl(allpaperdata, digits = 2, booktabs = T, align = "lccccc", centering = F, cap
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T)
 
-ggplot(dataframe_betas %>% mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% mutate(uniqueID=paste(ID,t,sep = "_t")) %>% arrange(beta), aes(x=beta,y=uniqueID,color=ID)) + 
+ggplot(allpaperdata %>% mutate(uniqueID=paste(ID,t,sep = "_t")) %>% arrange(beta), aes(x=beta,y=uniqueID,color=ID)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 
