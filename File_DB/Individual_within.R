@@ -372,5 +372,3 @@ Del037_norms_all <- Del037_norms_all %>%
   pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_Normative") %>%
   mutate(scenarios = as.numeric(recode(scenarios, `KW1` = 6, `KW2` = 5, `KW3` = 4, `KW4` = 3, `KW5` = 2, `KW6` = 1, `KW7` = 0))) %>%
   subset.data.frame(select = -c(ID, Treatment, Dictator))
-
-

@@ -111,22 +111,24 @@ Cha026=read_excel("data.xls", sheet = "Sheet1",
   mutate(gender = recode(female, `1` = 0, `0` = 1)) #1: male, 0: female
 
 # Subject ID (treatment neutrally 106, tax 266, tot 372)
-coldg = c("subject","elicit_norms","frame_tax","endowment", "keep", "gender", "age")
+coldg = c("subject","elicit_norms","frame_tax", "order", "endowment", "keep", "gender", "age")
 
 # norms file 
 Cha026_db_norms_1 <- Cha026 %>%
-  subset.data.frame(select = c(1,4,5,6,8,9,13,14)) %>%
+  subset.data.frame(select = c(1,4,5,6,7,8,9,13,14)) %>%
   subset.data.frame(subset = elicit_norms == 1) %>%
   subset.data.frame(subset = frame_tax == 0) %>%
+  subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
   mutate(subject_id = paste("2019Cha026", "1", "norms", subject, sep = "_"),
          treatment_id =  paste("2019Cha026", "1", sep = "_"),
          paper_id = "2019Cha026")
 
 Cha026_db_norms_2 <- Cha026 %>%
-  subset.data.frame(select = c(1,4,5,6,8,9,13,14)) %>%
+  subset.data.frame(select = c(1,4,5,6,7,8,9,13,14)) %>%
   subset.data.frame(subset = elicit_norms == 1) %>%
   subset.data.frame(subset = frame_tax == 1) %>%
+  subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
   mutate(subject_id = paste("2019Cha026", "2", "norms", subject, sep = "_"),
          treatment_id =  paste("2019Cha026", "2", sep = "_"),
@@ -137,22 +139,23 @@ Cha026_db_norms_2 <- Cha026 %>%
 Cha026_sub_1 <- Cha026 %>%
   subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
+  subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
   mutate(sent = endowment - keep) %>%
   mutate(coop = sent/endowment) %>%
   mutate(subject_id = paste("2019Cha026", "1", subject, sep = "_")) %>%
   mutate(treatment_id = paste("2019Cha026", "1", sep = "_"), paper_id = "2019Cha026")
 
-colnames(Cha026_sub_1) <- c("subject","elicit_norms","frame_tax","endowment", "keep", "gender", "age","choice", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Cha026_sub_1) <- c("subject","elicit_norms","frame_tax", "order", "endowment", "keep", "gender", "age","choice", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Cha026_sub_1 <- Cha026_sub_1 %>%
-  subset.data.frame(select = -c(subject, elicit_norms, frame_tax, keep)) %>% 
+  subset.data.frame(select = -c(subject, elicit_norms, frame_tax, order, keep)) %>% 
   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
 
 Choice_Cha026_DB_1 <- Cha026_sub_1
 
 Cha026_beliefs_1 <- Cha026_db_norms_1 %>%
-  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment)) %>%
+  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment, order)) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
 
 colnames(Cha026_beliefs_1) <- c("treatment_id", "scenarios", "KW_Normative", "age", "gender", "subject_id",  "paper_id", "Game_type", "Separate_sample_beliefs")
@@ -212,22 +215,23 @@ Cha026_choice_1 <- Cha026_choice_1 %>%
 Cha026_sub_2 <- Cha026 %>%
   subset.data.frame(select = coldg, subset = frame_tax == 1) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
+  subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
   mutate(sent = endowment - keep) %>%
   mutate(coop = sent/endowment) %>%
   mutate(subject_id = paste("2019Cha026", "2", subject, sep = "_")) %>%
   mutate(treatment_id = paste("2019Cha026", "2", sep = "_"), paper_id = "2019Cha026")
 
-colnames(Cha026_sub_2) <- c("subject","elicit_norms","frame_tax","endowment", "keep", "gender", "age","choice", "cooperation", "subject_id", "treatment_id", "paper_id")
+colnames(Cha026_sub_2) <- c("subject","elicit_norms","frame_tax", "order", "endowment", "keep", "gender", "age","choice", "cooperation", "subject_id", "treatment_id", "paper_id")
 
 Cha026_sub_2 <- Cha026_sub_2 %>%
-  subset.data.frame(select = -c(subject, elicit_norms, frame_tax, keep)) %>% 
+  subset.data.frame(select = -c(subject, elicit_norms, frame_tax, keep, order)) %>% 
   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
 
 Choice_Cha026_DB_2 <- Cha026_sub_2 
 
 Cha026_beliefs_2 <- Cha026_db_norms_2 %>%
-  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment)) %>%
+  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment, order)) %>%
   merge.data.frame(df_merge_game_type, by = c("treatment_id"))
 
 colnames(Cha026_beliefs_2) <- c("treatment_id", "scenarios", "KW_Normative", "age", "gender", "subject_id",  "paper_id", "Game_type", "Separate_sample_beliefs")
@@ -362,8 +366,8 @@ Kim003_sub_1 <- Kim003_sub_1 %>%
 Choice_Kim003_dg_DB <- Kim003_sub_1
 
 ## norms 
-Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143)) %>% 
-  mutate(subject_id = paste("2016Kim003", "7","norms", Subject, sep = "_")) %>%
+Kim003_db_norms_dg <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 135:143), subset = ANSW01 != 0) %>% 
+  mutate(subject_id = paste("2016Kim003", "7","norms", session, Subject, sep = "_")) %>%
   mutate(treatment_id = paste("2016Kim003", "7", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_dg <- Kim003_db_norms_dg %>%
@@ -466,8 +470,8 @@ Kim003_sub_2 <- Kim003_sub_2 %>%
 
 Choice_Kim003_DB <- Kim003_sub_2
 
-Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163)) %>% 
-  mutate(subject_id = paste("2016Kim003", "8","norms", Subject, sep = "_")) %>%
+Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163), subset = ANSW01 != 0) %>% 
+  mutate(subject_id = paste("2016Kim003", "8","norms", session, Subject, sep = "_")) %>%
   mutate(treatment_id = paste("2016Kim003", "8", sep = "_"), paper_id = "2016Kim003")
 
 Kim003_beliefs_ug <- Kim003_db_norms_ug %>%
@@ -525,3 +529,16 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
   relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, gender, age) %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
+
+rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
+                             "Kim003_choice_dg", 
+                             "Kim003_beliefs_ug",
+                             "Kim003_beliefs_dg",
+                             "Cha026_choice_1",
+                             "Cha026_beliefs_1",
+                             "Cha026_choice_2",
+                             "Cha026_beliefs_2",
+                             "Her061_choice",
+                             "Her061_beliefs",
+                             "Bas115_beliefs",
+                             "Bas115_choice"))])
