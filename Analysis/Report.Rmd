@@ -246,7 +246,7 @@ i=0
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within")
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within")
-individual_db_w <- merge.data.frame(choices_w, beliefs_w) 
+individual_db_w <- merge.data.frame(choices_w, beliefs_w, by = ) 
 ```
 
 
@@ -290,7 +290,7 @@ summary(model)
 dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
 ```
 
-### Between {.tabset}
+### Between-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_b <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
@@ -552,11 +552,16 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(meth
 ```
 
 ## Papers included
-``` {r}
-list_of_paper <- master %>% mutate(data_type = ifelse(is.na(Avg_NE), "Actions", ifelse(is.na(Avg_coop), "Norms", "Both"))) %>% 
-  group_by(data_type, PaperID, Game_type, Method_elicitation, Separate_sample_beliefs, Standard_game) %>% 
-  summarise(n_treatments = n())
-            
+``` {r echo=F}
+n_subjects_choice <- choices %>% subset.data.frame(A==1) %>% group_by(paper_id, treatment_id) %>% summarise(N_choices=length(A)) %>% rename(PaperID=paper_id) %>% mutate(TreatmentCode=str_split_fixed(treatment_id,"_",2)[,2]) %>% subset.data.frame(select = -c(treatment_id))
+
+n_subjects_beliefs <- beliefs %>% group_by(subject_id) %>% filter(row_number()==1)%>%group_by(paper_id, treatment_id) %>% summarise(N_beliefs=length(scenarios))%>% rename(PaperID=paper_id) %>% mutate(TreatmentCode=str_split_fixed(treatment_id,"_",2)[,2]) %>% subset.data.frame(select = -c(treatment_id))
+
+list_of_paper <- master %>% 
+  mutate(data_type = ifelse(is.na(Avg_NE), "Actions", ifelse(is.na(Avg_coop), "Norms", "Both"))) %>% 
+  group_by(data_type, PaperID, TreatmentCode, Game_type, Method_elicitation, Separate_sample_beliefs, Standard_game) %>% 
+  summarise(n_treatments = n()) %>% merge.data.frame(n_subjects_choice, all.x = T) %>% merge.data.frame(n_subjects_beliefs, all.x = T)
+
 opts <- options(knitr.kable.NA = "")
 kbl(list_of_paper, digits = 4, booktabs = T, align = "lcccccc", centering = F, caption = "Ciao") %>%
   kable_styling(position = "left", full_width = F) %>%
