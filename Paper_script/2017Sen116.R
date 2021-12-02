@@ -31,7 +31,7 @@ dg_base_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == "Contr
 
 
 # 2. Beliefs dataframe ----
-dg_base_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA) %>%
+dg_base_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA, Sd_Avg_NE_min_max = NA, Sum_delta_max = NA) %>%
   mutate(PaperID = "2017Sen116", TreatmentCode = 1)
 
 
@@ -58,7 +58,7 @@ dg_PN_dta_coop <- dg %>% subset.data.frame(select = coldg, Treatment == "PN") %>
 
 
 # 2. Beliefs dataframe ----
-dg_PN_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA) %>%
+dg_PN_final_norms <- data.frame(Avg_NE = NA, Var_NE = NA, Sd_Avg_NE = NA, Sd_Avg_NE_min_max = NA, Sum_delta_max = NA) %>%
   mutate(PaperID = "2017Sen116", TreatmentCode = 2)
 
 

@@ -70,6 +70,9 @@ s1_dg_baseline_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = no
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s1_dg_baseline_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s1_dg_baseline_norms_var <- norms_s1[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -84,7 +87,9 @@ s1_dg_baseline_final_norms <- merge.data.frame(s1_dg_baseline_appropriateness_su
          TreatmentCode = 1, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s1_dg_baseline_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s1_dg_baseline_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -124,6 +129,9 @@ s1_dg_always_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norm
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s1_dg_always_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s1_dg_always_norms_var <- norms_s1[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -138,7 +146,9 @@ s1_dg_always_final_norms <- merge.data.frame(s1_dg_always_appropriateness_sum, s
          TreatmentCode = 2, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s1_dg_always_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s1_dg_always_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -179,6 +189,9 @@ s1_dg_nr_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s1_dg_nr_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s1_dg_nr_norms_var <- norms_s1[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -193,7 +206,9 @@ s1_dg_nr_final_norms <- merge.data.frame(s1_dg_nr_appropriateness_sum, s1_dg_nr_
          TreatmentCode = 3, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s1_dg_nr_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s1_dg_nr_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -234,6 +249,9 @@ s1_dg_nc_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s1_dg_nc_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s1_dg_nc_norms_var <- norms_s1[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -248,7 +266,9 @@ s1_dg_nc_final_norms <- merge.data.frame(s1_dg_nc_appropriateness_sum, s1_dg_nc_
          TreatmentCode = 4, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s1_dg_nc_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s1_dg_nc_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -289,6 +309,9 @@ s2_dg_baseline_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = no
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s2_dg_baseline_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s2_dg_baseline_norms_var <- norms_s2[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -303,7 +326,9 @@ s2_dg_baseline_final_norms <- merge.data.frame(s2_dg_baseline_appropriateness_su
          TreatmentCode = 7, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s2_dg_baseline_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s2_dg_baseline_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -344,6 +369,9 @@ s2_dg_always_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norm
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s2_dg_always_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s2_dg_always_norms_var <- norms_s2[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -358,7 +386,9 @@ s2_dg_always_final_norms <- merge.data.frame(s2_dg_always_appropriateness_sum, s
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s2_dg_always_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s2_dg_always_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -399,6 +429,9 @@ s2_dg_nr_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s2_dg_nr_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s2_dg_nr_norms_var <- norms_s2[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -413,7 +446,9 @@ s2_dg_nr_final_norms <- merge.data.frame(s2_dg_nr_appropriateness_sum, s2_dg_nr_
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s2_dg_nr_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s2_dg_nr_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -454,6 +489,9 @@ s2_dg_nc_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- s2_dg_nc_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 s2_dg_nc_norms_var <- norms_s2[, norms_columns] %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
@@ -468,7 +506,9 @@ s2_dg_nc_final_norms <- merge.data.frame(s2_dg_nc_appropriateness_sum, s2_dg_nc_
          TreatmentCode = 10, 
          Avg_NE = as.integer(donation)/10,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(s2_dg_nc_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(s2_dg_nc_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

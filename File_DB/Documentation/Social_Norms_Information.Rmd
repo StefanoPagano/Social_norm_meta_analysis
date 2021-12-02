@@ -1,14 +1,14 @@
 ---
 title: "Social Norms Meta-Analysis Information"
 output:
-  bookdown::html_document2:
-    toc: yes
-    toc_float: yes
-    number_sections: true
-    
   pdf_document:
     latex_engine: xelatex
     toc: yes
+    number_sections: true
+  bookdown::html_document2:
+    
+    toc: yes
+    toc_float: yes
     number_sections: true
 ---
 
@@ -24,6 +24,7 @@ library(kableExtra)
 /* color 0a1128, 001f54, 034078, 1282a2, fefcfb - "https://coolors.co/0a1128-001f54-034078-1282a2-fefcfb"  */
 /* p = 161a1d*/
 /*"https://coolors.co/b76935-a56336-935e38-815839-6f523b-5c4d3c-4a473e-38413f-263c41-143642"*/
+
 h1, h2, h3 {
 color: #143642;
 }
@@ -198,6 +199,7 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 * **A**: 1 if choice is equal to scenario (by row), 0 otherwise
 * **endowment**: indicate initial endowment.
 
+
 # Method Clarification
 
 ## Paper search and feeding papers database
@@ -283,6 +285,7 @@ Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et mal
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. 
+
 
 # Homogeneity Criteria
 

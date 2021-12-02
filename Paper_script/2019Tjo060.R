@@ -38,6 +38,9 @@ ex8_dg_appropriateness_sum <- norms_8 %>% subset.data.frame(select = norms_colum
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- ex8_dg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 ex8_dg_norms_var <- norms_8[, norms_columns] %>%
   summarise_at(vars(S4H1:S4H5), var, na.rm=T) %>% 
@@ -50,7 +53,9 @@ ex8_dg_final_norms <- merge.data.frame(ex8_dg_appropriateness_sum, ex8_dg_norms_
          TreatmentCode = 8, 
          Avg_NE = as.integer(donation)/800,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(ex8_dg_appropriateness_sum$Kw_m)) %>% 
+         Sd_Avg_NE = sd(ex8_dg_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 
@@ -88,6 +93,9 @@ ex9_dg_appropriateness_sum <- norms_9 %>% subset.data.frame(select = norms_colum
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+positive_appropriateness <- ex9_dg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
 ## compute variance norm
 ex9_dg_norms_var <- norms_9[, norms_columns] %>%
   summarise_at(vars(Handling1:Handling5), var, na.rm=T) %>% 
@@ -100,7 +108,9 @@ ex9_dg_final_norms <- merge.data.frame(ex9_dg_appropriateness_sum, ex9_dg_norms_
          TreatmentCode = 9, 
          Avg_NE = as.integer(donation)/800,
          Var_NE = ..y,
-         Sd_Avg_NE = sd(ex9_dg_appropriateness_sum$Kw_m)) %>%
+         Sd_Avg_NE = sd(ex9_dg_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
