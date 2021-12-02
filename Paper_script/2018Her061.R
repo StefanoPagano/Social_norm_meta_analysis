@@ -66,7 +66,7 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
          Var_NE = ..y,
          Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

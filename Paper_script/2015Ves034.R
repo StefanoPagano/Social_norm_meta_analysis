@@ -71,7 +71,7 @@ ug1_final_norms <- merge.data.frame(ug1_appropriateness_sum, ug1_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(ug1_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -126,7 +126,7 @@ ug2_final_norms <- merge.data.frame(ug2_appropriateness_sum, ug2_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(ug2_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         Sum_delta_max = sum(positive_appropriateness$delta_max)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

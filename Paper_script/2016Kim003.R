@@ -88,7 +88,7 @@ dg_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
 
 label_col = as.character(seq(0,16,2))
 dg_columns <- c(1, 3, 4, 135:143)
-n_sub_N = norms1 %>% summarise(n_sub_N = n())
+n_sub_N = norms1 %>% summarise(n_sub_N = sum(!is.na(ANSW01)))
 
 
 ## compute norm 
@@ -115,7 +115,7 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
     Var_NE = ..y,
     Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m),
     Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-    Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
+    specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -146,7 +146,7 @@ tg_dta_coop <- tgs %>% subset.data.frame(select = coltg, subset = per== 1) %>%
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,80,10))
 tg_columns <- c(1, 3, 4, 164:172)
-n_sub_N = norms1 %>% summarise(n_sub_N = n())
+n_sub_N = norms1 %>% summarise(n_sub_N = sum(!is.na(ANSW34)))
 
 ## compute norm 
 tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>% 
@@ -172,7 +172,7 @@ tg_final_norms <- merge.data.frame(tg_appropriateness_sum, tg_norms_var, by = "d
     Var_NE = ..y,
     Sd_Avg_NE = sd(tg_appropriateness_sum$Kw_m),
     Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-    Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
+    specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -212,7 +212,7 @@ ug_dta_coop <- ug %>% subset.data.frame(select = colug, subset = role == 1) %>%
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,16,2))
 ug_columns <- c(1, 3, 4, 155:163)
-n_sub_N = norms1 %>% summarise(n_sub_N = n())
+n_sub_N = norms1 %>% summarise(n_sub_N = sum(!is.na(ANSW23)))
 
 ## compute norm 
 ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>% 
@@ -238,7 +238,7 @@ ug_final_norms <- merge.data.frame(ug_appropriateness_sum, ug_norms_var, by = "d
     Var_NE = ..y,
     Sd_Avg_NE = sd(ug_appropriateness_sum$Kw_m),
     Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-    Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
+    specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -280,7 +280,7 @@ pgg_dta_coop <- data.frame(Avg_coop = NA, Var_coop = NA) %>%
 ## KW scale: 1: VI; 2: I; 3: A; 4: VA
 label_col = as.character(seq(0,50,5))
 pgg_columns <- c(1, 3, 4, 144:154)
-n_sub_N = norms1 %>% summarise(n_sub_N = n())
+n_sub_N = norms1 %>% summarise(n_sub_N = sum(!is.na(ANSW12)))
 
 ### compute norm 
 pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>% 
@@ -306,7 +306,7 @@ pgg_final_norms <- merge.data.frame(pgg_appropriateness_sum, pgg_norms_var, by =
     Var_NE = ..y,
     Sd_Avg_NE = sd(pgg_appropriateness_sum$Kw_m),
     Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-    Sum_delta_max = sum(positive_appropriateness$delta_max)) %>% 
+    specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
