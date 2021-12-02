@@ -101,7 +101,7 @@ geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman")
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta, color = Game_type)) + geom_point() + geom_text(aes(label=PaperID)) # geom_smooth(method = "lm") + stat_cor(method = "spearman") 
 
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 

@@ -23,20 +23,15 @@ colnames(norms) <- c("Condition", "KW00", "KW10", "KW20", "KW30", "KW40", "KW50"
 
 # recoding
 norms <- norms %>% mutate(id = c(1:195)) %>%
-  mutate(sent = recode(Common_DonateChoice, `1` = 0, 
-                                            `2` = 10, 
-                                            `3` = 20, 
-                                            `4` = 30, 
-                                            `5` = 40, 
-                                            `6` = 50)) %>%
-  mutate(KW00_M = recode(KW00, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW10_M = recode(KW10, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW20_M = recode(KW20, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW30_M = recode(KW30, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW40_M = recode(KW40, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KW50_M = recode(KW50, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KWPDG_Coop = recode(AppropPGG_COOPERATE, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
-         KWPDG_Def = recode(AppropPGG_DEFECT, `-2` = -1, `-1` = -1/3, `1` = 1/3, `2` = 1),
+  mutate(sent = recode(Common_DonateChoice, `1` = 0, `2` = 10, `3` = 20, `4` = 30, `5` = 40, `6` = 50)) %>%
+  mutate(KW00_M = recode(KW00, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW10_M = recode(KW10, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW20_M = recode(KW20, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW30_M = recode(KW30, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW40_M = recode(KW40, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW50_M = recode(KW50, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KWPDG_Coop = recode(AppropPGG_COOPERATE,`-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KWPDG_Def = recode(AppropPGG_DEFECT, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
          EE_PDG = recode(Common_PGG, `1` = 1, `2` = 0))
 
 # meta-information dataset
