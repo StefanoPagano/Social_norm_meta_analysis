@@ -6,7 +6,6 @@ output:
     toc: yes
     number_sections: true
   bookdown::html_document2:
-    
     toc: yes
     toc_float: yes
     number_sections: true
