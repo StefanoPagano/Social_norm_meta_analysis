@@ -3,11 +3,12 @@ title: "Social Norms Meta-Analysis Information"
 author: "Sp & AG"
 date: "1/12/2021"
 output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
   html_document:
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
@@ -226,7 +227,6 @@ kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccc
 
 
 Following these criteria, the number of treatments in target is `r Sum_of_treatments_in_target`.
- 
 
 ## 2.2 Papers selection
 
