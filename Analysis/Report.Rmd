@@ -69,7 +69,7 @@ $$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
 where:
 
-* $NE_{Specificity} = {1 \over \sigma_{J}}$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions $j$
+* $NE_{Specificity} = \frac{\sum_{i=1}^N max(KW_i)-KW_i}{N-1}$ ??????
 
 * $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
 
@@ -78,10 +78,10 @@ We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 <b>Summary of Norm strength</b>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-# specificity = Sd_Avg_NE
+# specificity = mean of max deviation
 # consistency = sqrt(Var_NE)
 
-master = master %>% mutate(Norm_Strength = 1/sqrt(Var_NE) + 1/Sd_Avg_NE,
+master = master %>% mutate(Norm_Strength = 1/sqrt(Var_NE) + specificity,
                            Delta = (Avg_NE-Avg_coop))
 ```
 
