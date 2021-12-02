@@ -22,6 +22,7 @@ library(sjPlot)
 library(kableExtra)
 library(car)
 library(DT)
+library(zoo)
 
 setwd("../")
 
@@ -93,7 +94,7 @@ summary(master$Norm_Strength)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
-geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Macro_game_type)
+geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Game_type)
 ```
 
   
@@ -119,14 +120,14 @@ UG <- master %>% subset.data.frame(Game_type=="UG"& Choice_Method!= "OnlyNorms")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4_mean <- master %>% 
-  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")&Choice_Method != "OnlyNorms") %>%
-  group_by(Macro_game_type) %>% 
+  subset.data.frame(subset = Game_type %in% c("DG", "UG")&Choice_Method != "OnlyNorms") %>%
+  group_by(Game_type) %>% 
   summarise(Coop = mean(Avg_coop, na.rm = T), 
             Avg_Norm = mean(Avg_NE, na.rm = T), 
             Delta = mean(Delta, na.rm = T), 
             Strength = mean(Norm_Strength, na.rm = T),
             n = n()) %>% 
-  arrange(Macro_game_type)
+  arrange(Game_type)
 
 master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, Sd_Avg_NE, Var_NE), subset = Game_type %in% c("DG", "UG"))
 
@@ -135,7 +136,7 @@ wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
 wilc_coop = wilcox.test(Avg_coop ~ Macro_game_type, data = master_test)
 wilc_norm = wilcox.test(Avg_NE ~ Macro_game_type, data = master_test)
 
-hp4plus_mean <- hp4_mean %>% add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+hp4plus_mean <- hp4_mean %>% add_row(Game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
 ```
 
 We test the hypothesis whether :
@@ -184,17 +185,17 @@ kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, cap
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 hp4_SP_CS <- master %>% 
-  subset.data.frame(subset = Macro_game_type %in% c("DG and Donation Game", "UG")) %>%
-  group_by(Macro_game_type) %>% 
+  subset.data.frame(subset = Game_type %in% c("DG", "UG")) %>%
+  group_by(Game_type) %>% 
   summarise(Specificity = mean(1/(Sd_Avg_NE), na.rm = T), 
             Consistency = mean(1/(sqrt(Var_NE)), na.rm = T)) %>% 
-  arrange(Macro_game_type)
+  arrange(Game_type)
 
-F_test_spec <- wilcox.test(1/(master_test$Sd_Avg_NE) ~ master_test$Macro_game_type)
-F_test_cons <- wilcox.test(1/(sqrt(master_test$Var_NE)) ~ master_test$Macro_game_type)
+F_test_spec <- wilcox.test(1/(master_test$Sd_Avg_NE) ~ master_test$Game_type)
+F_test_cons <- wilcox.test(1/(sqrt(master_test$Var_NE)) ~ master_test$Game_type)
 
 hp4plus_SP_CS <- hp4_SP_CS %>% 
-  add_row(Macro_game_type = "Difference (Wilcoxon p-value)", Specificity = F_test_spec$p.value, Consistency = F_test_cons$p.value)
+  add_row(Game_type = "Difference (Wilcoxon p-value)", Specificity = F_test_spec$p.value, Consistency = F_test_cons$p.value)
 
 opts <- options(knitr.kable.NA = "")
 kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, caption = "Consistency e Specificity") %>%
@@ -202,8 +203,8 @@ kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, capti
   column_spec(1, bold = T) %>%
   row_spec(3, bold = T, color = "white", background = "#6c757d")
 
-ggarrange(ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/Sd_Avg_NE))) + xlab("Specificity"),
-ggplot(master_test) + geom_density(aes(color = Macro_game_type, x=log(1/sqrt(Var_NE)))) + xlab("Consistency"), common.legend = T)
+ggarrange(ggplot(master_test) + geom_density(aes(color = Game_type, x=log(1/Sd_Avg_NE))) + xlab("Specificity"),
+ggplot(master_test) + geom_density(aes(color = Game_type, x=log(1/sqrt(Var_NE)))) + xlab("Consistency"), common.legend = T)
 
 ```
 
@@ -243,8 +244,8 @@ i=0
 
 ### Within-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within") %>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,KW_Normative,Game_type))
-choices_w <- choices %>% subset.data.frame(subset = Design=="Within") %>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,A,choice,Game_type, endowment))
+beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within") #%>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,KW_Normative,Game_type))
+choices_w <- choices %>% subset.data.frame(subset = Design=="Within") #%>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,A,choice,Game_type, endowment))
 individual_db_w <- choices_w %>% merge.data.frame(beliefs_w)
 ```
 
@@ -292,12 +293,15 @@ dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model
 ### Between-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+
 Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003") %>% 
   rbind.data.frame(data.frame(paper_id="2016Kim003", scenarios=seq(1,15,2), KW_Normative=NA)) %>% 
-  arrange(scenarios) %>%
+  ungroup() %>% arrange(scenarios) %>%
   mutate(KW_Normative = na.approx(KW_Normative, maxgap = 1, rule = 1))
+
+beliefs_b <- beliefs_temp %>% merge.data.frame(Kim003_interpolation, all = T)
 choices_b <- choices %>% subset.data.frame(subset = Design=="Between")%>% mutate(payoff=endowment-scenarios)
-individual_db_b <- merge.data.frame(choices_b, beliefs_b, all.x = T)
+individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
 #### 2016Kim003
