@@ -2,14 +2,20 @@
 title: "Social Norms Meta-Analysis Information"
 author: "Sp & AG"
 date: "1/12/2021"
-output: 
+output:
   html_document:
-    toc: True
-    toc_float: True
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE)
+#knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE)
+
+library(tidyverse)
+library(readxl)
+library(kableExtra)
 ```
 
 # 1. List of Variables Used in DB
@@ -143,7 +149,7 @@ contains the variables needed for the following analyses
 *	**Var_NE**: variance of normative expectation;
 *	**Sd_Avg_NE**: indicate the standard deviation of sums of elicitation method scores in the possible choices set
 
-$$\sigma\left(max\left(\frac{\sum_{j=1}^{J}\theta_j}{N}\right),\ \theta_j=\sum_{i=1}^{N}\alpha_{i,j},\ j\in\{1:N\}\right)$$
+$$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \sum_{i=1}^{N}\alpha_{i,j}, \ j\in\{1,...,J\}\right)$$
 
 * **Avg_EE**: average empirical expectation (for Bicchieri-Xiao elicitation method)
 * **Avg_PNB**: average personal belief (it changes based on elicitation method, Krupka-Weber or Bicchieri-Xiao)
@@ -186,8 +192,41 @@ The selection criteria to identify papers in target was:
 	+ Norms elicitation with Krupka and Weber (2013) or Bicchieri-Xiao (2009)
 	+ Only monetary incentivized treatments (both choices and norms elicitation)
 
-With this criteria, the number of treatments in targer is 213.
-In the following, 
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#### SOCIAL NORMS META-ANALYSIS INFORMATION ####
+meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
+
+game_type_in_target = c("DG", "PGG", "PDG", "Donation Game", "UG", "TG", "ToG", "CPR", "GEG", "DG Tax", "BG", "Lying DG", "Third-Party Lying DG", "Tax Game", "Investment Game")
+
+# 2.1 PAPER SEARCH
+
+## number of treatments in target
+meta_filtered <- meta_dataset %>% subset.data.frame(subset = Game_type %in% game_type_in_target & Monetary_Incentivized_experiment == "Y" & Method_elicitation != "N")
+
+table_treatments_in_target_per_game <- meta_filtered %>% 
+  group_by(Game_type) %>% 
+  summarise(treatments_per_game = n (),
+            between_sub_beliefs = sum(Separate_sample_beliefs == "Y", na.rm = T),
+            KW = sum(Method_elicitation == "KW", na.rm = T),
+            Bicchieri = sum(Method_elicitation == "Bicchieri", na.rm = T),
+            KW_and_Bicchieri = sum(Method_elicitation == "Both", na.rm = T),
+            Only_Norms = sum(Choice_Method == "OnlyNorms", na.rm = T),
+            Available_data = sum(StatusTreatment_Roma == "6-Complete", na.rm = T)) %>% 
+  arrange(-treatments_per_game)
+
+Sum_of_treatments_in_target = sum(table_treatments_in_target_per_game$treatments_per_game)
+
+#kable(table_treatments_in_target_per_game)
+
+opts <- options(knitr.kable.NA = "")
+kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccccccc", centering = F, caption = "Summary of Major Variables per Game Type") %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T)
+```
+
+
+Following these criteria, the number of treatments in target is `r Sum_of_treatments_in_target`.
+ 
 
 ## 2.2 Papers selection
 
