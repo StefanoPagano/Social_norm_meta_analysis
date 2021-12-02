@@ -1,10 +1,11 @@
 ---
 title: "Social Norms Meta-Analysis Information"
 output:
-  html_document:
+  bookdown::html_document2:
     toc: yes
     toc_float: yes
     number_sections: true
+    
   pdf_document:
     latex_engine: xelatex
     toc: yes
@@ -21,14 +22,14 @@ library(kableExtra)
 
 ```{css text_style, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 /* color 0a1128, 001f54, 034078, 1282a2, fefcfb - "https://coolors.co/0a1128-001f54-034078-1282a2-fefcfb"  */
-/* 1d3557, 161a1d, 0b090a*/
-
+/* p = 161a1d*/
+/*"https://coolors.co/b76935-a56336-935e38-815839-6f523b-5c4d3c-4a473e-38413f-263c41-143642"*/
 h1, h2, h3 {
-color: #242423;
+color: #143642;
 }
 
 p, ul, table {
-color: #161a1d;
+color: #263c41;
 }
 ```
 
@@ -141,6 +142,10 @@ contains all variables regarding the elicitation of expectations and beliefs
 
 * **StatusTreatment_Roma**: indicate status of data collection.
 
+```{r, echo=FALSE, out.width="100%", fig.cap="Flow of data collection status of treatments.", fig.align='center'}
+knitr::include_graphics("Attachments/StatusTreatment.png")
+```
+
 ## Treatment.csv
 
 List of data at treatment level with information and average/variance index calculated.
@@ -241,7 +246,10 @@ colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_targe
 
 
 #kable(table_treatments_in_target_per_game)
+```
 
+
+```{r , echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 opts <- options(knitr.kable.NA = "")
 kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccccccc", centering = F, caption = "Summary of Major Variables per Game Type") %>%
   kable_styling(position = "left", full_width = F) %>%
