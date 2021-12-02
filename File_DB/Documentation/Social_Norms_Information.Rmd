@@ -1,14 +1,14 @@
 ---
 title: "Social Norms Meta-Analysis Information"
-author: "Sp & AG"
-date: "1/12/2021"
 output:
-  pdf_document:
-    latex_engine: xelatex
-    toc: yes
   html_document:
     toc: yes
     toc_float: yes
+    number_sections: true
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    number_sections: true
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
@@ -19,11 +19,24 @@ library(readxl)
 library(kableExtra)
 ```
 
-# 1. List of Variables Used in DB
+```{css text_style, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+/* color 0a1128, 001f54, 034078, 1282a2, fefcfb - "https://coolors.co/0a1128-001f54-034078-1282a2-fefcfb"  */
+/* 1d3557, 161a1d, 0b090a*/
 
-## 1.1 Social Norms meta.xlsx
+h1, h2, h3 {
+color: #242423;
+}
 
-### General Description: 
+p, ul, table {
+color: #161a1d;
+}
+```
+
+# List of Variables Used in DB
+
+## Social Norms meta.xlsx
+
+### General Description:
 
 The dataset will contain information at the treatment level for each of the papers we have included in our list. Variables are divided into 4 categories: 1. study identifiers; 2. Design variables; 3. Beliefs / expectations variables; 4. specific-game variables;
 
@@ -128,7 +141,7 @@ contains all variables regarding the elicitation of expectations and beliefs
 
 * **StatusTreatment_Roma**: indicate status of data collection.
 
-## 1.2 Treatment.csv
+## Treatment.csv
 
 List of data at treatment level with information and average/variance index calculated.
 
@@ -180,9 +193,9 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 * **A**: 1 if choice is equal to scenario (by row), 0 otherwise
 * **endowment**: indicate initial endowment.
 
-# 2. Method Clarification
+# Method Clarification
 
-## 2.1 Paper search and feeding papers database
+## Paper search and feeding papers database
 
 The first step to implement this meta-analysis was to find paper. Thanks to different research portal, as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 155 paper about cooperation and elicitation of social norms.
 The selection criteria to identify papers in target was:
@@ -193,7 +206,7 @@ The selection criteria to identify papers in target was:
 	+ Norms elicitation with Krupka and Weber (2013) or Bicchieri-Xiao (2009)
 	+ Only monetary incentivized treatments (both choices and norms elicitation)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r descriptive_2_1, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #### SOCIAL NORMS META-ANALYSIS INFORMATION ####
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
 
@@ -217,6 +230,16 @@ table_treatments_in_target_per_game <- meta_filtered %>%
 
 Sum_of_treatments_in_target = sum(table_treatments_in_target_per_game$treatments_per_game)
 
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="Game_type"] = "Game type"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="treatments_per_game"] = "Treatment per Game Type"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="between_sub_beliefs"] = "Between Subjects Beliefs"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="KW"] = "KW"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="Bicchieri"] = "Bicchieri"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="KW_and_Bicchieri"] = "KW and Bicchieri"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="Only_Norms"] = "Only Norms"
+colnames(table_treatments_in_target_per_game)[colnames(table_treatments_in_target_per_game)=="Available_data"] = "Available Data"
+
+
 #kable(table_treatments_in_target_per_game)
 
 opts <- options(knitr.kable.NA = "")
@@ -228,36 +251,36 @@ kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccc
 
 Following these criteria, the number of treatments in target is `r Sum_of_treatments_in_target`.
 
-## 2.2 Papers selection
+## Papers selection
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
-## 2.3 Data Collection
+## Data Collection
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
-## 2.4 Database Designing
+## Database Designing
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
-## 2.5 Treatment Analysis
+## Treatment Analysis
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
-## 2.6 Individual Analysis
+## Individual Analysis
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
 Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. 
 
-# 3. Homogeneity Criteria
+# Homogeneity Criteria
 
 For all games, we take into consideration the first round observation and the allocation where dictator have the maximum endowment and recipient have zero.
 
-## 3.1 Dictator Game (DG)
+## Dictator Game (DG)
 
 We consider all DGs including at least two or more real players (no computers).
 
@@ -283,13 +306,13 @@ We consider all DGs including at least two or more real players (no computers).
 * No papers that limit the dictator’s action space such that it does not include the option to give nothing nor to take from the recipient
 * No real effort task used to determine the dictator’s endowment
 
-## 3.2 Take or Give Game (ToG)
+## Take or Give Game (ToG)
 
 This category includes DG with take framing.
 
 * To define cooperation levels, we look at final allocations; hence, for example, if dictators have some restrictions applying on their choices, such as donating only part of his endowment, we consider as cooperation the ratio between amount sent and total endowment.
 
-## 3.3 Public Good Game (PGG)
+## Public Good Game (PGG)
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.
 Nunc viverra imperdiet enim. Fusce est. Vivamus a tellus.
