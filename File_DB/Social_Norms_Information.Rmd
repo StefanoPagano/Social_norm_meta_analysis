@@ -1,0 +1,258 @@
+---
+title: "Social Norms Meta-Analysis Information"
+author: "Sp & AG"
+date: "1/12/2021"
+output: 
+  html_document:
+    toc: True
+    toc_float: True
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE)
+```
+
+# 1. List of Variables Used in DB
+
+## 1.1 Social Norms meta.xlsx
+
+### General Description: 
+
+The dataset will contain information at the treatment level for each of the papers we have included in our list. Variables are divided into 4 categories: 1. study identifiers; 2. Design variables; 3. Beliefs / expectations variables; 4. specific-game variables;
+
+### Study identifiers: {#Study_identifiers}
+
+contains all variables used to identify uniquely studies
+
+* **n_Paper**: paper progressive number
+* **PaperID**: paper unique identification code (4 character for year + 3 character for first author + 3 character for progressive number)
+* **Title**: paper title
+* **Authors**: authors list
+* **Year**: year of publication 
+* **Outlet**: if paper is published specify the Journal of publication
+* **Published**: indicate if paper is published or working paper/thesis
+* **Available Dataset**: if dataset is available online
+* **Check DB**: if the data was searched online
+* **TreatmentName_paper**: treatment name in experiment;
+* **TreatmentCode**: identification number of treatment in an experiment;
+* **treatment_id**: treatment unique identification code ( = PaperID _ TreatmentCode)
+* **Comments**
+
+### Design variables
+contains all variables regarding the experimental design.
+
+* **First task**: Y if the main game in the treatment is played as first task, N if other tasks are played before;
+* **Treatment_Dependent_variable**: a tag about the goal of the treatments implemented. Drawn upon CoDa ontology (macro-categories). See [PDF](https://cooperationdatabank.org/wp-content/uploads/2020/10/Complete-Codebook_12Oct.pdf)
+* **between_vs_within**: treatment allocation;
+* **Game_type**: type of implemented game:
+  + PD = Prisoner’s Dilemma; 
+  + PGG = Public Goods Game; 
+  + UG = Ultimatum Game; 
+  + DG = Dictator Game; 
+  + GEG = Gift Exchange Game;
+  + TG = Trust Game; 
+  + ToG = Take or Give Game; 
+  + The variable includes also other types of game indicated with their full names. 
+* **Standard_Game**: Y if game has the standard rules; Partially if there are some differences in actions and norms but data are comparable; N if game not in target;
+* **Group_size**: number of players in the game; Notice, not the total number of subjects in a session; 
+* **One_Shot_Repeated**: a variable indicating if game is one shot or repeated:
+  + one shot 
+  + repeated game
+* **Choice_Method**: direct choice; strategy method; if both, see comments;
+* **Matching**: protocol used to match subjects:
+  + stranger
+  + partner
+  + perfect stranger
+* **Rounds**: number of rounds;
+* **Known_endgame**: Y if subject know the end of the game, N otherwise 
+* **Punishment**: presence of sanctions in the game
+  + monetary
+  + non-monetary
+  + N
+* **Rewards**: presence of rewards in the game
+  + monetary
+  + non-monetary
+  + N
+* **Environment**: indicate whether laboratory experiment or not
+  + laboratory
+  + online
+  + field
+  + classroom
+* **Country**: subjects country, if missing is equal to country of paper
+* **Monetary_Incentivized_experiment**: monetary payment to participants (yes, no)
+* **Other_type_incentives**: indicate payment if not monetary (e.g., students credits)
+* **Comments**
+
+### Beliefs / expectations variables
+
+contains all variables regarding the elicitation of expectations and beliefs
+
+* **Method elicitation**: 
+  + Krupka and Weber: only if Krupka and Weber 2013 questionnaire used to elicit social norms (incentivized) and/or personal normative beliefs (not incentivized);
+  + Bicchieri and Xiao: only if expectations (either empirical, normative or personal) are elicited;
+  + Both: if both methods are used;
+  + N: if social norms are not elicited in a given treatment.
+* **Separate_sample_beliefs**: Y if a different sample is used to elicit beliefs; 
+* **Belief_repeated**: Y if beliefs elicited more than once in the game; N otherwise
+* **Before_after_main_decisions**: elicitation of beliefs before or after the main game decisions
+* **KW_Normative**: Y if Krupka and Weber (2013) method and normative expectations elicited; N otherwise
+* **KW_Personal_Beliefs**: Y if Krupka and Weber (2013) method and personal normative beliefs elicited; N otherwise
+* **Bicchieri_Empirical**: Y if Bicchieri method and empirical expectations elicited; N otherwise
+* **Bicchieri_Normative**: Y if Bicchieri method and normative expectations elicited; N otherwise
+* **Bicchieri_Personal_Beliefs**: Y if Bicchieri method and personal normative beliefs elicited; N otherwise
+* **Bicchieri** Between: Y if Bicchieri method and elicited using separate samples;
+* **Incentives_beliefs**: Y if incentivized elicitation method, N otherwise
+* **Comments**
+
+### Game specific variables:
+
+*	**MPCR**: if game type is PGG, indicate Marginal Per Capita Return (numeric)
+*	**PGG_Endowment**: if game type is PGG, indicate initial endowment
+*	**PD_payoff_cooperation**: single player’s payoff from cooperation action
+*	**PD_payoff_defection**: single player’s payoff from defection action
+*	**DG_UG_Initial_endowment**: if game type is DG/UG, indicate initial endowment
+*	**TG_multiplier**: multiplicator in the TG (how much is the amount sent multiplied)
+*	**TG_Endowment**: if game type is TG, indicate initial endowment of truster
+*	**GEG_real_effort**: if game type is GEG, indicate if real effort task
+*	**ToG_sender_Endowment**: if game type is ToG, indicate sender initial endowment
+*	**ToG_receiver_endowment**: if game type is ToG, indicate receiver initial endowment
+
+### Database Management
+
+* **StatusTreatment_Roma**: indicate status of data collection.
+
+## 1.2 Treatment.csv
+
+List of data at treatment level with information and average/variance index calculated.
+
+### Study identifiers:
+
+* PaperID, TreatmentCode, n_Paper, TreatmentName_paper, Year, Outlet, Published ~ see [Social Norms meta.xlsx](#Study_identifiers)
+
+### Design Variables:
+
+* FirstTask, between_vs_within, Game_type, Standard_game, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical,  Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma ~ see [Social Norms meta.xlsx](#Study_identifiers)
+
+### Computed Variables:
+
+contains the variables needed for the following analyses
+
+*	**Avg_coop**: average cooperation (it changes based on game type, e.g. in dictator game is computed as “amount sent/endowment” );
+*	**Var_coop**: variance of cooperation;
+*	**Avg_NE**: average normative expectation (it changes based on elicitation method, Krupka-Weber or Bicchieri-Xiao)
+*	**Var_NE**: variance of normative expectation;
+*	**Sd_Avg_NE**: indicate the standard deviation of sums of elicitation method scores in the possible choices set
+
+$$\sigma\left(max\left(\frac{\sum_{j=1}^{J}\theta_j}{N}\right),\ \theta_j=\sum_{i=1}^{N}\alpha_{i,j},\ j\in\{1:N\}\right)$$
+
+* **Avg_EE**: average empirical expectation (for Bicchieri-Xiao elicitation method)
+* **Avg_PNB**: average personal belief (it changes based on elicitation method, Krupka-Weber or Bicchieri-Xiao)
+* **Var_EE**: variance of empirical expectation
+* **Var_PNB**: variance of personal belief
+
+### Subjects_beliefs.csv {#beliefs}
+
+* **paper_id**: it is the same of “PaperID” in Social Norms meta.xlsx
+* **treatment_id**: it represents the treatment unique identification code ( = paper_id _ TreatmentCode)
+* **subject_id**: it represents the subject unique identification code ( = treatment_id _ “norm” _ subject code in row data or progressive number if missing)
+* **gender**: 1 if male, 0 if female
+* **age**: if exist only born date, it is calculated on the paper publication year
+* **scenarios**: indicate the set of possible value in the choice task
+* **KW_Normative**: indicate the KW score of normative expectation
+* **Game_type**: ~ see [Social Norms meta.xlsx](#Study_identifiers)
+* **KW_Personal**: indicate the average of personal belief in the norm task (Only in Krupka-Weber elicitation method) 
+* **Bicchieri_Empirical**: indicate the average of empirical expectation in norm task (Only in Bicchieri-Xiao elicitation method)
+* **Bicchieri_Normative**: indicate the average of normative expectation in norm task (Only in Bicchieri-Xiao elicitation method)
+* **Bicchieri_Personal**: indicate the average of personal belief in norm task (Only in Bicchieri-Xiao elicitation method)
+* **Design**: “within” if the sample among choice and belief task is the same, “between” otherwise.
+
+### Subjects_choice.csv
+
+* subject_id, treatment_id, paper_id, gender, age, Design, Game_type, scenarios ~ see [Subjects_beliefs.csv](#beliefs)
+* **choice**: indicate the subject choice in the game (e.g. in a dictator game indicate the amount of money/token that dictator sent to recipient)
+* **A**: 1 if choice is equal to scenario (by row), 0 otherwise
+* **endowment**: indicate initial endowment.
+
+# 2. Method Clarification
+
+## 2.1 Paper search and feeding papers database
+
+The first step to implement this meta-analysis was to find paper. Thanks to different research portal, as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 155 paper about cooperation and elicitation of social norms.
+The selection criteria to identify papers in target was:
+
+* **Game type**:
+	+ Cooperation and prosociality games
+	+ Presence of choice task and norm elicitation task
+	+ Norms elicitation with Krupka and Weber (2013) or Bicchieri-Xiao (2009)
+	+ Only monetary incentivized treatments (both choices and norms elicitation)
+
+With this criteria, the number of treatments in targer is 213.
+In the following, 
+
+## 2.2 Papers selection
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
+
+## 2.3 Data Collection
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
+
+## 2.4 Database Designing
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
+
+## 2.5 Treatment Analysis
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
+
+## 2.6 Individual Analysis
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. 
+
+# 3. Homogeneity Criteria
+
+For all games, we take into consideration the first round observation and the allocation where dictator have the maximum endowment and recipient have zero.
+
+## 3.1 Dictator Game (DG)
+
+We consider all DGs including at least two or more real players (no computers).
+
+### Choice data:
+
+* In case of repeated rounds, we consider only first-round decisions; if stranger matching protocol, and rounds differ in any of the design features (e.g., endowment, number of players, etc.) we can consider these as single independent observations
+* To define cooperation levels, we look at final allocations; hence, for example, if dictators have some restrictions applying on their choices, such as donating only part of his endowment, we consider as cooperation the ratio between amount sent and total endowment
+* No minigames (if minigames, these are flagged and possibly used in future analyses)
+
+### Norm data: 
+
+* If KW: norm (normative expectation) is computed by summing appropriateness scores of each actions and selecting the action with highest score; variance of norm is defined by computing the variance of appropriateness scores;
+* If Bicchieri: average norm (normative expectation) is computed as average of subjects’ answers; we compute the variance of a norm by computing the variance of scores;
+* If elicitation within subjects, only norm elicited from subjects playing role of Dictators; 
+* If elicited actions are a subset of choice actions, then we considered the paper anyway
+
+### Criteria for being defined as “Standard” (ref. Engel 2011) 
+
+* Not a minigame
+* Two players
+* No papers that give the recipient any kind of power (and thereby bring the experiment close to an ultimatum game);
+* No papers that mix the motive of benevolence with one of sanctioning the recipient
+* No papers that limit the dictator’s action space such that it does not include the option to give nothing nor to take from the recipient
+* No real effort task used to determine the dictator’s endowment
+
+## 3.2 Take or Give Game (ToG)
+
+This category includes DG with take framing.
+
+* To define cooperation levels, we look at final allocations; hence, for example, if dictators have some restrictions applying on their choices, such as donating only part of his endowment, we consider as cooperation the ratio between amount sent and total endowment.
+
+## 3.3 Public Good Game (PGG)
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.
+Nunc viverra imperdiet enim. Fusce est. Vivamus a tellus.
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci.
+
