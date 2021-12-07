@@ -1,14 +1,10 @@
 ---
 title: "Social Norms Meta-Analysis Information"
 output:
-  pdf_document:
-    latex_engine: xelatex
-    toc: yes
-    number_sections: true
   bookdown::html_document2:
     toc: yes
     toc_float: yes
-    number_sections: true
+    number_sections: yes
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
@@ -175,7 +171,7 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 * **Var_EE**: variance of empirical expectation
 * **Var_PNB**: variance of personal belief
 
-### Subjects_beliefs.csv {#beliefs}
+## Subjects_beliefs.csv {#beliefs}
 
 * **paper_id**: it is the same of “PaperID” in Social Norms meta.xlsx
 * **treatment_id**: it represents the treatment unique identification code ( = paper_id _ TreatmentCode)
@@ -191,7 +187,7 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 * **Bicchieri_Personal**: indicate the average of personal belief in norm task (Only in Bicchieri-Xiao elicitation method)
 * **Design**: “within” if the sample among choice and belief task is the same, “between” otherwise.
 
-### Subjects_choice.csv
+## Subjects_choice.csv
 
 * subject_id, treatment_id, paper_id, gender, age, Design, Game_type, scenarios ~ see [Subjects_beliefs.csv](#beliefs)
 * **choice**: indicate the subject choice in the game (e.g. in a dictator game indicate the amount of money/token that dictator sent to recipient)
@@ -223,15 +219,15 @@ game_type_in_target = c("DG", "PGG", "PDG", "Donation Game", "UG", "TG", "ToG", 
 ## number of treatments in target
 meta_filtered <- meta_dataset %>% subset.data.frame(subset = Game_type %in% game_type_in_target & Monetary_Incentivized_experiment == "Y" & Method_elicitation != "N")
 
-table_treatments_in_target_per_game <- meta_filtered %>% 
-  group_by(Game_type) %>% 
+table_treatments_in_target_per_game <- meta_filtered %>%
+  group_by(Game_type) %>%
   summarise(treatments_per_game = n (),
             between_sub_beliefs = sum(Separate_sample_beliefs == "Y", na.rm = T),
             KW = sum(Method_elicitation == "KW", na.rm = T),
             Bicchieri = sum(Method_elicitation == "Bicchieri", na.rm = T),
             KW_and_Bicchieri = sum(Method_elicitation == "Both", na.rm = T),
             Only_Norms = sum(Choice_Method == "OnlyNorms", na.rm = T),
-            Available_data = sum(StatusTreatment_Roma == "6-Complete", na.rm = T)) %>% 
+            Available_data = sum(StatusTreatment_Roma == "6-Complete", na.rm = T)) %>%
   arrange(-treatments_per_game)
 
 Sum_of_treatments_in_target = sum(table_treatments_in_target_per_game$treatments_per_game)
@@ -283,7 +279,7 @@ Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et mal
 ## Individual Analysis
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. 
+Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
 
 # Homogeneity Criteria
@@ -300,14 +296,14 @@ We consider all DGs including at least two or more real players (no computers).
 * To define cooperation levels, we look at final allocations; hence, for example, if dictators have some restrictions applying on their choices, such as donating only part of his endowment, we consider as cooperation the ratio between amount sent and total endowment
 * No minigames (if minigames, these are flagged and possibly used in future analyses)
 
-### Norm data: 
+### Norm data:
 
 * If KW: norm (normative expectation) is computed by summing appropriateness scores of each actions and selecting the action with highest score; variance of norm is defined by computing the variance of appropriateness scores;
 * If Bicchieri: average norm (normative expectation) is computed as average of subjects’ answers; we compute the variance of a norm by computing the variance of scores;
-* If elicitation within subjects, only norm elicited from subjects playing role of Dictators; 
+* If elicitation within subjects, only norm elicited from subjects playing role of Dictators;
 * If elicited actions are a subset of choice actions, then we considered the paper anyway
 
-### Criteria for being defined as “Standard” (ref. Engel 2011) 
+### Criteria for being defined as “Standard” (ref. Engel 2011)
 
 * Not a minigame
 * Two players
