@@ -101,7 +101,7 @@ geom_histogram() + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta, color = Game_type)) + geom_point() + geom_text(aes(label=PaperID)) # geom_smooth(method = "lm") + stat_cor(method = "spearman") 
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
@@ -136,7 +136,7 @@ wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
 wilc_coop = wilcox.test(Avg_coop ~ Macro_game_type, data = master_test)
 wilc_norm = wilcox.test(Avg_NE ~ Macro_game_type, data = master_test)
 
-hp4plus_mean <- hp4_mean %>% add_row(Game_type = "Difference (Wilcoxon p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
+hp4plus_mean <- hp4_mean %>% add_row(Game_type = "Difference (M.W.W. p-value)", Coop = wilc_coop$p.value, Avg_Norm = wilc_norm$p.value, Delta = wilc_delta$p.value, Strength = wilc_strength$p.value)
 ```
 
 We test the hypothesis whether :
