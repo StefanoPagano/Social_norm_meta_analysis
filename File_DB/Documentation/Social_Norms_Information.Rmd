@@ -199,14 +199,29 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 
 ## Paper search and feeding papers database
 
-The first step to implement this meta-analysis was to find paper. Thanks to different research portal, as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 155 paper about cooperation and elicitation of social norms.
+Thanks to different research platforms, as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 165 paper about cooperation and elicitation of social norms (corresponding to 452 treatments).
+
+## Papers selection
+
 The selection criteria to identify papers in target was:
 
-* **Game type**:
-	+ Cooperation and prosociality games
-	+ Presence of choice task and norm elicitation task
-	+ Norms elicitation with Krupka and Weber (2013) or Bicchieri-Xiao (2009)
-	+ Only monetary incentivized treatments (both choices and norms elicitation)
+* **Game type** (cooperation and prosociality games):
+  + Dictator Game (with tax/standard/Lying);
+  + Donation Game;
+  + Ultimatum Game;
+  + Trust Game;
+  + Public Good Game;
+  + Prisoner's Dilemma Game;
+  + Take or Give Fame;
+  + CPR;
+  + Bargaining Game;
+  + Tax Game;
+  + Investment Game;
+* Presence of choice task and norm elicitation task;
+* Norms elicitation:
+  + Krupka and Weber (2013);
+  + Bicchieri-Xiao (2009).
+* Only monetary incentivized treatments (both choices and norms elicitation).
 
 ```{r descriptive_2_1, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #### SOCIAL NORMS META-ANALYSIS INFORMATION ####
@@ -253,13 +268,7 @@ kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccc
   column_spec(1, bold = T)
 ```
 
-
 Following these criteria, the number of treatments in target is `r Sum_of_treatments_in_target`.
-
-## Papers selection
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
 
 ## Data Collection
 
