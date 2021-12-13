@@ -69,9 +69,9 @@ $$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
 where:
 
-* $NE_{Specificity} = \frac{\sum_{i=1}^N max(KW_i)-KW_i}{N-1}$ ??????
+* $NE_{Specificity} =$$ {\sum_{i=1}^{N-1} max(KW)-KW_i}\over{(N-1)[max(KW)-m]}$
 
-* $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
+* $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
 
 We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 
