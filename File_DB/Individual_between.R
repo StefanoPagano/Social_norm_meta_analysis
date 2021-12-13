@@ -470,7 +470,7 @@ Kim003_sub_2 <- Kim003_sub_2 %>%
 
 Choice_Kim003_DB <- Kim003_sub_2
 
-Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163), subset = ANSW01 != 0) %>% 
+Kim003_db_norms_ug <- Kim003_db_norms %>% subset.data.frame(select = dg_columns <- c(1, 3, 4, 155:163), subset = ANSW23 != 0) %>% 
   mutate(subject_id = paste("2016Kim003", "8","norms", session, Subject, sep = "_")) %>%
   mutate(treatment_id = paste("2016Kim003", "8", sep = "_"), paper_id = "2016Kim003")
 

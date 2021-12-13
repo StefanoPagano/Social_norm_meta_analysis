@@ -80,6 +80,8 @@ dg_base_norms_var <- norms %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
+val_max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))
+
 dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2017Del037", 
@@ -89,13 +91,13 @@ dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_nor
          Sd_Avg_NE = sd(dg_base_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
          specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
-         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
+         max_sigma = val_max_sigma) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
   merge.data.frame(dg_base_dta_coop, by = c("PaperID","TreatmentCode")) %>%
-  merge.data.frame(dg_base_final_norms[1,], all.x=T, by = c("PaperID","TreatmentCode")) %>% 
+  merge.data.frame(dg_base_final_norms[2,], all.x=T, by = c("PaperID","TreatmentCode")) %>% 
   subset.data.frame(select = -c(n_sub_N, Kw_m))
 
 
