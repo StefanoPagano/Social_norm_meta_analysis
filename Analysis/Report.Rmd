@@ -311,7 +311,7 @@ dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model
 
 ### Between-subjects Design {.tabset}
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative))
+beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative, rm.na=T))
 
 Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003") %>% 
   rbind.data.frame(data.frame(paper_id="2016Kim003", scenarios=seq(1,15,2), KW_Normative=NA)) %>% 
