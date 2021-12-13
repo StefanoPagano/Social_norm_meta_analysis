@@ -54,7 +54,7 @@ coldg = c("code","give","social","role_DG", "demo_gender","demo_age") #gender: 1
 ### choices
 Bas115_sub_1a <- Bas115 %>%
   subset.data.frame(select = coldg, subset = social == 1) %>%
-  subset.data.frame(subset = role_DG == 1) %>%
+  #subset.data.frame(subset = role_DG == 1) %>%
   mutate(endowment = 10) %>%
   mutate(coop = give/endowment) %>%
   mutate(subject_id = paste("2020Bas115", "1a", code, sep = "_")) %>%
@@ -72,7 +72,7 @@ Choice_Within_DB <- Bas115_sub_1a
 ### beliefs
 Bas115_norms_1a <- Bas115_db_norms[, c(1:4,6,25:35)] %>%
   subset.data.frame(subset = social == 1) %>%
-  subset.data.frame(subset = role_DG == 1) %>%
+  #subset.data.frame(subset = role_DG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "1a", code, sep = "_")) %>%
   mutate(treatment_id = paste("2020Bas115", "1a", sep = "_"), paper_id = "2020Bas115") %>% 
   relocate(paper_id) %>%
@@ -87,7 +87,7 @@ colnames(Bas115_norms_1a)[colnames(Bas115_norms_1a)=="demo_gender"] = "gender"
 ### choices
 Bas115_sub_2a <- Bas115 %>%
   subset.data.frame(select = coldg, subset = social == 0) %>%
-  subset.data.frame(subset = role_DG == 1) %>%
+  #subset.data.frame(subset = role_DG == 1) %>%
   mutate(endowment = 10) %>%
   mutate(coop = give/endowment) %>%
   mutate(subject_id = paste("2020Bas115", "2a", code, sep = "_")) %>%
@@ -105,7 +105,7 @@ Choice_Within_DB <- Bas115_sub_2a %>%
 ### beliefs
 Bas115_norms_2a <- Bas115_db_norms[,c(1:4,6,25:35)] %>%
   subset.data.frame(subset = social == 0) %>%
-  subset.data.frame(subset = role_DG == 1) %>%
+  #subset.data.frame(subset = role_DG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "2a", code, sep = "_")) %>%
   mutate(treatment_id = paste("2020Bas115", "2a", sep = "_"), paper_id = "2020Bas115") %>% 
   relocate(paper_id) %>%
@@ -132,7 +132,7 @@ colug = c("code","give_UG","social", "role_UG","demo_gender","demo_age") #gender
 ### choices
 Bas115_sub_1c <- Bas115 %>%
   subset.data.frame(select = colug, subset = social == 1) %>%
-  subset.data.frame(subset = role_UG == 1) %>%
+  #subset.data.frame(subset = role_UG == 1) %>%
   mutate(endowment = 10) %>%
   mutate(coop = give_UG/endowment) %>%
   mutate(subject_id = paste("2020Bas115", "1c", code, sep = "_")) %>%
@@ -150,7 +150,7 @@ Choice_Within_DB <- Bas115_sub_1c %>%
 ### beliefs
 Bas115_norms_1c <- Bas115_db_norms[, c(1:3,5:6,36:46)] %>%
   subset.data.frame(subset = social == 1) %>%
-  subset.data.frame(subset = role_UG == 1) %>%
+  #subset.data.frame(subset = role_UG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "1c", code, sep = "_")) %>%
   mutate(treatment_id = paste("2020Bas115", "1c", sep = "_"), paper_id = "2020Bas115") %>% 
   relocate(paper_id) %>%
@@ -165,7 +165,7 @@ colnames(Bas115_norms_1c)[colnames(Bas115_norms_1c)=="demo_gender"] = "gender"
 ### choices
 Bas115_sub_2c <- Bas115 %>%
   subset.data.frame(select = colug, subset = social == 0) %>%
-  subset.data.frame(subset = role_UG == 1) %>%
+  #subset.data.frame(subset = role_UG == 1) %>%
   mutate(endowment = 10) %>%
   mutate(coop = give_UG/endowment) %>%
   mutate(subject_id = paste("2020Bas115", "2c", code, sep = "_")) %>%
@@ -183,7 +183,7 @@ Choice_Within_DB <- Bas115_sub_2c %>%
 ### beliefs
 Bas115_norms_2c <- Bas115_db_norms[, c(1:3,5:6,36:46)] %>%
   subset.data.frame(subset = social == 0) %>%
-  subset.data.frame(subset = role_UG == 1) %>%
+  #subset.data.frame(subset = role_UG == 1) %>%
   mutate(subject_id = paste("2020Bas115", "2c", code, sep = "_")) %>%
   mutate(treatment_id = paste("2020Bas115", "2c", sep = "_"), paper_id = "2020Bas115") %>% 
   relocate(paper_id) %>%
