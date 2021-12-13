@@ -89,7 +89,8 @@ s1_dg_baseline_final_norms <- merge.data.frame(s1_dg_baseline_appropriateness_su
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_baseline_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -148,7 +149,8 @@ s1_dg_always_final_norms <- merge.data.frame(s1_dg_always_appropriateness_sum, s
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_always_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -208,7 +210,8 @@ s1_dg_nr_final_norms <- merge.data.frame(s1_dg_nr_appropriateness_sum, s1_dg_nr_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_nr_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -268,7 +271,8 @@ s1_dg_nc_final_norms <- merge.data.frame(s1_dg_nc_appropriateness_sum, s1_dg_nc_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_nc_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -328,7 +332,8 @@ s2_dg_baseline_final_norms <- merge.data.frame(s2_dg_baseline_appropriateness_su
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_baseline_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -388,7 +393,8 @@ s2_dg_always_final_norms <- merge.data.frame(s2_dg_always_appropriateness_sum, s
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_always_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -448,7 +454,8 @@ s2_dg_nr_final_norms <- merge.data.frame(s2_dg_nr_appropriateness_sum, s2_dg_nr_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_nr_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -508,7 +515,8 @@ s2_dg_nc_final_norms <- merge.data.frame(s2_dg_nc_appropriateness_sum, s2_dg_nc_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_nc_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

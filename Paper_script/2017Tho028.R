@@ -3,10 +3,19 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
-dg=read_excel("libcons_alldata.xlsx", sheet = "alldata")
-
-## the next file contains all data except the conditional PG elicitations, which we did later
-#norms <- dg %>% subset.data.frame()
+dg=read_excel("libcons_alldata.xlsx", sheet = "alldata") %>% 
+     mutate(base0 = recode(base0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base1 = recode(base1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base2 = recode(base2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base3 = recode(base3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base4 = recode(base4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base5 = recode(base5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_0 = recode(asym1_0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_1 = recode(asym1_1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_2 = recode(asym1_2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_3 = recode(asym1_3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_4 = recode(asym1_4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_5 = recode(asym1_5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2017Tho028", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -80,7 +89,8 @@ dgb_final_norms <- merge.data.frame(dgb_appropriateness_sum, dgb_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgb_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -158,7 +168,8 @@ dga_final_norms <- merge.data.frame(dga_appropriateness_sum, dga_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(dga_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----

@@ -88,7 +88,8 @@ dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_nor
          Var_NE = ..y,
          Sd_Avg_NE = sd(dg_base_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -158,7 +159,8 @@ dg_in_final_norms <- merge.data.frame(dg_in_appropriateness_sum, dg_in_norms_var
          Var_NE = ..y,
          Sd_Avg_NE = sd(dg_in_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -229,7 +231,8 @@ dg_out_final_norms <- merge.data.frame(dg_out_appropriateness_sum, dg_out_norms_
          Var_NE = ..y,
          Sd_Avg_NE = sd(dg_out_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/(length(positive_appropriateness$delta_max)-1)) %>%
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
