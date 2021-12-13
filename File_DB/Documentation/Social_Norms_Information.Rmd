@@ -199,9 +199,9 @@ $$\sigma\left(max\left( \frac{\sum_{j=1}^{J}\theta_j}{N} \right),\ \theta_j = \s
 
 ## Paper search and feeding papers database
 
-Thanks to different research platforms, as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 165 paper about cooperation and elicitation of social norms (corresponding to 452 treatments).
+Thanks to different research platforms (Search Engine Platforms), as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 165 paper about cooperation and elicitation of social norms (corresponding to 452 treatments).
 
-## Papers selection
+## Search criteria
 
 The selection criteria to identify papers in target was:
 
@@ -217,11 +217,10 @@ The selection criteria to identify papers in target was:
   + Bargaining Game;
   + Tax Game;
   + Investment Game;
-* Presence of choice task and norm elicitation task;
-* Norms elicitation:
+* Presence of norm elicitation task:
   + Krupka and Weber (2013);
   + Bicchieri-Xiao (2009).
-* Only monetary incentivized treatments (both choices and norms elicitation).
+* Only monetary incentivized studies (both choices and norms elicitation).
 
 ```{r descriptive_2_1, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #### SOCIAL NORMS META-ANALYSIS INFORMATION ####
@@ -268,28 +267,26 @@ kbl(table_treatments_in_target_per_game, digits = 0, booktabs = T, align = "lccc
   column_spec(1, bold = T)
 ```
 
+
+Thanks to different research platforms (Search Engine Platforms), as Google Scholar, EconRepec, WebOfScience, Ideas and Google group ESA, we find 165 paper about cooperation and elicitation of social norms (corresponding to 452 treatments).
+
+<!-- To find qualifying studies, I began by conducting a 5 × 6  -->
+<!-- keyword search across PsychINFO, EconLit, Sociological  -->
+<!-- Abstracts, International Bibliography of the Social Sciences, PubMed, SSRN, IDEAS REPEC, and Google Scholar,  -->
+<!-- using each possible combination of “prisoner’s dilemma,”  -->
+<!-- “public goods game,” “trust game,” “investment game,” or  -->
+<!-- “ultimatum game” with “cognitive load,” “time pressure,”  -->
+<!-- “ego depletion,” “intuition priming,” “intuition recall,” or  -->
+<!-- “intuition conceptual priming.” I also conducted  -->
+<!-- controlled-vocabulary searches combining the terms  -->
+<!-- “cooperation,” “social dilemma,” and “trust” with “intuition” and “dual-process models” when possible (the relevant controlled vocabulary for this meta-analysis was  -->
+<!-- available only in PsychINFO and Sociological Abstracts) -->
+
+<!-- Furthermore, I solicited published and unpublished data  -->
+<!-- sets from the field at large using ESA e-mail list -->
+
+
 Following these criteria, the number of treatments in target is `r Sum_of_treatments_in_target`.
-
-## Data Collection
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
-
-## Database Designing
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
-
-## Treatment Analysis
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
-
-## Individual Analysis
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna. Nunc viverra imperdiet enim. Fusce est.
-Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem.
-
 
 # Homogeneity Criteria
 
