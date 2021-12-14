@@ -80,7 +80,7 @@ dg_base_norms_var <- norms %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col)
 
-val_max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))
+val_max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))
 
 dg_base_final_norms <- merge.data.frame(dg_base_appropriateness_sum, dg_base_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 

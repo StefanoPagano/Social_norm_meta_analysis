@@ -72,7 +72,7 @@ positive_appropriateness <- dgn_appropriateness_sum %>% subset.data.frame(subset
 dgn_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 0) %>%
   group_by(action) %>%
-  summarise(var_coop = var(norm))
+  summarise(var_norm = var(norm))
   # cbind.data.frame(donation=label_col)
 
 dgn_final_norms <- merge.data.frame(dgn_appropriateness_sum, dgn_norms_var, by = "action") %>% 
@@ -80,12 +80,12 @@ dgn_final_norms <- merge.data.frame(dgn_appropriateness_sum, dgn_norms_var, by =
   mutate(PaperID = "2019Cha026", 
     TreatmentCode = 1, 
     Avg_NE = action/10,
-    Var_NE = var_coop,
+    Var_NE = var_norm,
     Sd_Avg_NE = sd(dgn_appropriateness_sum$Kw_m),
     Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
     specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
-    max_sigma = sd(c(rep(0.2, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
-  subset.data.frame(select = -c(coop, var_coop, action))
+    max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
+  subset.data.frame(select = -c(coop, var_norm, action))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
@@ -144,7 +144,7 @@ positive_appropriateness <- dgt_appropriateness_sum %>% subset.data.frame(subset
 dgt_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 1) %>%
   group_by(action) %>%
-  summarise(var_coop = var(norm))
+  summarise(var_norm = var(norm))
 # cbind.data.frame(donation=label_col)
 
 dgt_final_norms <- merge.data.frame(dgt_appropriateness_sum, dgt_norms_var, by = "action") %>% 
@@ -152,12 +152,12 @@ dgt_final_norms <- merge.data.frame(dgt_appropriateness_sum, dgt_norms_var, by =
   mutate(PaperID = "2019Cha026", 
          TreatmentCode = 2, 
          Avg_NE = action/10,
-         Var_NE = var_coop,
+         Var_NE = var_norm,
          Sd_Avg_NE = sd(dgt_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
          specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
-         max_sigma = sd(c(rep(0.2, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
-  subset.data.frame(select = -c(coop, var_coop, action))
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
+  subset.data.frame(select = -c(coop, var_norm, action))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
