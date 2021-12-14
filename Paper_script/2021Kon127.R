@@ -59,7 +59,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
 n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s1_dg_baseline_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -89,8 +89,8 @@ s1_dg_baseline_final_norms <- merge.data.frame(s1_dg_baseline_appropriateness_su
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_baseline_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
-         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -119,7 +119,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
 n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s1_dg_always_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -149,8 +149,8 @@ s1_dg_always_final_norms <- merge.data.frame(s1_dg_always_appropriateness_sum, s
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_always_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
-         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -180,7 +180,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
 n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s1_dg_nr_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -210,8 +210,8 @@ s1_dg_nr_final_norms <- merge.data.frame(s1_dg_nr_appropriateness_sum, s1_dg_nr_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_nr_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
-         max_sigma = sd(c(rep(1/3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
@@ -241,7 +241,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,68:78)
 n_sub_N = norms_s1 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s1_dg_nc_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_columns) %>%
@@ -271,7 +271,7 @@ s1_dg_nc_final_norms <- merge.data.frame(s1_dg_nc_appropriateness_sum, s1_dg_nc_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s1_dg_nc_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -302,7 +302,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
 n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "baseline") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s2_dg_baseline_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -332,7 +332,7 @@ s2_dg_baseline_final_norms <- merge.data.frame(s2_dg_baseline_appropriateness_su
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_baseline_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -363,7 +363,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
 n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "always remind") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s2_dg_always_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -393,7 +393,7 @@ s2_dg_always_final_norms <- merge.data.frame(s2_dg_always_appropriateness_sum, s
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_always_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -424,7 +424,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
 n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "never remind") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s2_dg_nr_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -454,7 +454,7 @@ s2_dg_nr_final_norms <- merge.data.frame(s2_dg_nr_appropriateness_sum, s2_dg_nr_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_nr_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -485,7 +485,7 @@ label_col = as.character(seq(0,10,1))
 norms_columns <- c(1,2,7,15,73:83)
 n_sub_N = norms_s2 %>% subset.data.frame(select = norms_columns) %>%
   subset.data.frame(subset = participant._current_app_name == "kwtask") %>%
-  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = n())
+  subset.data.frame(subset = player.treatment == "no conflict") %>% summarise(n_sub_N = sum(!is.na(DG_SN_0)))
 
 ## compute norm 
 s2_dg_nc_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_columns) %>%
@@ -515,7 +515,7 @@ s2_dg_nc_final_norms <- merge.data.frame(s2_dg_nc_appropriateness_sum, s2_dg_nc_
          Var_NE = ..y,
          Sd_Avg_NE = sd(s2_dg_nc_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)*(1-1/3)),
+         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          max_sigma = sd(c(rep(0.3, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 

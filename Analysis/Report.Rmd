@@ -69,7 +69,7 @@ $$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
 where:
 
-* $NE_{Specificity} =$$ {\sum_{i=1}^{N-1} max(KW)-KW_i}\over{(N-1)[max(KW)-m]}$
+* $NE_{Specificity} =$$ {\sum_{i=1}^{N-1} max(KW)-KW_i}\over{(N-1)[max(KW)-min(KW)]}$
 
 * $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$ is the reciprocal of the standard deviation computed on the most appropriate action $N$.
 
