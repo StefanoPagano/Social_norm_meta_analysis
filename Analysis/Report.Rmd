@@ -89,24 +89,29 @@ master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
 Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength)
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Game_type)
 ```
 
 Specificity
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specificity)
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity)) +
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity") + xlab("Specificity") + facet_wrap(~Game_type)
 ```
 
 Consistency
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency)
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency)) +
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Consistency") + xlab("Consistency") + facet_wrap(~Game_type)
 ```
 
 <b>Distribution</b>
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
-geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Game_type)
-```
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$consistency, master$Delta, method= "spearman", exact = F)
 
