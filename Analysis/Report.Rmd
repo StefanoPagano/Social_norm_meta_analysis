@@ -156,7 +156,7 @@ hp4_mean <- master %>%
             n = n()) %>% 
   arrange(Game_type)
 
-master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, Sd_Avg_NE, Var_NE), subset = Game_type %in% c("DG", "UG"))
+master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, specificity, consistency), subset = Game_type %in% c("DG", "UG"))
 
 wilc_delta = wilcox.test(Delta ~ Macro_game_type, data=master_test)
 wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
@@ -214,12 +214,12 @@ kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, cap
 hp4_SP_CS <- master %>% 
   subset.data.frame(subset = Game_type %in% c("DG", "UG")) %>%
   group_by(Game_type) %>% 
-  summarise(Specificity = mean(1/(Sd_Avg_NE), na.rm = T), 
-            Consistency = mean(1/(sqrt(Var_NE)), na.rm = T)) %>% 
+  summarise(Specificity = mean(specificity, na.rm = T), 
+            Consistency = mean(consistency, na.rm = T)) %>% 
   arrange(Game_type)
 
-F_test_spec <- wilcox.test(1/(master_test$Sd_Avg_NE) ~ master_test$Game_type)
-F_test_cons <- wilcox.test(1/(sqrt(master_test$Var_NE)) ~ master_test$Game_type)
+F_test_spec <- wilcox.test(master_test$specificity ~ master_test$Game_type)
+F_test_cons <- wilcox.test(master_test$consistency ~ master_test$Game_type)
 
 hp4plus_SP_CS <- hp4_SP_CS %>% 
   add_row(Game_type = "Difference (Wilcoxon p-value)", Specificity = F_test_spec$p.value, Consistency = F_test_cons$p.value)
@@ -230,8 +230,8 @@ kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, capti
   column_spec(1, bold = T) %>%
   row_spec(3, bold = T, color = "white", background = "#6c757d")
 
-ggarrange(ggplot(master_test) + geom_density(aes(color = Game_type, x=log(1/Sd_Avg_NE))) + xlab("Specificity"),
-ggplot(master_test) + geom_density(aes(color = Game_type, x=log(1/sqrt(Var_NE)))) + xlab("Consistency"), common.legend = T)
+#ggarrange(ggplot(master_test) + geom_density(aes(color = Game_type, x=specificity) + xlab("Specificity"),
+#ggplot(master_test) + geom_density(aes(color = Game_type, x=consistency)) + xlab("Consistency"), common.legend = T)
 
 ```
 
