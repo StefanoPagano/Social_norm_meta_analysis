@@ -270,7 +270,7 @@ $U_{ij} = \alpha \pi_j + \beta S_{j}$
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs <- read.csv("../File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("../File_DB/Output/Subjects_choices.csv", sep = ",")
-dataframe_betas <- data.frame(ID=NA, t=NA, game=NA,alpha=NA, beta=NA,SE_alpha=NA,SE_beta=NA)
+dataframe_betas <- data.frame(ID=NA, t=NA, game=NA,alpha=NA, beta=NA,SE_alpha=NA,SE_beta=NA, endowment=NA)
 i=0
 ```
 
@@ -291,7 +291,7 @@ i=i+1
 Bas115_dg = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="DG") %>% mutate(payoff=endowment-scenarios)
 model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_1a"))
 summary(model)
-dataframe_betas[i,] <- c("2020Bas115",1,"DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+dataframe_betas[i,] <- c("2020Bas115",1,"DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]), mean(Bas115_dg$endowment))
 ```
 
 DG - Treatment 2 ("Private")
@@ -300,7 +300,7 @@ DG - Treatment 2 ("Private")
 i=i+1
 model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_2a"))
 summary(model)
-dataframe_betas[i,] <- c("2020Bas115",2, "DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+dataframe_betas[i,] <- c("2020Bas115",2, "DG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]),Bas115_dg %>% subset.data.frame(subset = treatment_id =="2020Bas115_2a")%>%summarise(e=mean(endowment)))
 ```
 
 UG - Treatment 1 ("Social")
@@ -310,7 +310,7 @@ i=i+1
 Bas115_ug = individual_db_w %>% subset.data.frame(paper_id=="2020Bas115" & Game_type=="UG") %>% mutate(payoff=endowment-scenarios)
 model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_1c"))
 summary(model)
-dataframe_betas[i,] <- c("2020Bas115",3,"UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+dataframe_betas[i,] <- c("2020Bas115",3,"UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]),Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_1c")%>%summarise(e=mean(endowment)))
 ```
 
 UG - Treatment 2 ("Private")
@@ -319,7 +319,7 @@ UG - Treatment 2 ("Private")
 i=i+1
 model <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_2c"))
 summary(model)
-dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]))
+dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model$coefficients["KW_Normative"],sqrt(model$var[1,1]),sqrt(model$var[2,2]),Bas115_ug %>% subset.data.frame(subset = treatment_id =="2020Bas115_2c")%>%summarise(e=mean(endowment)))
 ```
 
 ### Between-subjects Design {.tabset}
@@ -344,7 +344,7 @@ i=i+1
 Kim003_dg = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="DG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subset = subject_id!="2016Kim003_7_2222")
 clogit.kim_dg <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_dg)
 summary(clogit.kim_dg)
-dataframe_betas[i,] <- c("2016Kim003",1,"DG",clogit.kim_dg$coefficients["payoff"],clogit.kim_dg$coefficients["KW_Normative"],sqrt(clogit.kim_dg$var[1,1]),sqrt(clogit.kim_dg$var[2,2]))
+dataframe_betas[i,] <- c("2016Kim003",1,"DG",clogit.kim_dg$coefficients["payoff"],clogit.kim_dg$coefficients["KW_Normative"],sqrt(clogit.kim_dg$var[1,1]),sqrt(clogit.kim_dg$var[2,2]),mean(Kim003_dg$endowment))
 ```
 
 
@@ -352,13 +352,11 @@ For UG game
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="UG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subject_id!="2016Kim003_8_1804" & subject_id!="2016Kim003_8_2411")
-  
-
 #mlogit.kim <- mlogit(A~payoff+KW_Normative|0, data = Kim003_m)
 #summary(mlogit.kim)#$CoefTable[1,2] ### SUCA 2beta/alpha monetary trade off from -1 to 1 
 clogit.kim_ug <- clogit(A~payoff+KW_Normative +strata(subject_id), data = Kim003_ug)
 summary(clogit.kim_ug)
-dataframe_betas[i,] <- c("2016Kim003",2,"UG",clogit.kim_ug$coefficients["payoff"],clogit.kim_ug$coefficients["KW_Normative"],sqrt(clogit.kim_ug$var[1,1]),sqrt(clogit.kim_ug$var[2,2]))
+dataframe_betas[i,] <- c("2016Kim003",2,"UG",clogit.kim_ug$coefficients["payoff"],clogit.kim_ug$coefficients["KW_Normative"],sqrt(clogit.kim_ug$var[1,1]),sqrt(clogit.kim_ug$var[2,2]),mean(Kim003_ug$endowment))
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -380,7 +378,7 @@ i=i+1
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
 clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061)
 summary(clogit.her)
-dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]))
+dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]),mean(Her061$endowment))
 ```
 
 
@@ -412,7 +410,7 @@ clogit.cha_1 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Cha
 summary(clogit.cha_1)
 #mlogit.cha <- mlogit(A~ 0+payoff + KW_Normative, data = Cha026_m)
 #summary(mlogit.cha)
-dataframe_betas[i,] <- c("2019Cha026",1, "DG", clogit.cha_1$coefficients["payoff"],clogit.cha_1$coefficients["KW_Normative"],sqrt(clogit.cha_1$var[1,1]),sqrt(clogit.cha_1$var[2,2]))
+dataframe_betas[i,] <- c("2019Cha026",1, "DG", clogit.cha_1$coefficients["payoff"],clogit.cha_1$coefficients["KW_Normative"],sqrt(clogit.cha_1$var[1,1]),sqrt(clogit.cha_1$var[2,2]),mean(Cha026$endowment))
 ```
 
 
@@ -422,7 +420,7 @@ Treatment 2
 i=i+1
 clogit.cha_2 <- clogit(A~ payoff + KW_Normative + strata(subject_id), data = Cha026%>% subset.data.frame(treatment_id=="2019Cha026_2"))
 summary(clogit.cha_2)
-dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff"],clogit.cha_2$coefficients["KW_Normative"],sqrt(clogit.cha_2$var[1,1]),sqrt(clogit.cha_2$var[2,2]))
+dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff"],clogit.cha_2$coefficients["KW_Normative"],sqrt(clogit.cha_2$var[1,1]),sqrt(clogit.cha_2$var[2,2]), Cha026%>% subset.data.frame(treatment_id=="2019Cha026_2")%>% summarise(e=mean(endowment)))
 ```
 
 ### All papers results
