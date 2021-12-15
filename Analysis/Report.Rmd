@@ -82,14 +82,22 @@ We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 # consistency = sqrt(Var_NE)
 
 master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
-                           Norm_Strength = sqrt(Var_NE)/max_sigma + specificity,
+                           Norm_Strength = consistency + specificity,
                            Delta = (Avg_NE-Avg_coop))
 ```
 
-
+Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength)
+```
+
+Specificity
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specificity)
+```
+
+Consistency
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency)
 ```
 
@@ -104,7 +112,7 @@ cor.test(master$consistency, master$Delta, method= "spearman", exact = F)
 
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
 
