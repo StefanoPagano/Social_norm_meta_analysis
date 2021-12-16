@@ -82,8 +82,8 @@ We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 # consistency = sqrt(Var_NE)
 
 master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
-                           Norm_Strength = consistency + specificity,
-                           Delta = (Avg_NE-Avg_coop))
+                           Norm_Strength = consistency + specificity_plus + specificity_min,
+                           Delta = (Avg_NE-Avg_coop)/Avg_NE)
 ```
 
 Norm Strenght
@@ -94,11 +94,19 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_
 geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Game_type)
 ```
 
-Specificity
+Specificity plus
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-summary(master$specificity)
+summary(master$specificity_plus)
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity)) +
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus)) +
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity") + xlab("Specificity") + facet_wrap(~Game_type)
+```
+
+Specificity minus
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+summary(master$specificity_min)
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min)) +
 geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity") + xlab("Specificity") + facet_wrap(~Game_type)
 ```
 
@@ -122,20 +130,29 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$specificity, master$Delta, method= "spearman", exact = F)
+cor.test(master$specificity_plus, master$Delta, method= "spearman", exact = F)
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
   
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+cor.test(master$specificity_min, master$Delta, method= "spearman", exact = F)
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 
 ```
 
@@ -161,7 +178,7 @@ hp4_mean <- master %>%
             n = n()) %>% 
   arrange(Game_type)
 
-master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, specificity, consistency), subset = Game_type %in% c("DG", "UG"))
+master_test <- master %>% subset.data.frame(select = c(Game_type, Avg_coop, Avg_NE, Delta, Norm_Strength, Macro_game_type, specificity_plus, specificity_min,consistency), subset = Game_type %in% c("DG", "UG"))
 
 wilc_delta = wilcox.test(Delta ~ Macro_game_type, data=master_test)
 wilc_strength = wilcox.test(Norm_Strength ~ Macro_game_type, data = master_test)
@@ -219,15 +236,16 @@ kbl(hp4plus_mean, digits = 4, booktabs = T, align = "lccccc", centering = F, cap
 hp4_SP_CS <- master %>% 
   subset.data.frame(subset = Game_type %in% c("DG", "UG")) %>%
   group_by(Game_type) %>% 
-  summarise(Specificity = mean(specificity, na.rm = T), 
+  summarise(Specificity_plus = mean(specificity_plus, na.rm = T), Specificity_min = mean(specificity_min, na.rm = T), 
             Consistency = mean(consistency, na.rm = T)) %>% 
   arrange(Game_type)
 
-F_test_spec <- wilcox.test(master_test$specificity ~ master_test$Game_type)
+F_test_spec_plus <- wilcox.test(master_test$specificity_plus ~ master_test$Game_type)
+F_test_spec_min <- wilcox.test(master_test$specificity_min ~ master_test$Game_type)
 F_test_cons <- wilcox.test(master_test$consistency ~ master_test$Game_type)
 
 hp4plus_SP_CS <- hp4_SP_CS %>% 
-  add_row(Game_type = "Difference (Wilcoxon p-value)", Specificity = F_test_spec$p.value, Consistency = F_test_cons$p.value)
+  add_row(Game_type = "Difference (Wilcoxon p-value)", Specificity_plus = F_test_spec_plus$p.value, Specificity_min = F_test_spec_min$p.value, Consistency = F_test_cons$p.value)
 
 opts <- options(knitr.kable.NA = "")
 kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, caption = "Consistency e Specificity") %>%
