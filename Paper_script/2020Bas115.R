@@ -87,6 +87,17 @@ dgS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
 positive_appropriateness <- dgS_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgS_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgS_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgS_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 dgS_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 1) %>%
@@ -102,7 +113,8 @@ dgS_final_norms <- merge.data.frame(dgS_appropriateness_sum, dgS_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgS_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -152,6 +164,17 @@ dgP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
 positive_appropriateness <- dgP_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgP_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgP_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgP_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 dgP_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 0) %>%
@@ -167,7 +190,8 @@ dgP_final_norms <- merge.data.frame(dgP_appropriateness_sum, dgP_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgP_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -218,6 +242,17 @@ dgtS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) 
 positive_appropriateness <- dgtS_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgtS_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgtS_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgtS_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 dgtS_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 1) %>%
@@ -233,7 +268,8 @@ dgtS_final_norms <- merge.data.frame(dgtS_appropriateness_sum, dgtS_norms_var, b
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgtS_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -284,6 +320,17 @@ dgtP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) 
 positive_appropriateness <- dgtP_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgtP_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgtP_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgtP_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 dgtP_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 0) %>%
@@ -299,7 +346,8 @@ dgtP_final_norms <- merge.data.frame(dgtP_appropriateness_sum, dgtP_norms_var, b
          Var_NE = ..y,
          Sd_Avg_NE = sd(dgtP_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -351,6 +399,17 @@ ugS_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
 positive_appropriateness <- ugS_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(ugS_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- ugS_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- ugS_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 ugS_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 1) %>%
@@ -366,7 +425,8 @@ ugS_final_norms <- merge.data.frame(ugS_appropriateness_sum, ugS_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(ugS_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -420,6 +480,17 @@ ugP_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
 positive_appropriateness <- ugP_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(ugP_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- ugP_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- ugP_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
 ## compute variance norm
 ugP_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = social == 0) %>%
@@ -435,7 +506,8 @@ ugP_final_norms <- merge.data.frame(ugP_appropriateness_sum, ugP_norms_var, by =
          Var_NE = ..y,
          Sd_Avg_NE = sd(ugP_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>% 
   subset.data.frame(select = -c(..x, ..y, donation))
 

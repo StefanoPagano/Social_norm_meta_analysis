@@ -68,6 +68,18 @@ dgn_appropriateness_sum <- norms %>%
 positive_appropriateness <- dgn_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgn_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgn_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgn_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
 ## compute variance norm
 dgn_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 0) %>%
@@ -78,13 +90,14 @@ dgn_norms_var <- norms %>%
 dgn_final_norms <- merge.data.frame(dgn_appropriateness_sum, dgn_norms_var, by = "action") %>% 
   subset.data.frame(subset = coop == max(coop)) %>% 
   mutate(PaperID = "2019Cha026", 
-    TreatmentCode = 1, 
-    Avg_NE = action/10,
-    Var_NE = var_norm,
-    Sd_Avg_NE = sd(dgn_appropriateness_sum$Kw_m),
-    Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-    specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
-    max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
+         TreatmentCode = 1, 
+         Avg_NE = action/10,
+         Var_NE = var_norm,
+         Sd_Avg_NE = sd(dgn_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(coop, var_norm, action))
 
 # 3. combine dataset ----
@@ -140,6 +153,18 @@ dgt_appropriateness_sum <- norms %>%
 positive_appropriateness <- dgt_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(dgt_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- dgt_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- dgt_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
 ## compute variance norm
 dgt_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 1) %>%
@@ -155,7 +180,8 @@ dgt_final_norms <- merge.data.frame(dgt_appropriateness_sum, dgt_norms_var, by =
          Var_NE = var_norm,
          Sd_Avg_NE = sd(dgt_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(coop, var_norm, action))
 

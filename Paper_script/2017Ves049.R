@@ -57,6 +57,18 @@ pgg1_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
 positive_appropriateness <- pgg1_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(pgg1_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- pgg1_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- pgg1_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
 ## compute variance norm
 pgg1_norms_var <- pgg[, norms_columns] %>%
   subset.data.frame(subset = Treatment == 1) %>%
@@ -72,7 +84,8 @@ pgg1_final_norms <- merge.data.frame(pgg1_appropriateness_sum, pgg1_norms_var, b
          Var_NE = ..y,
          Sd_Avg_NE = sd(pgg1_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -120,6 +133,18 @@ pgg2_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
 positive_appropriateness <- pgg2_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(pgg2_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- pgg2_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- pgg2_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
 ## compute variance norm
 pgg2_norms_var <- pgg[, norms_columns] %>%
   subset.data.frame(subset = Treatment == 2) %>%
@@ -135,7 +160,8 @@ pgg2_final_norms <- merge.data.frame(pgg2_appropriateness_sum, pgg2_norms_var, b
          Var_NE = ..y,
          Sd_Avg_NE = sd(pgg2_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
@@ -184,6 +210,18 @@ pgg3_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
 positive_appropriateness <- pgg3_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
+if (min(pgg3_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- pgg3_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- pgg3_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
 ## compute variance norm
 pgg3_norms_var <- pgg[, norms_columns] %>%
   subset.data.frame(subset = Treatment == 3) %>%
@@ -199,7 +237,8 @@ pgg3_final_norms <- merge.data.frame(pgg3_appropriateness_sum, pgg3_norms_var, b
          Var_NE = ..y,
          Sd_Avg_NE = sd(pgg3_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
-         specificity = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
   subset.data.frame(select = -c(..x, ..y, donation))
 
