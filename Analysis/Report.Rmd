@@ -4,6 +4,7 @@ output:
   html_document:
     toc: True
     toc_float: True
+date: 
 ---
 
 # Analysis Treatment-level: All Games
@@ -30,7 +31,7 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")))
 ```
 
-## Previusly
+## Previuosly
 
 H2
   - Outlier
@@ -67,7 +68,7 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 <br>
 
-## HP2 : Is compliance related to norm strength?
+## HP2 : Is compliance related to norm strength? {.tabset}
 
 We compute norm strength as:
 
@@ -95,7 +96,7 @@ master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
                            Delta = (Avg_NE-Avg_coop)/Avg_NE)
 ```
 
-Norm Strenght
+### Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
@@ -108,7 +109,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=speci
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-Specificity plus
+### Specificity plus
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specificity_plus)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus)) +
@@ -121,7 +122,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=speci
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-Specificity minus
+### Specificity minus
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specificity_min)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min)) +
@@ -134,7 +135,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-Consistency
+### Consistency
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency)) +
