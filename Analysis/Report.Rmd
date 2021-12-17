@@ -483,14 +483,14 @@ $U_{ij} = \alpha \pi_j + \beta S_{j} + \eta S_{j}*\sigma_j(S_{ij})$
 
 ### Within-subjects elicitation {.tabset}
 
-#### 2020Bas115
+#### 2020Bas115 {.tabset}
 
-DG - T1
+##### DG - T1
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=1
-SDi= Bas115_dg %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
+SDi= Bas115_dg %>% group_by(scenarios) %>% summarise(sdi=sd(KW_Normative))
 Bas115_dg <- Bas115_dg %>% merge.data.frame(SDi)
-model <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"))
+model <- clogit(A~ payoff + KW_Normative+ KW_Normative*sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_1a"))
 summary(model)
 dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha=model$coefficients["payoff"],
                                         beta=model$coefficients["KW_Normative"],
@@ -501,10 +501,10 @@ dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha
                                         )
 ```
 
-DG - T2
+##### DG - T2
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-model <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
+model <- clogit(A~ payoff + KW_Normative+ KW_Normative*sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
 summary(model)
 dataframe_betas_augmented[i,] <- c(ID="2020Bas115",t=2,game_type="DG",alpha=model$coefficients["payoff"],
                                         beta=model$coefficients["KW_Normative"],
@@ -525,7 +525,7 @@ DG game
 SDj= beliefs %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(sdj=sd(KW_Normative))
 i=i+1
 Kim003_dg = Kim003_dg %>% merge.data.frame(SDj)
-model <- clogit(A~payoff+KW_Normative + KW_Normative:sdj + strata(subject_id), data = Kim003_dg)
+model <- clogit(A~payoff+KW_Normative*sdj + strata(subject_id), data = Kim003_dg)
 summary(model)
 dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=1,game_type="DG",
                                    alpha=model$coefficients["payoff"],
@@ -554,14 +554,9 @@ dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=2,game_type="UG",alpha=mode
 
 ## Individual analysis of norm compliance {.tabset}
 
-
-### bas155
-bas115_strenght <- Bas115 %>% group_by(subject_id) %>% summarise(specificity = sd(KW_Normative))
-data_bas115 <- Bas115 %>% merge.data.frame(bas115_strenght)
-data_bas115_m <- dfidx(data_bas115 %>% mutate(scenarios=as.factor(scenarios)),
-            idx = c("subject_id","scenarios"), 
-            idpkg = "mlogit")
-summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))
+```{r}
+individual_db_b %>% merge.data.frame(master%>% rename(TreatmentCode=treatment_id))
+```
 
 
 # Appendix {.tabset}
