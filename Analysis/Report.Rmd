@@ -98,8 +98,8 @@ We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 # specificity = mean of max deviation
 # consistency = sqrt(Var_NE)
 
-master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
-                           Norm_Strength = consistency + specificity_plus + specificity_min,
+master = master %>% mutate(consistency=1-(sqrt(Var_NE)/max_sigma),
+                           Norm_Strength = consistency + specificity_plus,
                            Delta = (Avg_NE-Avg_coop)/Avg_NE)
 ```
 
