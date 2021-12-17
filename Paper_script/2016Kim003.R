@@ -48,7 +48,7 @@ norms1 <- norms1 %>% mutate(ANSW01 = recode(answers.1., `1` = -1, `2` = -1/3, `3
        ANSW40 = recode(answers.40., `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
        ANSW41 = recode(answers.41., `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
        ANSW42 = recode(answers.42., `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
-
+#answ:
 #1-9 DG
 #12-22 PGG
 #23-31 UG
