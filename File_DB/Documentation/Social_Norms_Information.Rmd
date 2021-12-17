@@ -60,6 +60,7 @@ contains all variables regarding the experimental design.
 
 * **First task**: Y if the main game in the treatment is played as first task, N if other tasks are played before;
 * **Treatment_Dependent_variable**: a tag about the goal of the treatments implemented. Drawn upon CoDa ontology (macro-categories). See [PDF](https://cooperationdatabank.org/wp-content/uploads/2020/10/Complete-Codebook_12Oct.pdf)
+  + not empty when same game type and difference in design, NA otherwise;
 * **between_vs_within**: treatment allocation;
 * **Game_type**: type of implemented game:
   + PD = Prisoner’s Dilemma; 
