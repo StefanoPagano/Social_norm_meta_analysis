@@ -33,20 +33,6 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")))
 ```
 
-## Previously
-
-H2
-  - Outlier
-
-H3:
-	- no framing
-	- same actions
-
-comments on individual analysis
-        - $\alpha < 0$
-
-
-<br>
 
 ## HP1: Relation between norms and actions
 
