@@ -154,8 +154,11 @@ We also computed the specificity for inappropriate actions (this is not used in 
 
 * $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$
 
+**Content** indicates the mean appropriateness level of a norm.
 
-We compute compliance as 
+* $E[max_j(KW_j)] \forall j \in A$ where A is the action space
+
+We compute **Compliance** as 
 
 * $Delta = NE_{avg}-Coop_{avg}$
 
@@ -185,7 +188,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=speci
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-#### consistency
+#### Consistency
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency)) +
@@ -198,15 +201,8 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-### CONTENT {.tabset}
+#### Norm Content {.tabset}
 
-$$Strength = {KW_m}$$
-
-We compute compliance as 
-
-* $Delta = NE_{avg}-Coop_{avg}$
-
-#### Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Avg_KW_m)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m)) +
