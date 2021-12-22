@@ -136,7 +136,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 
 ### NEW ANALYSIS {.tabset}
 
-<h2>Overview of the computed statistics</h2>
+**Overview of the computed statistics**
 
 $$Strength = {NE_{Consistency}+NE_{Specificity^+}}$$
 
@@ -203,7 +203,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-#### Norm Content {.tabset}
+#### Norm Content
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Avg_KW_m)
@@ -217,7 +217,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_K
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-### Relation among variables
+#### Relation among variables
 
 ** Norm Content and Specificity plus **
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
