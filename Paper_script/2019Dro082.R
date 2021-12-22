@@ -78,7 +78,7 @@ dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "d
   mutate(PaperID = "2019Dro082", 
          TreatmentCode = "1a", 
          Avg_NE = as.integer(donation_range)/13,
-         Var_NE = ..y,
+         Var_NE = ..y, Avg_KW_m = Kw_m,
          Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
          specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
