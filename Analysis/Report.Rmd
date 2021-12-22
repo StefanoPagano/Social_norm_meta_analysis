@@ -82,12 +82,12 @@ We compute norm strength as:
 # master = master %>% mutate(consistency_old = 1/sqrt(Var_NE),
 #                            Norm_Strength_old = consistency_old + Sd_Avg_NE,
 #                            Delta = Avg_NE-Avg_coop)
-master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
+master = master %>% mutate(consistency=1-sqrt(Var_NE)/max_sigma,
                            consistency_old = 1/sqrt(Var_NE),
                            specificity_old = 1/Sd_Avg_NE,
                            Norm_Strength = consistency + specificity_plus,
                            Norm_Strength_old = consistency_old + specificity_old,
-                           Delta = Avg_NE-Avg_coop)
+                           Delta = (Avg_NE-Avg_coop)/Avg_NE)
 ```
 
 ### OLD ANALYSIS {.tabset}
