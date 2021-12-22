@@ -33,7 +33,7 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")))
 ```
 
-## Previuosly
+## Previously
 
 H2
   - Outlier
@@ -74,24 +74,6 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 We compute norm strength as:
 
-$$Strength = {NE_{Consistency}+NE_{Specificity^-}+NE_{Specificity^+}}$$
-
-where:
-
-**Specificity** indicates how appropriate is prevailing social norm relative to other possible action
-
-* $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)[max(KW)-min(KW)]}$ $\forall KW_i > 0$
-
-* $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)[max(|KW|)-min(|KW|)]}$ $\forall KW_i < 0$
-
-**Consistency** indicates what it is the consensus around a prevailing social norm
-
-* $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$
-
-* $0 < Strength < 3$
-
-We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
-
 ## Summary of computed variables {.tabset}
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -102,12 +84,30 @@ We compute compliance as $Delta = NE_{avg}-Coop_{avg}$
 #                            Delta = Avg_NE-Avg_coop)
 master = master %>% mutate(consistency=sqrt(Var_NE)/max_sigma,
                            consistency_old = 1/sqrt(Var_NE),
+                           specificity_old = 1/Sd_Avg_NE,
                            Norm_Strength = consistency + specificity_plus,
-                           Norm_Strength_old = consistency_old + Sd_Avg_NE,
+                           Norm_Strength_old = consistency_old + specificity_old,
                            Delta = Avg_NE-Avg_coop)
 ```
 
 ### OLD ANALYSIS {.tabset}
+
+$$Strength = {NE_{Consistency}+NE_{Specificity}}$$
+
+where:
+
+**Specificity** indicates how appropriate is prevailing social norm relative to other possible action
+
+* $NE_{Specificity} = \frac{1}{\sigma_j}$ $\forall KW_j$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions j
+
+**Consistency** indicates what it is the consensus around a prevailing social norm
+
+* $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action N
+
+
+We compute compliance as 
+
+* $Delta = NE_{avg}-Coop_{avg}$
 
 #### Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -122,16 +122,16 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength_old, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-#### Specificity (SD_Avg_NE)
+#### Specificity_old
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-summary(master$Sd_Avg_NE)
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Sd_Avg_NE)) +
-geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity (SD_Avg_NE") + xlab("Specificity") + facet_wrap(~Game_type)
+summary(master$specifity_old)
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_old)) +
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity_old") + xlab("Specificity") + facet_wrap(~Game_type)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Sd_Avg_NE, master$Delta, method= "spearman", exact = F)
-ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Sd_Avg_NE, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+cor.test(master$specificity_old, master$Delta, method= "spearman", exact = F)
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_old, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Sd_Avg_NE, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
@@ -149,6 +149,29 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 ```
 
 ### NEW ANALYSIS {.tabset}
+
+$$Strength = {NE_{Consistency}+NE_{Specificity^+}}$$
+
+* $0 < Strength < 2$
+
+where:
+
+**Specificity** indicates how appropriate is prevailing social norm relative to other possible action
+
+* $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)[max(KW)-min(KW)]}$ $\forall KW_i > 0$
+
+We also computed the specificity for inappropriate actions (this is not used in the computation of norm strenght)
+
+* $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)[max(|KW|)-min(|KW|)]}$ $\forall KW_i < 0$
+
+**Consistency** indicates what it is the consensus around a prevailing social norm
+
+* $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$
+
+
+We compute compliance as 
+
+* $Delta = NE_{avg}-Coop_{avg}$
 
 #### Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
