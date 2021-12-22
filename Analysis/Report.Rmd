@@ -136,13 +136,15 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 
 ### NEW ANALYSIS {.tabset}
 
+<h2>Overview of the computed statistics</h2>
+
 $$Strength = {NE_{Consistency}+NE_{Specificity^+}}$$
 
-* $0 < Strength < 2$
+$0 < Strength < 2$
 
 where:
 
-**Specificity** indicates how appropriate is prevailing social norm relative to other possible action
+**Specificity** indicates how appropriate is the prevailing social norm relative to other possible action
 
 * $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)[max(KW)-min(KW)]}$ $\forall KW_i > 0$
 
@@ -206,13 +208,29 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consi
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Avg_KW_m)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m)) +
-geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength") + xlab("Strength Norm") + facet_wrap(~Game_type)
+geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Content") + xlab("Norm Content") + facet_wrap(~Game_type)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Avg_KW_m, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+```
+
+### Relation among variables
+
+** Norm Content and Specificity plus **
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+cor.test(master$Avg_KW_m, master$specificity_plus, method= "spearman", exact = F)
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+```
+
+** Norm Content and Consistency **
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+cor.test(master$Avg_KW_m, master$consistency, method= "spearman", exact = F)
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
