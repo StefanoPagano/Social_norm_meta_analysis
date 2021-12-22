@@ -65,6 +65,8 @@ dgn_appropriateness_sum <- norms %>%
   mutate(n_sub_N, Kw_m = coop/n_sub_N)
   # cbind.data.frame(donation=label_col)
 
+db_appropriateness <- dgn_appropriateness_sum %>% select(action, Kw_m) %>% mutate(PaperID = "2019Cha026", TreatmentCode = 1, donation = action) %>% select(-c(action))
+
 positive_appropriateness <- dgn_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -150,6 +152,9 @@ dgt_appropriateness_sum <- norms %>%
   mutate(n_sub_N, Kw_m = coop/n_sub_N)
 # cbind.data.frame(donation=label_col)
 
+db_appropriateness <- dgt_appropriateness_sum %>% select(action, Kw_m) %>% mutate(PaperID = "2019Cha026", TreatmentCode = 2, donation = action) %>% select(-c(action)) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- dgt_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -195,3 +200,5 @@ finaldf <- meta_dataset %>%
 
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)

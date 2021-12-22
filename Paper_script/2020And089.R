@@ -74,6 +74,8 @@ dg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %>
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- dg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2020And089", TreatmentCode = 1)
+
 positive_appropriateness <- dg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -154,6 +156,9 @@ dg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- dg2_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2020And089", TreatmentCode = 2) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- dg2_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -227,8 +232,11 @@ pdg_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) %
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col) %>%
+  cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- pdg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2020And089", TreatmentCode = 3) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- pdg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -249,17 +257,17 @@ pdg_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = Condition == 1) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), var, na.rm=T) %>% 
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col)
+  cbind.data.frame(donation=label_col)
 
 pdg_EE <- norms[, norms_columns] %>%
   subset.data.frame(subset = Condition == 1) %>% 
   summarise(Avg_EE = mean(EE_PDG, na.rm =T))
 
-pdg_final_norms <- merge.data.frame(pdg_appropriateness_sum, pdg_norms_var, by = "Action") %>% 
+pdg_final_norms <- merge.data.frame(pdg_appropriateness_sum, pdg_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2020And089", 
          TreatmentCode = 3, 
-         Avg_NE = as.integer(Action),
+         Avg_NE = as.integer(donation),
          Var_NE = ..y, Avg_KW_m = Kw_m,
          Sd_Avg_NE = sd(pdg_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(pdg_EE),
@@ -267,7 +275,7 @@ pdg_final_norms <- merge.data.frame(pdg_appropriateness_sum, pdg_norms_var, by =
          specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
-  subset.data.frame(select = -c(..x, ..y, Action))
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% merge.data.frame(pdg_dta_coop, by = c("PaperID","TreatmentCode")) %>% 
@@ -301,8 +309,11 @@ pdg2_appropriateness_sum <- norms %>% subset.data.frame(select = norms_columns) 
   subset.data.frame(subset = Condition == 0) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col) %>%
+  cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- pdg2_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2020And089", TreatmentCode = 4) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- pdg2_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -323,17 +334,17 @@ pdg2_norms_var <- norms[, norms_columns] %>%
   subset.data.frame(subset = Condition == 0) %>%
   summarise_at(vars(KWPDG_Coop:KWPDG_Def), var, na.rm=T) %>% 
   t.data.frame() %>% 
-  cbind.data.frame(Action=label_col)
+  cbind.data.frame(donation=label_col)
 
 pdg2_EE <- norms[, norms_columns] %>%
   subset.data.frame(subset = Condition == 0) %>% 
   summarise(Avg_EE = mean(EE_PDG, na.rm =T))
 
-pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, by = "Action") %>% 
+pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2020And089", 
          TreatmentCode = 4, 
-         Avg_NE = as.integer(Action),
+         Avg_NE = as.integer(donation),
          Var_NE = ..y, Avg_KW_m = Kw_m,
          Sd_Avg_NE = sd(pdg2_appropriateness_sum$Kw_m),
          Avg_EE = as.numeric(pdg2_EE),
@@ -341,7 +352,7 @@ pdg2_final_norms <- merge.data.frame(pdg2_appropriateness_sum, pdg2_norms_var, b
          specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
-  subset.data.frame(select = -c(..x, ..y, Action))
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
@@ -352,3 +363,5 @@ finaldf <- meta_dataset %>%
   mutate(Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)

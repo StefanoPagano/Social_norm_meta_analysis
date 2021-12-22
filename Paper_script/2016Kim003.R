@@ -98,6 +98,8 @@ dg_appropriateness_sum <- norms1 %>% subset.data.frame(select = dg_columns) %>%
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- dg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2016Kim003", TreatmentCode = 7)
+
 positive_appropriateness <- dg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -167,6 +169,9 @@ tg_appropriateness_sum <- norms1 %>% subset.data.frame(select = tg_columns) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- tg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2016Kim003", TreatmentCode = 6) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- tg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -247,6 +252,9 @@ ug_appropriateness_sum <- norms1 %>% subset.data.frame(select = ug_columns) %>%
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- ug_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2016Kim003", TreatmentCode = 8) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- ug_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -330,6 +338,9 @@ pgg_appropriateness_sum <- norms1 %>% subset.data.frame(select = pgg_columns) %>
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- pgg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2016Kim003", TreatmentCode = 9) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- pgg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -374,3 +385,5 @@ finaldf <- meta_dataset %>%
 
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)

@@ -49,8 +49,10 @@ dg_appropriateness_sum <- norms %>%
   subset.data.frame(select = col_treat) %>%
   summarise_at(vars(norm1_0:norm1_200), sum, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation_range=label_col) %>%
+  cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- dg_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2019Dro082", TreatmentCode = "1a")
 
 positive_appropriateness <- dg_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -71,20 +73,20 @@ if (min(dg_appropriateness_sum$Kw_m) < 0){
 dg_norms_var <- norms %>%
   summarise_at(vars(norm1_0:norm1_200), var, na.rm=T) %>%
   t.data.frame() %>% 
-  cbind.data.frame(donation_range=label_col)
+  cbind.data.frame(donation=label_col)
 
-dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation_range") %>% 
+dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = "donation") %>% 
   subset.data.frame(subset = ..x == max(..x)) %>% 
   mutate(PaperID = "2019Dro082", 
          TreatmentCode = "1a", 
-         Avg_NE = as.integer(donation_range)/13,
+         Avg_NE = as.integer(donation)/13,
          Var_NE = ..y, Avg_KW_m = Kw_m,
          Sd_Avg_NE = sd(dg_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
          specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
          specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
          max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
-  subset.data.frame(select = -c(..x, ..y, donation_range))
+  subset.data.frame(select = -c(..x, ..y, donation))
 
 # 3. combine dataset ----
 finaldf <- meta_dataset %>% 
@@ -94,3 +96,5 @@ finaldf <- meta_dataset %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)

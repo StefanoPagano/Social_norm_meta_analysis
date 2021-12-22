@@ -70,6 +70,8 @@ s1_dg_baseline_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = no
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- s1_dg_baseline_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 1)
+
 positive_appropriateness <- s1_dg_baseline_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -141,6 +143,9 @@ s1_dg_always_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norm
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- s1_dg_always_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 2) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- s1_dg_always_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -215,6 +220,9 @@ s1_dg_nr_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- s1_dg_nr_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 3) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- s1_dg_nr_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -287,6 +295,9 @@ s1_dg_nc_appropriateness_sum <- norms_s1 %>% subset.data.frame(select = norms_co
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- s1_dg_nc_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 4) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- s1_dg_nc_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -361,6 +372,9 @@ s2_dg_baseline_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = no
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- s2_dg_baseline_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 7) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- s2_dg_baseline_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -433,6 +447,9 @@ s2_dg_always_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norm
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- s2_dg_always_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 8) %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- s2_dg_always_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -507,6 +524,9 @@ s2_dg_nr_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- s2_dg_nr_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 9) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- s2_dg_nr_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -580,6 +600,9 @@ s2_dg_nc_appropriateness_sum <- norms_s2 %>% subset.data.frame(select = norms_co
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- s2_dg_nc_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2021Kon127", TreatmentCode = 10) %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- s2_dg_nc_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -624,3 +647,6 @@ finaldf <- meta_dataset %>% merge.data.frame(s2_dg_nc_dta_coop, by = c("PaperID"
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
 
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)

@@ -679,3 +679,41 @@ between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id)
 summary(between)
 #dataframe_betas[i,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```
+
+# Comparison of Avg_kw_m per paper {.tabset}
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+setwd("../")
+setwd("Paper_csv/")
+getwd()
+df_avg_kw <- read.csv("2015Ves034_avg_kw.csv", sep = ",")
+
+df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2017Del037_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2017Tho028_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2017Ves049_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2019Dro082_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2019Tjo060_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2020And089_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+df_avg_kw <- read.csv("2021Kon127_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+```
+

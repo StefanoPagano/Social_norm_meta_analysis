@@ -54,6 +54,8 @@ pgg1_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- pgg1_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2017Ves049", TreatmentCode = "3a")
+
 positive_appropriateness <- pgg1_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -129,6 +131,9 @@ pgg2_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
   t.data.frame() %>% 
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
+
+db_appropriateness <- pgg2_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2017Ves049", TreatmentCode = "2a") %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- pgg2_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
@@ -207,6 +212,9 @@ pgg3_appropriateness_sum <- pgg %>% subset.data.frame(select = norms_columns) %>
   cbind.data.frame(donation=label_col) %>%
   mutate(n_sub_N, Kw_m = ./n_sub_N)
 
+db_appropriateness <- pgg3_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2017Ves049", TreatmentCode = "1a") %>%
+  rbind.data.frame(db_appropriateness)
+
 positive_appropriateness <- pgg3_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
 
@@ -251,3 +259,5 @@ finaldf <- meta_dataset %>% merge.data.frame(pgg3_dta_coop, by = c("PaperID","Tr
 
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
+
+write.csv(db_appropriateness, file = paste(csv_path_output, paste(db_appropriateness$PaperID[1], "_avg_kw.csv", sep = ""), sep = ""), row.names = F)
