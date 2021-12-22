@@ -680,7 +680,7 @@ summary(between)
 #dataframe_betas[i,] <- c("Avg. Between",between$coefficients["payoff"],between$coefficients["KW_Normative"],between$var[1,1],between$var[2,2])
 ```
 
-# Comparison of Avg_kw_m per paper {.tabset}
+## Comparison of Avg_kw_m per paper
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 setwd("../")
@@ -714,6 +714,11 @@ df_avg_kw <- read.csv("2021Kon127_avg_kw.csv", sep = ",") %>% rbind.data.frame(d
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+temp_master <- df_avg_kw %>% distinct(PaperID)
 
+for (i in temp_master$PaperID) {
+ temp_master_for <- df_avg_kw %>% filter(PaperID == i)
+  print(ggplot(temp_master_for, aes(x=donation, y=Kw_m)) + geom_bar(stat = "identity") + labs(title = i) + facet_wrap(~TreatmentCode, ncol = 2))
+}
 ```
 
