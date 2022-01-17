@@ -58,7 +58,6 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(meth
 
 ## HP2 : Is compliance related to norm strength? {.tabset}
 
-We compute norm strength as:
 
 ## Summary of computed variables {.tabset}
 
@@ -76,7 +75,21 @@ master = master %>% mutate(consistency=1-sqrt(Var_NE)/max_sigma,
                            Delta = (Avg_NE-Avg_coop)/Avg_NE)
 ```
 
-### OLD ANALYSIS {.tabset}
+### DELTA ANALYSIS
+
+We compute **Compliance** as 
+
+* $Delta = \frac{NE_{avg}-Coop_{avg}}{NE_{avg}}$
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+summary(master$Delta)
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Delta)) +
+geom_histogram(bins = 10, col=I("black")) + ggtitle("Histogram of Compliance") + xlab("Compliance (Delta)") + facet_wrap(~Game_type)
+```
+
+### STRENGTH OLD ANALYSIS {.tabset}
+
+We compute norm strength as:
 
 $$Strength = {NE_{Consistency}+NE_{Specificity}}$$
 
@@ -91,11 +104,7 @@ where:
 * $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action N
 
 
-We compute compliance as 
-
-* $Delta = NE_{avg}-Coop_{avg}$
-
-#### Norm Strenght
+#### Norm Strength
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength_old)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength_old)) +
@@ -103,7 +112,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Norm_Strength_old, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength_old, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength_old, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -116,7 +124,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity_old
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$specificity_old, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_old, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Sd_Avg_NE, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -129,12 +136,12 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Consistency") +
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$consistency_old, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency_old, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency_old, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-### NEW ANALYSIS {.tabset}
+
+### STRENGTH NEW ANALYSIS {.tabset}
 
 **Overview of the computed statistics**
 
@@ -146,23 +153,19 @@ where:
 
 **Specificity** indicates how appropriate is the prevailing social norm relative to other possible action
 
-* $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)[max(KW)-min(KW)]}$ $\forall KW_i > 0$
+* $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)}$ $\forall KW_i > 0$
 
 We also computed the specificity for inappropriate actions (this is not used in the computation of norm strenght)
 
-* $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)[max(|KW|)-min(|KW|)]}$ $\forall KW_i < 0$
+* $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)}$ $\forall KW_i < 0$
 
 **Consistency** indicates what it is the consensus around a prevailing social norm
 
-* $NE_{Consistency} = {\sigma_{N} \over max(\sigma_{N})}$
+* $NE_{Consistency} = 1- {\sigma_{N} \over max(\sigma_{N})}$
 
 **Content** indicates the mean appropriateness level of a norm.
 
 * $E[max_j(KW_j)] \forall j \in A$ where A is the action space
-
-We compute **Compliance** as 
-
-* $Delta = NE_{avg}-Coop_{avg}$
 
 #### Norm Strenght
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -172,7 +175,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Strength")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Norm_Strength, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -185,7 +187,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Specificity (po
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$specificity_plus, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -198,7 +199,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Consistency") +
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$consistency, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -212,7 +212,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Norm Content") 
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Avg_KW_m, master$Delta, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
@@ -221,16 +220,20 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_K
 
 ** Norm Content and Specificity plus **
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Avg_KW_m, master$specificity_plus, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
 ** Norm Content and Consistency **
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Avg_KW_m, master$consistency, method= "spearman", exact = F)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
+```
+
+#### Delta vs Spec. neg.
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
+ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -238,6 +241,7 @@ DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method!= "OnlyNorms"
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG"& Choice_Method!= "OnlyNorms")
 ```
+
 
 ## HP3: Effect of punishment on norms and actions
 
@@ -272,7 +276,7 @@ We test the hypothesis whether :
 <!--   + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_norm$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level). -->
   
 * **Delta** in DG is higher than UG.
-  + *Delta* is computed as $NE_{avg}-Coop_{avg}$ 
+  
   + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_delta$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
   
 * **Norm Strength** in DG is higher than UG.
