@@ -45,7 +45,7 @@ The content of the norm and behavior correlate positively.
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Avg_NE, master$Avg_coop, method= "spearman", exact = F)
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman") + xlab("Cooperation Norm (as % of endowment)") + ylab("Cooperation (% of endowment)")
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Macro_game_type, ncol=3) + stat_cor(method = "spearman")
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")
 ```
 
 ### Results
