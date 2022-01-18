@@ -1,10 +1,13 @@
 ---
 title: "Social Norms Meta-Analysis Information"
-output:
-  bookdown::html_document2:
-    toc: yes
-    toc_float: yes
-    number_sections: yes
+params:
+  filename: 'social.tex'
+  #output:
+  # pdf_document:
+  #   toc: yes
+  #   toc_float: yes
+  #   keep_tex: yes
+  #   number_sections: yes
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
