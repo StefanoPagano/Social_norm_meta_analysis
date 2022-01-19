@@ -27,7 +27,7 @@ getwd()
 master <- read.csv("File_DB/Output/Treatment.csv") %>% 
   filter(Game_type == "DG") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete") %>%
-  mutate(Baseline = c(1,0,1,0,1,0,1,1)) %>%
+  mutate(Baseline = c(1,0,1,0,1,0,1,1)) %>% 
   filter(Baseline == 1 & PaperID != "2017Tho028") #modificare valore standard game di tho028
 
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
@@ -35,6 +35,27 @@ beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
 
+```
 
+# Individual-level analyses
+
+```{r}
+# belief dataset aggregated to get appropriateness for each action
+beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(KW_Normative = mean(KW_Normative, rm.na=T))
+Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>% 
+  rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), KW_Normative=NA)) %>% 
+  ungroup() %>% arrange(scenarios) %>%
+  mutate(KW_Normative = na.approx(KW_Normative, maxgap = 1, rule = 1))
+mean_beliefs <- beliefs %>% merge.data.frame(Kim003_interpolation, all = T) %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(mean_app=mean(KW_Normative))
+individual_db <- choices %>% merge.data.frame(mean_beliefs)%>% mutate(payoff=endowment-scenarios)
+master$treatment_id = paste(master$PaperID,"_",master$TreatmentCode, sep="")
+# mlogit
+for (i in levels(as.factor(individual_db$treatment_id))) {
+  model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=individual_db%>% filter(treatment_id==i))
+  print(i)
+print(summary(model))
+}
+#mdata=mlogit.data(individual_db, chid.var = "scenarios")
+#mlogit()
 ```
 
