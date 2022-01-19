@@ -601,7 +601,7 @@ dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=1,game_type="DG",
 For UG game
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
-SDj= Kim003_ug %>% group_by(scenarios) %>% summarise(sdj=sd(KW_Normative))
+#SDj= Kim003_ug %>% group_by(scenarios) %>% summarise(sdj=sd(KW_Normative))
 Kim003_ug = Kim003_ug %>% merge.data.frame(SDj)
 model <- clogit(A~payoff+KW_Normative + KW_Normative*sdj + strata(subject_id), data = Kim003_ug)
 summary(model)
@@ -616,15 +616,12 @@ dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=2,game_type="UG",alpha=mode
 
 ## Individual analysis of norm compliance {.tabset}
 
-
-### bas155
-bas115_strenght <- Bas115 %>% group_by(subject_id) %>% summarise(specificity = sd(KW_Normative))
-data_bas115 <- Bas115 %>% merge.data.frame(bas115_strenght)
-data_bas115_m <- dfidx(data_bas115 %>% mutate(scenarios=as.factor(scenarios)),
-            idx = c("subject_id","scenarios"), 
-            idpkg = "mlogit")
-summary(mlogit(A ~ payoff |KW_Normative|specificity , data=data_bas115_m))
-
+```{r}
+library(arm)
+regression_db <- individual_db_b %>% filter(A==1) %>% merge.data.frame(SDj, by=c("paper_id","treatment_id", "scenarios")) %>% mutate(coop=choice/endowment)
+ml1 <- lmer(coop ~ KW_Normative*sdj + (1|paper_id) + (1|treatment_id), data=regression_db)
+tab_model(ml1)
+```
 
 # Appendix {.tabset}
 
@@ -673,7 +670,7 @@ opts <- options(knitr.kable.NA = "")
 kbl(list_of_paper, digits = 4, booktabs = T, align = "lcccccc", centering = F, caption = "Ciao") %>%
   kable_styling(position = "left", full_width = F) %>%
   column_spec(1, bold = T)
-datatable(master %>% subset.data.frame(select = c(PaperID, TreatmentCode, Game_type, Avg_coop, SD_NE, Sd_Avg_NE, Norm_Strength, Delta)),rownames = F) %>% formatRound(columns = c("Avg_coop", "Avg_coop", "SD_NE", "Sd_Avg_NE", "Norm_Strength", "Delta"), digits = 2)
+datatable(master %>% subset.data.frame(select = c(PaperID, TreatmentCode, Game_type, Avg_coop, SD_NE, Sd_Avg_NE, Norm_Strength, Delta, consistency, specificity_plus, specificity_min)),rownames = F) %>% formatRound(columns = c("Avg_coop", "Avg_coop", "SD_NE", "Sd_Avg_NE", "Norm_Strength", "Delta"), digits = 2)
 ```
 
 ## Conditional logit model (Overall model)
