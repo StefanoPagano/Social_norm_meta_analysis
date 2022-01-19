@@ -1,0 +1,40 @@
+---
+title: "dg_analysis"
+author: "Sp & AG"
+date: "19/1/2022"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+rm(list=ls())
+library(ggplot2)
+library(tidyverse)
+library(mlogit)
+library(sjmisc)
+library(ggrepel)
+library(readxl)
+library(ggpubr)
+library(survival)
+library(sjPlot)
+library(kableExtra)
+library(car)
+library(DT)
+library(zoo)
+
+setwd("../")
+# read data 
+getwd()
+master <- read.csv("File_DB/Output/Treatment.csv") %>% 
+  filter(Game_type == "DG") %>%
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete") %>%
+  mutate(Baseline = c(1,0,1,0,1,0,1,1)) %>%
+  filter(Baseline == 1 & PaperID != "2017Tho028") #modificare valore standard game di tho028
+
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
+  filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
+choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
+  filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
+
+
+```
+
