@@ -26,7 +26,7 @@ setwd("../")
 getwd()
 master <- read.csv("File_DB/Output/Treatment.csv") %>% 
   filter(Game_type == "DG") %>%
-  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline == 1)
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline %in% c(NA, 1))
 
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))

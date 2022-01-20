@@ -217,6 +217,33 @@ print(summary(model))
 ## 
 ## 
 ## 
+## Iteration 1 - deviance = 130.6425 - criterion = 0.1468605
+## Iteration 2 - deviance = 122.1611 - criterion = 0.0693712
+## Iteration 3 - deviance = 116.9599 - criterion = 0.04443238
+## Iteration 4 - deviance = 115.2967 - criterion = 0.01441262
+## Iteration 5 - deviance = 115.2283 - criterion = 0.0005928477
+## Iteration 6 - deviance = 115.2283 - criterion = 7.998107e-07
+## Iteration 7 - deviance = 115.2283 - criterion = 1.469533e-12
+## converged
+## [1] &quot;2018Her061_9&quot;
+## 
+## Call:
+## mclogit::mclogit(formula = cbind(A, choice) ~ payoff + mean_app, 
+##     data = individual_db %&gt;% filter(treatment_id == i))
+## 
+##          Estimate Std. Error z value Pr(&gt;|z|)    
+## payoff     1.8670     0.5111   3.653 0.000259 ***
+## mean_app   4.9146     1.6665   2.949 0.003187 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Null Deviance:     182.2 
+## Residual Deviance: 115.2 
+## Number of Fisher Scoring iterations:  7 
+## Number of observations:  38 
+## 
+## 
+## 
 ## Iteration 1 - deviance = 234.7681 - criterion = 0.3003319
 ## Iteration 2 - deviance = 231.9921 - criterion = 0.01196074
 ## Iteration 3 - deviance = 231.8452 - criterion = 0.0006334298
@@ -248,7 +275,7 @@ print(summary(model))
 ## Iteration 4 - deviance = 453.2756 - criterion = 0.006099267
 ## Iteration 5 - deviance = 453.0985 - criterion = 0.000390737
 ## Iteration 6 - deviance = 453.0978 - criterion = 1.562984e-06
-## Iteration 7 - deviance = 453.0978 - criterion = 2.491226e-11
+## Iteration 7 - deviance = 453.0978 - criterion = 2.491276e-11
 ## converged
 ## [1] &quot;2020Bas115_2a&quot;
 ## 
