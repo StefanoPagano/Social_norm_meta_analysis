@@ -38,20 +38,22 @@ choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
 # Individual-level analyses
 
 ```{r}
-# belief dataset aggregated to get appropriateness for each action
-beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(avg_kw = mean(KW_Normative, rm.na=T),
-                                                                                                                                                       sd_kw = sd(KW_Normative, na.rm = T))
+# scenario measures : belief dataset aggregated to get appropriateness for each action
+beliefs_temp <- beliefs %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(avg_kw = mean(KW_Normative, rm.na=T), sd_kw = sd(KW_Normative, na.rm = T))
+
 Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>% 
   rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), avg_kw=NA, sd_kw=NA)) %>% 
   ungroup() %>% arrange(scenarios) %>%
-  mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1),
-         sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1))
-mean_beliefs <- beliefs %>% merge.data.frame(Kim003_interpolation, all = T) %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(mean_app=mean(KW_Normative), sd_app=mean(sd_KW))
+  mutate(avg_kw = na.approx(avg_kw, maxgap = 1, rule = 1),
+         sd_kw = na.approx(sd_kw, maxgap = 1, rule = 1))
+mean_beliefs <- beliefs_temp %>% merge.data.frame(Kim003_interpolation, all = T)
+# individual measures
+beliefs%>% group_by(paper_id, treatment_id, subject_id)  %>% summarise(sum_negative = sd(KW_Normative[KW_Normative<0]))
 individual_db <- choices %>% merge.data.frame(mean_beliefs)%>% mutate(payoff=endowment-scenarios)
 master$treatment_id = paste(master$PaperID,"_",master$TreatmentCode, sep="")
 # mlogit
 for (i in levels(as.factor(individual_db$treatment_id))) {
-  model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=individual_db%>% filter(treatment_id==i))
+  model=mclogit::mclogit(cbind(A,choice)~ payoff + avg_kw, data=individual_db%>% filter(treatment_id==i))
   print(i)
 print(summary(model))
 }
