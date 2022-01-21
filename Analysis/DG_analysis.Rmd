@@ -15,6 +15,7 @@ library(ggrepel)
 library(readxl)
 library(ggpubr)
 library(survival)
+library(gridExtra)
 library(sjPlot)
 library(kableExtra)
 library(car)
@@ -28,6 +29,10 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   filter(Game_type == "DG") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline %in% c(NA, 1))
 
+list_of_paper_in_target <- read.csv("File_DB/Output/Treatment.csv") %>% 
+  filter(Game_type == "DG") %>%
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline %in% c(NA, 1), select = c(PaperID, TreatmentCode, TreatmentName_paper, Year, Game_type, Standard_game, Baseline, Group_size, Rounds, Method_elicitation, Avg_coop, Avg_NE, Var_coop, Var_NE, Avg_KW_m))
+
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
@@ -35,27 +40,127 @@ choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
 
 ```
 
-# Individual-level analyses
+# Description of data included
+
+## Search criteria
+
+The selection criteria to identify papers in target was:
+
+* **Game type** (cooperation and prosociality games):
+  + Dictator Game <!--(with tax/standard/Lying); -->
+  <!-- + Donation Game; -->
+  <!-- + Ultimatum Game; -->
+  <!-- + Trust Game; -->
+  <!-- + Public Good Game; -->
+  <!-- + Prisoner's Dilemma Game; -->
+  <!-- + Take or Give Fame; -->
+  <!-- + CPR; -->
+  <!-- + Bargaining Game; -->
+  <!-- + Tax Game; -->
+  <!-- + Investment Game; -->
+* Presence of norm elicitation task:
+  + Krupka and Weber (2013);
+  + Bicchieri-Xiao (2009).
+* Only monetary incentivized studies (both choices and norms elicitation).
+* Baseline treatment (no framing)
+* Standard game
+* Both choice and normative task
+* Data available
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+opts <- options(knitr.kable.NA = "")
+kbl(list_of_paper_in_target, digits = 4, booktabs = T, align = "llllllllllrrrrrr", centering = F, caption="List of paper after selection criteria applied") %>%
+  kable_styling(position = "left", full_width = F) %>%
+  column_spec(1, bold = T)
+
+```
+
+## Plots
+
+Beliefs
 
 ```{r}
-# belief dataset aggregated to get appropriateness for each action
-beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(avg_kw = mean(KW_Normative, rm.na=T),
-                                                                                                                                                       sd_kw = sd(KW_Normative, na.rm = T))
-Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>% 
-  rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), avg_kw=NA, sd_kw=NA)) %>% 
-  ungroup() %>% arrange(scenarios) %>%
-  mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1),
-         sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1))
-mean_beliefs <- beliefs %>% merge.data.frame(Kim003_interpolation, all = T) %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(mean_app=mean(KW_Normative), sd_app=mean(sd_KW))
-individual_db <- choices %>% merge.data.frame(mean_beliefs)%>% mutate(payoff=endowment-scenarios)
-master$treatment_id = paste(master$PaperID,"_",master$TreatmentCode, sep="")
-# mlogit
-for (i in levels(as.factor(individual_db$treatment_id))) {
-  model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=individual_db%>% filter(treatment_id==i))
-  print(i)
-print(summary(model))
+setwd("../")
+setwd("Paper_csv/")
+getwd()
+
+df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
+df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
+  mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
+
+df_avg_kw <-  df_avg_kw %>% merge.data.frame(master %>% subset.data.frame(select = c(PaperID, TreatmentName_paper, TreatmentCode)) %>% mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep="")), by = c("PaperID","TreatmentCode","treatment_id")) %>% filter(!(is.na(TreatmentName_paper)))
+temp_master <- df_avg_kw %>% distinct(treatment_id)
+
+n=1
+list_plot <-  c()
+for (i in temp_master$treatment_id) {
+  temp_master_for <- df_avg_kw %>% filter(treatment_id == i)
+  list_plot[[n]] <- ggplot(temp_master_for, aes(x=donation, y=Kw_m)) + 
+    geom_bar(stat = "identity") + 
+    labs(title = i, subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+    ylim(-1,1) +
+    xlab("Scenario") + 
+    ylab("Appropriateness (average)")
+  n=n+1
 }
-#mdata=mlogit.data(individual_db, chid.var = "scenarios")
-#mlogit()
+
+do.call('grid.arrange',c(list_plot, ncol = 2))
 ```
+
+Choices
+
+```{r}
+perc_choices <- choices %>% filter(A==1) %>% group_by(treatment_id, choice) %>% summarise(n_of_sub = n())
+sum(perc_choices$n_of_sub)-nrow(choices %>% filter(A==1))
+
+perc_choices <-  perc_choices %>% merge.data.frame(master %>% subset.data.frame(select = c(PaperID, TreatmentName_paper, TreatmentCode)) %>% mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep="")), by = "treatment_id") %>% filter(!(is.na(TreatmentName_paper)))
+
+temp_master <- choices %>% distinct(treatment_id)
+
+n=1
+list_plot <-  c()
+for (i in temp_master$treatment_id) {
+  temp_master_for <- perc_choices %>% filter(treatment_id == i)
+  temp_master_for <- temp_master_for %>% mutate(total = sum(n_of_sub), perc_per_action = round(n_of_sub/total*100, digits=2))
+  list_plot[[n]] <- ggplot(temp_master_for, aes(x=choice, y=perc_per_action)) + 
+    geom_bar(stat = "identity") + 
+    labs(title = i, subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) + 
+    ylim(0,100) +
+    xlab("Choice") + ylab("Subjects (%)")
+  n=n+1
+}
+
+do.call('grid.arrange',c(list_plot, ncol = 2))
+```
+
+
+
+
+
+<!-- # Individual-level analyses -->
+
+<!-- ```{r} -->
+<!-- # belief dataset aggregated to get appropriateness for each action -->
+<!-- beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(avg_kw = mean(KW_Normative, rm.na=T), -->
+<!--                                                                                                                                                        sd_kw = sd(KW_Normative, na.rm = T)) -->
+<!-- Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%  -->
+<!--   rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), avg_kw=NA, sd_kw=NA)) %>%  -->
+<!--   ungroup() %>% arrange(scenarios) %>% -->
+<!--   mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1), -->
+<!--          sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1)) -->
+<!-- mean_beliefs <- beliefs %>% merge.data.frame(Kim003_interpolation, all = T) %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(mean_app=mean(KW_Normative), sd_app=mean(sd_KW)) -->
+<!-- individual_db <- choices %>% merge.data.frame(mean_beliefs)%>% mutate(payoff=endowment-scenarios) -->
+<!-- master$treatment_id = paste(master$PaperID,"_",master$TreatmentCode, sep="") -->
+<!-- # mlogit -->
+<!-- for (i in levels(as.factor(individual_db$treatment_id))) { -->
+<!--   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=individual_db%>% filter(treatment_id==i)) -->
+<!--   print(i) -->
+<!-- print(summary(model)) -->
+<!-- } -->
+<!-- #mdata=mlogit.data(individual_db, chid.var = "scenarios") -->
+<!-- #mlogit() -->
+<!-- ``` -->
 
