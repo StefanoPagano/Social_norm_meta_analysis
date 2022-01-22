@@ -215,6 +215,7 @@ Kim003_interpolation <- beliefs_kim_temp %>%
                               treatment_id="2016Kim003_7",
                               scenarios=seq(1,15,2),
                               avg_kw=NA)) %>%
+  ungroup() %>%
   arrange(scenarios) %>%
   mutate(KW_Normative = na.approx(avg_kw,
                                   maxgap = 1,
