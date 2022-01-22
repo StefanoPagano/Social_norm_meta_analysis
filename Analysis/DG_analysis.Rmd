@@ -27,17 +27,29 @@ setwd("../")
 # read data 
 master <- read.csv("File_DB/Output/Treatment.csv") %>% 
   filter(Game_type == "DG") %>%
-  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline %in% c(NA, 1)) %>% 
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & 
+                      Choice_Method != "OnlyNorms" & 
+                      StatusTreatment_Roma == "6-Complete" & 
+                      Baseline %in% c(NA, 1)) %>% 
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 
 # list of treatments in target
 list_of_paper_in_target <- read.csv("File_DB/Output/Treatment.csv") %>% 
   filter(Game_type == "DG") %>%
-  subset.data.frame(subset = !(Standard_game %in% c("N")) & Choice_Method != "OnlyNorms" & StatusTreatment_Roma == "6-Complete" & Baseline %in% c(NA, 1), select = c(PaperID, TreatmentCode, TreatmentName_paper, Year, Game_type, Standard_game, Baseline, Group_size, Rounds, Method_elicitation, Avg_coop, Avg_NE, Var_coop, Var_NE, Avg_KW_m))
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & 
+                      Choice_Method != "OnlyNorms" & 
+                      StatusTreatment_Roma == "6-Complete" & 
+                      Baseline %in% c(NA, 1), 
+                    select = c(PaperID, TreatmentCode, TreatmentName_paper, 
+                               Year, Game_type, Standard_game, 
+                               Baseline, Group_size, Rounds, 
+                               Method_elicitation, Avg_coop, Avg_NE, 
+                               Var_coop, Var_NE, Avg_KW_m))
 
-#read file beliefs and choices
+# read file beliefs and choices
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
+
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
 
@@ -72,14 +84,21 @@ The selection criteria to identify papers in target was:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
+# print table of "list_of_paper_in_target"
 opts <- options(knitr.kable.NA = "")
-kbl(list_of_paper_in_target, digits = 4, booktabs = T, align = "llllllllllrrrrrr", centering = F, caption="List of paper after selection criteria applied") %>%
-  kable_styling(position = "left", full_width = F) %>%
+kbl(list_of_paper_in_target,
+    digits = 4, 
+    booktabs = T, 
+    align = "llllllllllrrrrrr", 
+    centering = F, 
+    caption="List of paper after selection criteria applied") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
   column_spec(1, bold = T)
-
 ```
 
 ## Plots {.tabset}
+<!-- tab: beliefs, choices -->
 
 ### Beliefs
 
@@ -93,80 +112,151 @@ df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(d
 df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 
-df_avg_kw <-  df_avg_kw %>% merge.data.frame(master %>% subset.data.frame(select = c(PaperID, TreatmentName_paper, TreatmentCode, treatment_id)), by = c("PaperID","TreatmentCode","treatment_id")) %>% filter(!(is.na(TreatmentName_paper)))
-temp_master <- df_avg_kw %>% distinct(treatment_id)
+df_avg_kw <-  df_avg_kw %>% merge.data.frame(master %>% 
+                                               subset.data.frame(select = c(PaperID, 
+                                                                            TreatmentName_paper, 
+                                                                            TreatmentCode, 
+                                                                            treatment_id)), 
+                                             by = c("PaperID","TreatmentCode","treatment_id")) %>% 
+  filter(!(is.na(TreatmentName_paper)))
+temp_master <- df_avg_kw %>% 
+  distinct(treatment_id)
 
+# inizializing variable for loop
 n=1
 list_plot <-  c()
+
+# creation of a plots list
 for (i in temp_master$treatment_id) {
-  temp_master_for <- df_avg_kw %>% filter(treatment_id == i)
-  list_plot[[n]] <- ggplot(temp_master_for, aes(x=donation, y=Kw_m)) + 
+  
+  # dataset
+  temp_master_for <- df_avg_kw %>% 
+    filter(treatment_id == i)
+  
+  # list
+  list_plot[[n]] <- ggplot(temp_master_for, 
+                           aes(x=donation, y=Kw_m)) + 
     geom_bar(stat = "identity") + 
-    labs(title = i, subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+    labs(title = i, 
+         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
     ylim(-1,1) +
     xlab("Scenario") + 
     ylab("Appropriateness (average)")
+  
   n=n+1
 }
 
-do.call('grid.arrange',c(list_plot, ncol = 2))
+# merge plots in one figure
+do.call('grid.arrange', 
+        c(list_plot, ncol = 2))
 ```
 
 ### Choices
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-perc_choices <- choices %>% filter(A==1) %>% group_by(treatment_id, choice) %>% summarise(n_of_sub = n())
-#sum(perc_choices$n_of_sub)-nrow(choices %>% filter(A==1))
+#
+perc_choices <- choices %>% 
+  filter(A==1) %>% 
+  group_by(treatment_id, choice) %>% 
+  summarise(n_of_sub = n()) %>% 
+  merge.data.frame(master %>% 
+                     subset.data.frame(select = c(PaperID, TreatmentName_paper, 
+                                                  TreatmentCode, treatment_id)), 
+                   by = "treatment_id") %>% 
+  filter(!(is.na(TreatmentName_paper)))
 
-perc_choices <-  perc_choices %>% merge.data.frame(master %>% subset.data.frame(select = c(PaperID, TreatmentName_paper, TreatmentCode, treatment_id)), by = "treatment_id") %>% filter(!(is.na(TreatmentName_paper)))
+temp_master <- choices %>% 
+  distinct(treatment_id)
 
-temp_master <- choices %>% distinct(treatment_id)
-
+# inizializing variables for loop
 n=1
-list_plot <-  c()
+list_plot <- c()
+
+# creation of a plots list
 for (i in temp_master$treatment_id) {
-  temp_master_for <- perc_choices %>% filter(treatment_id == i)
-  temp_master_for <- temp_master_for %>% mutate(total = sum(n_of_sub), perc_per_action = round(n_of_sub/total*100, digits=2))
-  list_plot[[n]] <- ggplot(temp_master_for, aes(x=choice, y=perc_per_action)) + 
+  
+  # dataset
+  temp_master_for <- perc_choices %>% 
+    filter(treatment_id == i)
+  temp_master_for <- temp_master_for %>% 
+    mutate(total = sum(n_of_sub), 
+           perc_per_action = round(n_of_sub/total*100, digits=2))
+  # list
+  list_plot[[n]] <- ggplot(temp_master_for, 
+                           aes(x=choice, 
+                               y=perc_per_action)) + 
     geom_bar(stat = "identity") + 
-    labs(title = i, subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) + 
+    labs(title = i, 
+         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) + 
     ylim(0,100) +
-    xlab("Choice") + ylab("Subjects (%)")
+    xlab("Choice") + 
+    ylab("Subjects (%)")
+  
   n=n+1
 }
 
+# merge plots in one figure
 do.call('grid.arrange',c(list_plot, ncol = 2))
 ```
 
 # Consistency and Specificity {.tabset}
+<!-- tab: consistency, specificity -->
 
 ## Consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-df_consistency_beliefs <- beliefs %>% 
-  filter(treatment_id %in% levels(as.factor(master$treatment_id))) %>%
-  merge.data.frame(master %>% subset.data.frame(select = c(treatment_id, max_sigma)), by="treatment_id") %>%
-  group_by(treatment_id, scenarios) %>% summarise(consistency = sd(KW_Normative), appropriateness = sum(KW_Normative))
+beliefs_kim_temp <- beliefs %>%
+  subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
+  group_by(paper_id, treatment_id, scenarios) %>%
+  summarise(avg_kw = mean(KW_Normative, na.rm=T))
 
-tab_max <- beliefs %>% group_by(treatment_id, scenarios) %>% summarise(KW=mean(KW_Normative)) %>% summarise(scenarios=scenarios[which(KW==max(KW))])
-
-output <- merge.data.frame(tab_max, beliefs, all.x = T, by=c("treatment_id", "scenarios"))
-
-Kim003_interpolation <- beliefs %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
-  rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), avg_kw=NA, sd_kw=NA)) %>%
+Kim003_interpolation <- beliefs_kim_temp %>% 
+  rbind.data.frame(data.frame(paper_id="2016Kim003",
+                              treatment_id="2016Kim003_7",
+                              scenarios=seq(1,15,2),
+                              avg_kw=NA)) %>%
   arrange(scenarios) %>%
-  mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1))
+  mutate(KW_Normative = na.approx(avg_kw,
+                                  maxgap = 1,
+                                  rule = 1))
 
-ggplot(output, aes(x=treatment_id, y=KW_Normative)) + 
-  geom_boxplot() + 
+df_consistency_beliefs <- beliefs %>%
+  filter(treatment_id %in% levels(as.factor(master$treatment_id))) %>%
+  merge.data.frame(master %>%
+                     subset.data.frame(select = c(treatment_id,
+                                                  max_sigma)),
+                   by="treatment_id") %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(sd = sd(KW_Normative),
+            appropriateness = sum(KW_Normative))
+
+tab_max <- beliefs %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(KW=mean(KW_Normative)) %>%
+  summarise(scenarios=scenarios[which(KW==max(KW))])
+
+output <- merge.data.frame(tab_max,
+                           beliefs,
+                           all.x = T,
+                           by=c("treatment_id", "scenarios"))
+
+ggplot(output,
+       aes(x=treatment_id,
+           y=KW_Normative)) +
+  geom_boxplot() +
   labs(title="Boxplot of consistency per paper") +
-  xlab("Paper") + ylab("Consistency")
+  xlab("Paper") +
+  ylab("Consistency")
 
-ggplot(output, aes(x=KW_Normative)) + 
-  geom_histogram() + facet_wrap(~treatment_id, ncol=2)
+ggplot(output,
+       aes(x=KW_Normative)) +
+  geom_histogram() +
+  facet_wrap(~treatment_id, ncol=2)
 
-ggplot(output, aes(x=KW_Normative)) + 
-  geom_density() + facet_wrap(~treatment_id, ncol=2)
+ggplot(output,
+       aes(x=KW_Normative)) +
+  geom_density() +
+  facet_wrap(~treatment_id, ncol=2)
 
 ```
 
@@ -176,14 +266,24 @@ ggplot(output, aes(x=KW_Normative)) +
 
 df_specificity_per_subject <- beliefs %>% 
   group_by(subject_id) %>% 
-  mutate(n_actions_positive = sum(KW_Normative>0), n_actions_negative=sum(KW_Normative<=0), specificity = n_actions_negative/n_actions_positive)
+  mutate(n_actions_positive = sum(KW_Normative>0), 
+         n_actions_negative=sum(KW_Normative<=0), 
+         specificity = n_actions_negative/n_actions_positive)
 
-ggplot(df_specificity_per_subject, aes(x=treatment_id, y=specificity)) + 
+#box plot of specificity
+ggplot(df_specificity_per_subject, 
+       aes(x=treatment_id, 
+           y=specificity)) + 
   geom_boxplot() + 
   labs(title="Boxplot of specificity per paper") +
-  xlab("Paper") + ylab("Specificity")
+  xlab("Paper") + 
+  ylab("Specificity")
 
-ggplot(df_specificity_per_subject, aes(x=n_actions_positive, y=specificity)) + geom_point()
+#density plot of specificity
+ggplot(df_specificity_per_subject, 
+       aes(x=n_actions_positive, 
+           y=specificity)) + 
+  geom_point()
 
 ```
 
