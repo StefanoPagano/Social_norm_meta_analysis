@@ -158,7 +158,8 @@ do.call('grid.arrange',
 perc_choices <- choices %>% 
   filter(A==1) %>% 
   group_by(treatment_id, choice) %>% 
-  summarise(n_of_sub = n()) %>% 
+  summarise(n_of_sub = n(),
+            endowment = endowment) %>% 
   merge.data.frame(master %>% 
                      subset.data.frame(select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
@@ -181,13 +182,16 @@ for (i in temp_master$treatment_id) {
   temp_master_for <- temp_master_for %>% 
     mutate(total = sum(n_of_sub), 
            perc_per_action = round(n_of_sub/total*100, digits=2))
+  print(temp_master_for$endowment)
   # list
   list_plot[[n]] <- ggplot(temp_master_for, 
                            aes(x=choice, 
                                y=perc_per_action)) + 
     geom_bar(stat = "identity") + 
     labs(title = i, 
-         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) + 
+         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+    xlim(0,temp_master_for$endowment[1]) +
+    scale_x_continuous(breaks = 0:temp_master_for$endowment[1]) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
@@ -205,42 +209,93 @@ do.call('grid.arrange',c(list_plot, ncol = 2))
 ## Consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-beliefs_kim_temp <- beliefs %>%
-  subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
-  group_by(paper_id, treatment_id, scenarios) %>%
-  summarise(avg_kw = mean(KW_Normative, na.rm=T))
+# interpolation of appropriateness with scenarios out of game
+beliefs_only_kim <- beliefs %>%
+  filter(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
+  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  mutate(KW_Normative_temp = KW_Normative)
 
-Kim003_interpolation <- beliefs_kim_temp %>% 
-  rbind.data.frame(data.frame(paper_id="2016Kim003",
-                              treatment_id="2016Kim003_7",
-                              scenarios=seq(1,15,2),
-                              avg_kw=NA)) %>%
-  ungroup() %>%
-  arrange(scenarios) %>%
-  mutate(KW_Normative = na.approx(avg_kw,
-                                  maxgap = 1,
-                                  rule = 1))
+n_subj = length(levels(as.factor(beliefs_only_kim$subject_id)))
 
+kim003_interpolation <- data.frame(paper_id=NA,
+                           treatment_id=NA,
+                           subject_id = NA,
+                           scenarios=NA,
+                           KW_Normative=NA,
+                           KW_Normative_temp=NA)
+
+for (subj in levels(as.factor(beliefs_only_kim$subject_id))) {
+  subj_df <- data.frame(paper_id="2016Kim003",
+                        treatment_id="2016Kim003_7",
+                        subject_id = subj,
+                        scenarios=seq(1,15,2),
+                        KW_Normative = NA,
+                        KW_Normative_temp=NA)
+  
+  subj_beliefs <- beliefs_only_kim %>%
+    filter(subject_id == subj)
+  #print(subj_beliefs)
+  
+  subj_beliefs <- subj_beliefs %>%
+    rbind.data.frame(subj_df) %>%
+    arrange(paper_id, treatment_id, subject_id, scenarios) %>%
+    mutate(KW_Normative = na.approx(KW_Normative_temp,
+                                    maxgap = 1,
+                                    rule = 1))
+  
+  kim003_interpolation <- subj_beliefs %>%
+    rbind.data.frame(kim003_interpolation)
+  #print(kim003_interpolation)
+}
+
+# how many scenarios are there for each subject in kim003_interpolation dataframe?
+kim003_interpolation %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
+  group_by(subject_id) %>% 
+  summarise(n_scen=length(scenarios)) %>%
+  group_by(n_scen) %>%
+  summarise(n_subjs = length(subject_id))
+
+# how many scenarios are there for each subject in beliefs datafreme?
+beliefs %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
+  group_by(subject_id) %>% 
+  summarise(n_scen=length(scenarios)) %>%
+  group_by(n_scen) %>%
+  summarise(n_subjs = length(subject_id))
+
+# dataset to plot consistency
 df_consistency_beliefs <- beliefs %>%
+  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   filter(treatment_id %in% levels(as.factor(master$treatment_id))) %>%
+  filter(paper_id != "2016Kim003") %>%
+  rbind.data.frame(kim003_interpolation %>% select(-KW_Normative_temp)) %>%
   merge.data.frame(master %>%
                      subset.data.frame(select = c(treatment_id,
                                                   max_sigma)),
-                   by="treatment_id") %>%
-  group_by(treatment_id, scenarios) %>%
-  summarise(sd = sd(KW_Normative),
-            appropriateness = sum(KW_Normative))
+                   by="treatment_id") 
+# %>%
+#   group_by(treatment_id, scenarios) %>%
+#   summarise(sd = sd(KW_Normative),
+#             max_sigma = max_sigma,
+#             appropriateness = sum(KW_Normative)) %>%
+#   mutate(consistency = 1-(sd/max_sigma))
 
-tab_max <- beliefs %>%
+scenarios_w_max_appropriateness <- beliefs %>%
   group_by(treatment_id, scenarios) %>%
   summarise(KW=mean(KW_Normative)) %>%
   summarise(scenarios=scenarios[which(KW==max(KW))])
 
-output <- merge.data.frame(tab_max,
-                           beliefs,
+output <- merge.data.frame(scenarios_w_max_appropriateness,
+                           df_consistency_beliefs,
                            all.x = T,
                            by=c("treatment_id", "scenarios"))
 
+# are there the same subjects between output and beliefs?
+o <- output %>% group_by(treatment_id) %>% summarise(n_o=n())
+beliefs %>% filter(scenarios==0) %>% group_by(treatment_id) %>% summarise(n_b=n()) %>% merge.data.frame(o) %>% mutate(test=ifelse(n_b-n_o==0,"ok","n"))
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(output,
        aes(x=treatment_id,
            y=KW_Normative)) +
@@ -258,7 +313,6 @@ ggplot(output,
        aes(x=KW_Normative)) +
   geom_density() +
   facet_wrap(~treatment_id, ncol=2)
-
 ```
 
 ## Specificity
