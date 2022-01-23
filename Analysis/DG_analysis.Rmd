@@ -154,12 +154,12 @@ do.call('grid.arrange',
 ### Choices
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-#
+# INSERT GROUP_BY AND UNGROUP TO COMPUTE THE TOTAL NUMBER OF SUBJECT
 perc_choices <- choices %>% 
   filter(A==1) %>% 
   group_by(treatment_id, choice) %>% 
   summarise(n_of_sub = n(),
-            endowment = endowment) %>% 
+            endowment = mean(endowment)) %>% 
   merge.data.frame(master %>% 
                      subset.data.frame(select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
