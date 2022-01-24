@@ -154,12 +154,12 @@ do.call('grid.arrange',
 ### Choices
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-# INSERT GROUP_BY AND UNGROUP TO COMPUTE THE TOTAL NUMBER OF SUBJECT
+# dataset
 perc_choices <- choices %>% 
   filter(A==1) %>% 
   group_by(treatment_id, choice) %>% 
   summarise(n_of_sub = n(),
-            endowment = mean(endowment)) %>% 
+            endowment = mean(endowment)) %>%
   merge.data.frame(master %>% 
                      subset.data.frame(select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
@@ -302,7 +302,7 @@ ggplot(output,
   geom_boxplot() +
   labs(title="Boxplot of consistency per paper") +
   xlab("Paper") +
-  ylab("Consistency")
+  ylab("Appropriateness")
 
 ggplot(output,
        aes(x=KW_Normative)) +
@@ -343,27 +343,94 @@ ggplot(df_specificity_per_subject,
 ```
 
 
-<!-- # Individual-level analyses -->
+# Individual-level analyses
 
-<!-- ```{r} -->
-<!-- # belief dataset aggregated to get appropriateness for each action -->
-<!-- beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, treatment_id,scenarios) %>% summarise(avg_kw = mean(KW_Normative, rm.na=T), -->
-<!--                                                                                                                                                        sd_kw = sd(KW_Normative, na.rm = T)) -->
-<!-- Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>% -->
-<!--   rbind.data.frame(data.frame(paper_id="2016Kim003", treatment_id="2016Kim003_7", scenarios=seq(1,15,2), avg_kw=NA, sd_kw=NA)) %>% -->
-<!--   ungroup() %>% arrange(scenarios) %>% -->
-<!--   mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1), -->
-<!--          sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1)) -->
-<!-- mean_beliefs <- beliefs %>% merge.data.frame(Kim003_interpolation, all = T) %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(mean_app=mean(KW_Normative), sd_app=mean(sd_KW)) -->
-<!-- individual_db <- choices %>% merge.data.frame(mean_beliefs)%>% mutate(payoff=endowment-scenarios) -->
-<!-- master$treatment_id = paste(master$PaperID,"_",master$TreatmentCode, sep="") -->
-<!-- # mlogit -->
-<!-- for (i in levels(as.factor(individual_db$treatment_id))) { -->
-<!--   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=individual_db%>% filter(treatment_id==i)) -->
-<!--   print(i) -->
-<!-- print(summary(model)) -->
-<!-- } -->
-<!-- #mdata=mlogit.data(individual_db, chid.var = "scenarios") -->
-<!-- #mlogit() -->
-<!-- ``` -->
+```{r}
+# belief dataset aggregated to get appropriateness for each action
+# beliefs_temp <- beliefs %>%
+#   subset.data.frame(subset = Design=="Between"& Game_type=="DG") %>%
+#   group_by(paper_id, treatment_id,scenarios) %>%
+#   summarise(avg_kw = mean(KW_Normative, rm.na=T),
+#             sd_kw = sd(KW_Normative, na.rm = T))
+# 
+# Kim003_interpolation <- beliefs_temp %>%
+#   subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
+#   rbind.data.frame(data.frame(paper_id="2016Kim003",
+#                               treatment_id="2016Kim003_7",
+#                               scenarios=seq(1,15,2),
+#                               avg_kw=NA,
+#                               sd_kw=NA)) %>%
+#   ungroup() %>%
+#   arrange(scenarios) %>%
+#   mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1),
+#          sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1))
+# 
+# mean_beliefs <- beliefs %>%
+#   merge.data.frame(Kim003_interpolation, all = T) %>%
+#   group_by(paper_id, treatment_id, scenarios) %>%
+#   summarise(mean_app=mean(KW_Normative),
+#             sd_app=mean(sd_KW))
+# 
+# individual_db <- choices %>%
+#   merge.data.frame(mean_beliefs)%>%
+#   mutate(payoff=endowment-scenarios)
+
+utility_df_long <- df_consistency_beliefs %>% 
+  group_by(subject_id) %>% 
+  mutate(n_actions_positive = sum(KW_Normative>=0), 
+         n_actions_negative=sum(KW_Normative<0), 
+         specificity = n_actions_negative/n_actions_positive)
+
+mean_beliefs <- df_consistency_beliefs %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(mean_app = mean(KW_Normative),
+            sd_app = sd(KW_Normative))
+
+utility_df_treatment <- choices %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  mutate(payoff = endowment - scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app)
+
+betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA)
+
+# mlogit standard
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  print(i)
+  print(summary(model))
+  betas_standard_logit <- betas_standard_logit %>% rbind.data.frame(data.frame(paper = i, 
+                                                                               alpha = as.numeric(model$coefficients[1]),
+                                                                               beta=as.numeric(model$coefficients[2]),
+                                                                               SE_alpha=coef(summary(model))[1, "Std. Error"],
+                                                                               SE_beta=coef(summary(model))[2, "Std. Error"]))
+}
+
+ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+
+betas_spec_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA)
+
+# mlogit consistency
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  print(i)
+  print(summary(model2))
+  betas_spec_logit <- betas_spec_logit %>% rbind.data.frame(data.frame(paper = i, 
+                                                                       alpha = as.numeric(model2$coefficients[1]),
+                                                                       beta=as.numeric(model2$coefficients[2]),
+                                                                       delta=as.numeric(model2$coefficients[3]),
+                                                                       SE_alpha=coef(summary(model2))[1, "Std. Error"],
+                                                                       SE_beta=coef(summary(model2))[2, "Std. Error"],
+                                                                       SE_delta=coef(summary(model2))[3, "Std. Error"]))
+}
+
+ggplot(betas_spec_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+```
 
