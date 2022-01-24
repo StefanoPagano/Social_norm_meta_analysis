@@ -343,38 +343,10 @@ ggplot(df_specificity_per_subject,
 ```
 
 
-# Individual-level analyses
+# Individual-level analyses {.tabset}
 
-```{r}
-# belief dataset aggregated to get appropriateness for each action
-# beliefs_temp <- beliefs %>%
-#   subset.data.frame(subset = Design=="Between"& Game_type=="DG") %>%
-#   group_by(paper_id, treatment_id,scenarios) %>%
-#   summarise(avg_kw = mean(KW_Normative, rm.na=T),
-#             sd_kw = sd(KW_Normative, na.rm = T))
-# 
-# Kim003_interpolation <- beliefs_temp %>%
-#   subset.data.frame(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
-#   rbind.data.frame(data.frame(paper_id="2016Kim003",
-#                               treatment_id="2016Kim003_7",
-#                               scenarios=seq(1,15,2),
-#                               avg_kw=NA,
-#                               sd_kw=NA)) %>%
-#   ungroup() %>%
-#   arrange(scenarios) %>%
-#   mutate(KW_Normative = na.approx(avg_kw, maxgap = 1, rule = 1),
-#          sd_KW = na.approx(sd_kw, maxgap = 1, rule = 1))
-# 
-# mean_beliefs <- beliefs %>%
-#   merge.data.frame(Kim003_interpolation, all = T) %>%
-#   group_by(paper_id, treatment_id, scenarios) %>%
-#   summarise(mean_app=mean(KW_Normative),
-#             sd_app=mean(sd_KW))
-# 
-# individual_db <- choices %>%
-#   merge.data.frame(mean_beliefs)%>%
-#   mutate(payoff=endowment-scenarios)
-
+## Standard
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 utility_df_long <- df_consistency_beliefs %>% 
   group_by(subject_id) %>% 
   mutate(n_actions_positive = sum(KW_Normative>=0), 
@@ -413,7 +385,10 @@ ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 
 betas_spec_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA)
+```
 
+## With consistency
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # mlogit consistency
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=utility_df_treatment%>% 
@@ -432,5 +407,9 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 ggplot(betas_spec_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+
+ggplot(betas_spec_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=delta-2*SE_beta,xmax=delta+2*SE_beta))
 ```
 
