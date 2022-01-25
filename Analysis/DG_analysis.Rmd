@@ -372,8 +372,8 @@ betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, S
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  print(i)
-  print(coef(summary(model)))
+  #print(i)
+  #print(coef(summary(model)))
   betas_standard_logit <- betas_standard_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model$coefficients[1]),
@@ -407,8 +407,8 @@ betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  print(i)
-  print(coef(summary(model2)))
+  #print(i)
+  #print(coef(summary(model2)))
   betas_cons_logit <- betas_cons_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model2$coefficients[1]),
