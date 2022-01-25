@@ -195,7 +195,7 @@ for (i in temp_master$treatment_id) {
     geom_bar(stat = "identity") + 
     labs(title = i, 
          subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-    scale_x_continuous(breaks = 0:temp_master_for$endowment[1]) +
+    xlim(0,temp_master_for$endowment[1]) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
