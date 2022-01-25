@@ -1,7 +1,7 @@
 ---
 title: "dg_analysis"
 author: "Sp & AG"
-date: "19/1/2022"
+date: "25/1/2022"
 output: html_document
 ---
 
@@ -75,10 +75,15 @@ The selection criteria to identify papers in target was:
   <!-- + Investment Game; -->
 * Presence of norm elicitation task:
   + Krupka and Weber (2013);
-  + Bicchieri-Xiao (2009).
 * Only monetary incentivized studies (both choices and norms elicitation).
 * Baseline treatment (no framing)
 * Standard game
+  + Not a minigame
+  + Two players
+  + No papers that give the recipient any kind of power (and thereby bring the experiment close to an ultimatum game);
+  + No papers that mix the motive of benevolence with one of sanctioning the recipient
+  + No papers that limit the dictator’s action space such that it does not include the option to give nothing nor to take from the recipient
+  + No real effort task used to determine the dictator’s endowment
 * Both choice and normative task
 * Data available
 
@@ -306,8 +311,7 @@ ggplot(output,
        aes(x=treatment_id,
            y=KW_Normative)) +
   geom_boxplot() +
-  labs(title="Boxplot of appropriatensess per paper",
-       subtitle = "Consistency can be evaluate throught IQR") +
+  labs(title="Distribution of appropriateness of most appropriate action (norm)") +
   xlab("Paper") +
   ylab("Appropriateness")
 
