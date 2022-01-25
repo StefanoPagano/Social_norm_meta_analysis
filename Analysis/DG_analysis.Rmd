@@ -97,10 +97,10 @@ kbl(list_of_paper_in_target,
   column_spec(1, bold = T)
 ```
 
-## Plots {.tabset}
+# Plots {.tabset}
 <!-- tab: beliefs, choices -->
 
-### Beliefs
+## Beliefs
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 setwd("../")
@@ -151,7 +151,7 @@ do.call('grid.arrange',
         c(list_plot, ncol = 2))
 ```
 
-### Choices
+## Choices
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # dataset
@@ -206,6 +206,12 @@ do.call('grid.arrange',c(list_plot, ncol = 2))
 # Consistency and Specificity {.tabset}
 <!-- tab: consistency, specificity -->
 
+## Formulas
+
+$$ consistency = \frac{1}{\sigma_n}$$
+
+$$ specificity = \frac{\#\ of\ negative\ actions}{\#\ of\ positive\ actions}$$
+
 ## Consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -248,19 +254,19 @@ for (subj in levels(as.factor(beliefs_only_kim$subject_id))) {
   #print(kim003_interpolation)
 }
 
-# how many scenarios are there for each subject in kim003_interpolation dataframe?
-kim003_interpolation %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
-  group_by(subject_id) %>% 
-  summarise(n_scen=length(scenarios)) %>%
-  group_by(n_scen) %>%
-  summarise(n_subjs = length(subject_id))
+# # how many scenarios are there for each subject in kim003_interpolation dataframe?
+# kim003_interpolation %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
+#   group_by(subject_id) %>% 
+#   summarise(n_scen=length(scenarios)) %>%
+#   group_by(n_scen) %>%
+#   summarise(n_subjs = length(subject_id))
 
-# how many scenarios are there for each subject in beliefs datafreme?
-beliefs %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
-  group_by(subject_id) %>% 
-  summarise(n_scen=length(scenarios)) %>%
-  group_by(n_scen) %>%
-  summarise(n_subjs = length(subject_id))
+# # how many scenarios are there for each subject in beliefs datafreme?
+# beliefs %>% filter(paper_id=="2016Kim003" & treatment_id == "2016Kim003_7") %>% 
+#   group_by(subject_id) %>% 
+#   summarise(n_scen=length(scenarios)) %>%
+#   group_by(n_scen) %>%
+#   summarise(n_subjs = length(subject_id))
 
 # dataset to plot consistency
 df_consistency_beliefs <- beliefs %>%
@@ -289,9 +295,9 @@ output <- merge.data.frame(scenarios_w_max_appropriateness,
                            all.x = T,
                            by=c("treatment_id", "scenarios"))
 
-# are there the same subjects between output and beliefs?
-o <- output %>% group_by(treatment_id) %>% summarise(n_o=n())
-beliefs %>% filter(scenarios==0) %>% group_by(treatment_id) %>% summarise(n_b=n()) %>% merge.data.frame(o) %>% mutate(test=ifelse(n_b-n_o==0,"ok","n"))
+# # are there the same subjects between output and beliefs?
+# o <- output %>% group_by(treatment_id) %>% summarise(n_o=n())
+# beliefs %>% filter(scenarios==0) %>% group_by(treatment_id) %>% summarise(n_b=n()) %>% merge.data.frame(o) %>% mutate(test=ifelse(n_b-n_o==0,"ok","n"))
 ```
 
 
@@ -300,7 +306,8 @@ ggplot(output,
        aes(x=treatment_id,
            y=KW_Normative)) +
   geom_boxplot() +
-  labs(title="Boxplot of consistency per paper") +
+  labs(title="Boxplot of appropriatensess per paper",
+       subtitle = "Consistency can be evaluate throught IQR") +
   xlab("Paper") +
   ylab("Appropriateness")
 
@@ -334,12 +341,6 @@ ggplot(df_specificity_per_subject,
   xlab("Paper") + 
   ylab("Specificity")
 
-#density plot of specificity
-ggplot(df_specificity_per_subject, 
-       aes(x=n_actions_positive, 
-           y=specificity)) + 
-  geom_point()
-
 ```
 
 
@@ -365,50 +366,76 @@ utility_df_treatment <- choices %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
-betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA)
+betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
 # mlogit standard
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   print(i)
-  print(summary(model))
-  betas_standard_logit <- betas_standard_logit %>% rbind.data.frame(data.frame(paper = i, 
-                                                                               alpha = as.numeric(model$coefficients[1]),
-                                                                               beta=as.numeric(model$coefficients[2]),
-                                                                               SE_alpha=coef(summary(model))[1, "Std. Error"],
-                                                                               SE_beta=coef(summary(model))[2, "Std. Error"]))
+  print(coef(summary(model)))
+  betas_standard_logit <- betas_standard_logit %>% 
+    rbind.data.frame(data.frame(paper = i, 
+                                alpha = as.numeric(model$coefficients[1]),
+                                beta=as.numeric(model$coefficients[2]),
+                                SE_alpha=coef(summary(model))[1, "Std. Error"],
+                                SE_beta=coef(summary(model))[2, "Std. Error"],
+                                MRS = 2*as.numeric(model$coefficients[2])/as.numeric(model$coefficients[1])))
 }
+
+opts <- options(knitr.kable.NA = "")
+kbl(betas_standard_logit,
+    digits = 4, 
+    booktabs = T, 
+    align = "lcccc", 
+    centering = F, 
+    caption="Coefficients for standard model") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
+  column_spec(1, bold = T)
 
 ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
-
-betas_spec_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA)
 ```
 
-## With consistency
+## With Standard Deviation
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
+
 # mlogit consistency
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   print(i)
-  print(summary(model2))
-  betas_spec_logit <- betas_spec_logit %>% rbind.data.frame(data.frame(paper = i, 
-                                                                       alpha = as.numeric(model2$coefficients[1]),
-                                                                       beta=as.numeric(model2$coefficients[2]),
-                                                                       delta=as.numeric(model2$coefficients[3]),
-                                                                       SE_alpha=coef(summary(model2))[1, "Std. Error"],
-                                                                       SE_beta=coef(summary(model2))[2, "Std. Error"],
-                                                                       SE_delta=coef(summary(model2))[3, "Std. Error"]))
+  print(coef(summary(model2)))
+  betas_cons_logit <- betas_cons_logit %>% 
+    rbind.data.frame(data.frame(paper = i, 
+                                alpha = as.numeric(model2$coefficients[1]),
+                                beta=as.numeric(model2$coefficients[2]),
+                                delta=as.numeric(model2$coefficients[3]),
+                                SE_alpha=coef(summary(model2))[1, "Std. Error"],
+                                SE_beta=coef(summary(model2))[2, "Std. Error"],
+                                SE_delta=coef(summary(model2))[3, "Std. Error"],
+                                MRS = 2*as.numeric(model2$coefficients[2])/as.numeric(model2$coefficients[1])))
 }
 
-ggplot(betas_spec_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+opts <- options(knitr.kable.NA = "")
+kbl(betas_cons_logit,
+    digits = 4, 
+    booktabs = T, 
+    align = "lcccc", 
+    centering = F, 
+    caption="Coefficients for model with std") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
+  column_spec(1, bold = T)
+
+ggplot(betas_cons_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 
-ggplot(betas_spec_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+ggplot(betas_cons_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=delta-2*SE_beta,xmax=delta+2*SE_beta))
 ```
