@@ -350,6 +350,9 @@ ggplot(df_specificity_per_subject,
 # Individual-level analyses {.tabset}
 
 ## Standard
+
+$U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 utility_df_long <- df_consistency_beliefs %>% 
   group_by(subject_id) %>% 
@@ -403,6 +406,9 @@ ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=
 ```
 
 ## With Standard Deviation
+
+$U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
 
