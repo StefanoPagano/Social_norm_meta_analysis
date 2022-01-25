@@ -62,17 +62,7 @@ choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
 The selection criteria to identify papers in target was:
 
 * **Game type** (cooperation and prosociality games):
-  + Dictator Game <!--(with tax/standard/Lying); -->
-  <!-- + Donation Game; -->
-  <!-- + Ultimatum Game; -->
-  <!-- + Trust Game; -->
-  <!-- + Public Good Game; -->
-  <!-- + Prisoner's Dilemma Game; -->
-  <!-- + Take or Give Fame; -->
-  <!-- + CPR; -->
-  <!-- + Bargaining Game; -->
-  <!-- + Tax Game; -->
-  <!-- + Investment Game; -->
+  + Dictator Game
 * Presence of norm elicitation task:
   + Krupka and Weber (2013);
 * Only monetary incentivized studies (both choices and norms elicitation).
@@ -113,7 +103,7 @@ setwd("Paper_csv/")
 
 df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
 df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
-df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% mutate(donation=10-donation) %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 
@@ -195,7 +185,7 @@ for (i in temp_master$treatment_id) {
     geom_bar(stat = "identity") + 
     labs(title = i, 
          subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-    xlim(0,temp_master_for$endowment[1]) +
+    xlim(-1,temp_master_for$endowment[1]) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
@@ -372,14 +362,22 @@ utility_df_treatment <- choices %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
+utility_df_treatment_cha <- utility_df_treatment %>%
+  filter(treatment_id == "2019Cha026_1") %>%
+  mutate(choice = 10-choice)
+
+utility_df_treatment <- utility_df_treatment %>%
+  filter(paper_id != "2019Cha026") %>%
+  rbind.data.frame(utility_df_treatment_cha)
+
 betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
 # mlogit standard
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  #print(i)
-  #print(coef(summary(model)))
+  print(i)
+  print(coef(summary(model)))
   betas_standard_logit <- betas_standard_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model$coefficients[1]),
@@ -414,10 +412,10 @@ betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha
 
 # mlogit consistency
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + sd_app, data=utility_df_treatment%>% 
+  model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  #print(i)
-  #print(coef(summary(model2)))
+  print(i)
+  print(coef(summary(model2)))
   betas_cons_logit <- betas_cons_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model2$coefficients[1]),
