@@ -306,11 +306,6 @@ ggplot(output,
 
 ggplot(output,
        aes(x=KW_Normative)) +
-  geom_histogram() +
-  facet_wrap(~treatment_id, ncol=2)
-
-ggplot(output,
-       aes(x=KW_Normative)) +
   geom_density() +
   facet_wrap(~treatment_id, ncol=2)
 ```
