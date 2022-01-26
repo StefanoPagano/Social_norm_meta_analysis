@@ -60,6 +60,7 @@ n_sub_N = norms %>%
 ## compute norm 
 dgn_appropriateness_sum <- norms %>%
   subset.data.frame(subset = frame_tax == 0) %>%
+  mutate(action=endowment-action) %>%
   group_by(action) %>%
   summarise(coop = sum(norm))%>%
   mutate(n_sub_N, Kw_m = coop/n_sub_N)
@@ -147,6 +148,7 @@ n_sub_N = norms %>%
 ## compute norm 
 dgt_appropriateness_sum <- norms %>%
   subset.data.frame(subset = frame_tax == 1) %>%
+  mutate(action=endowment-action) %>%
   group_by(action) %>%
   summarise(coop = sum(norm)) %>%
   mutate(n_sub_N, Kw_m = coop/n_sub_N)

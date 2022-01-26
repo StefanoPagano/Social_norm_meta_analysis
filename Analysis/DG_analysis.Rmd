@@ -13,10 +13,10 @@ library(mlogit)
 library(sjmisc)
 library(ggrepel)
 library(readxl)
+library(sjPlot)
 library(ggpubr)
 library(survival)
 library(gridExtra)
-library(sjPlot)
 library(kableExtra)
 library(car)
 library(DT)
@@ -103,7 +103,7 @@ setwd("Paper_csv/")
 
 df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
 df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
-df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% mutate(donation=10-donation) %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 
@@ -338,7 +338,7 @@ ggplot(df_specificity_per_subject,
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 utility_df_long <- df_consistency_beliefs %>% 
   group_by(subject_id) %>% 
   mutate(n_actions_positive = sum(KW_Normative>=0), 
@@ -357,22 +357,17 @@ utility_df_treatment <- choices %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
-utility_df_treatment_cha <- utility_df_treatment %>%
-  filter(treatment_id == "2019Cha026_1") %>%
-  mutate(choice = 10-choice)
-
-utility_df_treatment <- utility_df_treatment %>%
-  filter(paper_id != "2019Cha026") %>%
-  rbind.data.frame(utility_df_treatment_cha)
-
 betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
 # mlogit standard
+model_list <- list()
+n_model = 1
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  print(i)
-  print(coef(summary(model)))
+  model_list[[n_model]] = model
+  n_model = n_model +1
+
   betas_standard_logit <- betas_standard_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model$coefficients[1]),
@@ -392,7 +387,15 @@ kbl(betas_standard_logit,
   kable_styling(position = "left", 
                 full_width = F) %>%
   column_spec(1, bold = T)
+```
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+tab_model(model_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
@@ -409,8 +412,7 @@ betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  print(i)
-  print(coef(summary(model2)))
+  
   betas_cons_logit <- betas_cons_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
                                 alpha = as.numeric(model2$coefficients[1]),
@@ -439,6 +441,66 @@ ggplot(betas_cons_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta
 
 ggplot(betas_cons_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
   geom_point() + 
-  geom_errorbar(aes(xmin=delta-2*SE_beta,xmax=delta+2*SE_beta))
+  geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
+```
+
+
+## Social preferences model
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+choices_per_social_model <- choices %>% mutate(payoff=endowment-scenarios,
+                              other_payoff_ahead=ifelse(payoff>scenarios,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(payoff<scenarios,scenarios-payoff,0))
+
+utility_df_treatment_2 <- choices_per_social_model %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app)
+
+betas_standard_logit <- data.frame(paper = NA, rho=NA, sigma=NA, SE_rho=NA, SE_sigma=NA)
+
+model_list2 <- list()
+n_model2=1
+# mlogit
+for (i in levels(as.factor(utility_df_treatment_2$treatment_id))) {
+  model2=mclogit::mclogit(cbind(A,choice)~ other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_2%>% 
+                           filter(treatment_id==i))
+  model_list2[[n_model2]] = model2
+  n_model2 = n_model2 +1
+ 
+  
+  # betas_cons_logit <- betas_cons_logit %>% 
+  #   rbind.data.frame(data.frame(paper = i, 
+  #                               rho = as.numeric(model2$coefficients[1]),
+  #                               sigma=as.numeric(model2$coefficients[2]),
+  #                               SE_rho=coef(summary(model2))[1, "Std. Error"],
+  #                               SE_sigma=coef(summary(model2))[2, "Std. Error"]))
+}
+
+# opts <- options(knitr.kable.NA = "")
+# kbl(betas_cons_logit,
+#     digits = 4, 
+#     booktabs = T, 
+#     align = "lccc", 
+#     centering = F, 
+#     caption="Coefficients for model with std") %>%
+#   kable_styling(position = "left", 
+#                 full_width = F) %>%
+#   column_spec(1, bold = T)
+# 
+# ggplot(betas_cons_logit %>% filter(!(is.na(sigma))) %>% arrange(sigma), aes(x=sigma,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=sigma-2*SE_sigma,xmax=sigma+2*SE_sigma))
+# 
+# ggplot(betas_cons_logit %>% filter(!(is.na(rho))) %>% arrange(rho), aes(x=rho,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=rho-2*SE_rho,xmax=rho+2*SE_rho))
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+tab_model(model_list2, dv.labels = levels(as.factor(utility_df_treatment_2$treatment_id)), show.aic = T, show.loglik = T)
+
 ```
 
