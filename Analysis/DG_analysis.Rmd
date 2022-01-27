@@ -504,7 +504,7 @@ tab_model(model_list2, dv.labels = levels(as.factor(utility_df_treatment_2$treat
 
 ```
 
-## Demografic analysis {.tabset}
+## Demographic analysis {.tabset}
 
 ### Gender
 
