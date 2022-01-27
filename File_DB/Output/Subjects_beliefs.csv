@@ -1,4 +1,4 @@
-"treatment_id","subject_id","paper_id","gender","age","scenarios","KW_Normative","Game_type","KW_Personal","Bicchieri_Empirical","Bicchieri_Normative","Bicchieri_Personal","Design"
+"treatment_id","subject_id","paper_id","female","age","scenarios","KW_Normative","Game_type","KW_Personal","Bicchieri_Empirical","Bicchieri_Normative","Bicchieri_Personal","Design"
 "2020Bas115_1a","2020Bas115_1a_aaar13","2020Bas115",1,74,0,-1,"DG",NA,NA,NA,NA,"Within"
 "2020Bas115_1a","2020Bas115_1a_aaar13","2020Bas115",1,74,1,-0.6,"DG",NA,NA,NA,NA,"Within"
 "2020Bas115_1a","2020Bas115_1a_aaar13","2020Bas115",1,74,2,-0.6,"DG",NA,NA,NA,NA,"Within"

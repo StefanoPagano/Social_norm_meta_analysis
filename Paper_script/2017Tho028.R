@@ -4,18 +4,18 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 dg=read_excel("libcons_alldata.xlsx", sheet = "alldata") %>% 
-     mutate(base0 = recode(base0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            base1 = recode(base1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            base2 = recode(base2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            base3 = recode(base3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            base4 = recode(base4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            base5 = recode(base5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_0 = recode(asym1_0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_1 = recode(asym1_1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_2 = recode(asym1_2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_3 = recode(asym1_3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_4 = recode(asym1_4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
-            asym1_5 = recode(asym1_5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
+     mutate(base0 = dplyr::recode(base0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base1 = dplyr::recode(base1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base2 = dplyr::recode(base2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base3 = dplyr::recode(base3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base4 = dplyr::recode(base4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            base5 = dplyr::recode(base5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_0 = dplyr::recode(asym1_0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_1 = dplyr::recode(asym1_1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_2 = dplyr::recode(asym1_2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_3 = dplyr::recode(asym1_3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_4 = dplyr::recode(asym1_4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+            asym1_5 = dplyr::recode(asym1_5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2017Tho028", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))

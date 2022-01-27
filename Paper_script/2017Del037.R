@@ -15,13 +15,13 @@ norms <- dg %>%
                               KWansw.5.,
                               KWansw.6.,
                               KWansw.7.)) %>%
-  mutate(KW1 = recode(KWansw.1., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW2 = recode(KWansw.2., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW3 = recode(KWansw.3., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW4 = recode(KWansw.4., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW5 = recode(KWansw.5., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW6 = recode(KWansw.6., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
-         KW7 = recode(KWansw.7., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1)) 
+  mutate(KW1 = dplyr::recode(KWansw.1., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW2 = dplyr::recode(KWansw.2., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW3 = dplyr::recode(KWansw.3., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW4 = dplyr::recode(KWansw.4., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW5 = dplyr::recode(KWansw.5., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW6 = dplyr::recode(KWansw.6., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1),
+         KW7 = dplyr::recode(KWansw.7., `2` = -1, `4` = -1/3, `6` = 1/3, `8` = 1)) 
   #subset.data.frame(subset = endowment == 10)
 
 # meta-information dataset

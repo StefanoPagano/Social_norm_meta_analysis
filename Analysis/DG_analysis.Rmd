@@ -119,7 +119,7 @@ temp_master <- df_avg_kw %>%
 
 # inizializing variable for loop
 n=1
-list_plot <-  c()
+list_plot <- c()
 
 # creation of a plots list
 for (i in temp_master$treatment_id) {
@@ -489,12 +489,12 @@ for (i in levels(as.factor(utility_df_treatment_2$treatment_id))) {
 #                 full_width = F) %>%
 #   column_spec(1, bold = T)
 # 
-# ggplot(betas_cons_logit %>% filter(!(is.na(sigma))) %>% arrange(sigma), aes(x=sigma,y=paper)) + 
-#   geom_point() + 
+# ggplot(betas_cons_logit %>% filter(!(is.na(sigma))) %>% arrange(sigma), aes(x=sigma,y=paper)) +
+#   geom_point() +
 #   geom_errorbar(aes(xmin=sigma-2*SE_sigma,xmax=sigma+2*SE_sigma))
 # 
-# ggplot(betas_cons_logit %>% filter(!(is.na(rho))) %>% arrange(rho), aes(x=rho,y=paper)) + 
-#   geom_point() + 
+# ggplot(betas_cons_logit %>% filter(!(is.na(rho))) %>% arrange(rho), aes(x=rho,y=paper)) +
+#   geom_point() +
 #   geom_errorbar(aes(xmin=rho-2*SE_rho,xmax=rho+2*SE_rho))
 ```
 
@@ -502,5 +502,80 @@ for (i in levels(as.factor(utility_df_treatment_2$treatment_id))) {
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 tab_model(model_list2, dv.labels = levels(as.factor(utility_df_treatment_2$treatment_id)), show.aic = T, show.loglik = T)
 
+```
+
+## Demografic analysis {.tabset}
+
+### Gender
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+utility_df_long <- df_consistency_beliefs %>% 
+  group_by(subject_id) %>% 
+  mutate(n_actions_positive = sum(KW_Normative>=0), 
+         n_actions_negative=sum(KW_Normative<0), 
+         specificity = n_actions_negative/n_actions_positive)
+
+mean_beliefs <- df_consistency_beliefs %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(mean_app = mean(KW_Normative),
+            sd_app = sd(KW_Normative))
+
+utility_df_treatment_3 <- choices %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  mutate(payoff = endowment - scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app) %>%
+  filter(paper_id != "2018Her061")
+
+
+# mlogit standard
+model_list3 <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment_3$treatment_id))) {
+  print(i)
+  model3=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*female, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  model_list3[[n_model]] = model3
+  n_model = n_model +1
+}
+
+tab_model(model_list3, dv.labels = levels(as.factor(utility_df_treatment_3$treatment_id)), show.aic = T, show.loglik = T)
+```
+### Age
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+utility_df_long <- df_consistency_beliefs %>% 
+  group_by(subject_id) %>% 
+  mutate(n_actions_positive = sum(KW_Normative>=0), 
+         n_actions_negative=sum(KW_Normative<0), 
+         specificity = n_actions_negative/n_actions_positive)
+
+mean_beliefs <- df_consistency_beliefs %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(mean_app = mean(KW_Normative),
+            sd_app = sd(KW_Normative))
+
+utility_df_treatment_4 <- choices %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  mutate(payoff = endowment - scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app) %>%
+  filter(paper_id != "2018Her061")
+
+
+# mlogit standard
+model_list4 <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment_4$treatment_id))) {
+  print(i)
+  model4=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*age, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  model_list4[[n_model]] = model4
+  n_model = n_model +1
+}
+
+tab_model(model_list4, dv.labels = levels(as.factor(utility_df_treatment_4$treatment_id)), show.aic = T, show.loglik = T)
 ```
 

@@ -10,30 +10,30 @@ norms_s2=read.csv("kw_raw_study2.csv", sep=",")
 
 # recoding
 norms_s1 <- norms_s1 %>%
-  mutate(DG_SN_0 = recode(player.decision10_0, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_1 = recode(player.decision9_1, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_2 = recode(player.decision8_2, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_3 = recode(player.decision7_3, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_4 = recode(player.decision6_4, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_5 = recode(player.decision5_5, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_6 = recode(player.decision4_6, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_7 = recode(player.decision3_7, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_8 = recode(player.decision2_8, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_9 = recode(player.decision1_9, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_10 = recode(player.decision0_10, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1))
+  mutate(DG_SN_0 = dplyr::recode(player.decision10_0, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_1 = dplyr::recode(player.decision9_1, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_2 = dplyr::recode(player.decision8_2, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_3 = dplyr::recode(player.decision7_3, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_4 = dplyr::recode(player.decision6_4, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_5 = dplyr::recode(player.decision5_5, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_6 = dplyr::recode(player.decision4_6, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_7 = dplyr::recode(player.decision3_7, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_8 = dplyr::recode(player.decision2_8, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_9 = dplyr::recode(player.decision1_9, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_10 = dplyr::recode(player.decision0_10, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1))
 
 norms_s2 <- norms_s2 %>%
-  mutate(DG_SN_0 = recode(player.decision10_0, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_1 = recode(player.decision9_1, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_2 = recode(player.decision8_2, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_3 = recode(player.decision7_3, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_4 = recode(player.decision6_4, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_5 = recode(player.decision5_5, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_6 = recode(player.decision4_6, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_7 = recode(player.decision3_7, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_8 = recode(player.decision2_8, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_9 = recode(player.decision1_9, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
-         DG_SN_10 = recode(player.decision0_10, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1))
+  mutate(DG_SN_0 = dplyr::recode(player.decision10_0, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_1 = dplyr::recode(player.decision9_1, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_2 = dplyr::recode(player.decision8_2, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_3 = dplyr::recode(player.decision7_3, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_4 = dplyr::recode(player.decision6_4, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_5 = dplyr::recode(player.decision5_5, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_6 = dplyr::recode(player.decision4_6, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_7 = dplyr::recode(player.decision3_7, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_8 = dplyr::recode(player.decision2_8, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_9 = dplyr::recode(player.decision1_9, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1),
+         DG_SN_10 = dplyr::recode(player.decision0_10, `-3` = -1, `-2` = -0.6, `-1` = -0.3, `1` = 0.3, `2` = 0.6, `3` = 1))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2021Kon127", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) #%>% mutate(TreatmentCode = as.numeric(TreatmentCode))

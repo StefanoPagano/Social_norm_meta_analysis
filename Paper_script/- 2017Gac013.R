@@ -72,7 +72,7 @@ dg_appropriateness_sum <- norms1_dg %>%
          give_3 = median(c(N_norm14, N_norm24, N_norm34,N_norm44, N_norm54)),
          give_4 = median(c(N_norm15, N_norm25, N_norm35,N_norm45, N_norm55))) %>% group_by(N_treatment) %>%
   summarise_at(vars(give_0:give_4), sum, na.rm=T) %>%
-  pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>% mutate(sent=recode(Donation, give_0 = 0, give_1 = 1, give_2 =2, give_3 = 3, give_4 = 4))
+  pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>% mutate(sent=dplyr::recode(Donation, give_0 = 0, give_1 = 1, give_2 =2, give_3 = 3, give_4 = 4))
 
 ## compute variance norm
 dg_norms_var <- norms1_dg %>% 
@@ -84,7 +84,7 @@ dg_norms_var <- norms1_dg %>%
          give_4 = median(c(N_norm15, N_norm25, N_norm35,N_norm45, N_norm55))) %>% group_by(N_treatment) %>%
   summarise_at(vars(give_0:give_4), var, na.rm=T) %>%
   pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>%
-  mutate(sent=recode(Donation, give_0 = 0, give_1 = 1, give_2 =2, give_3 = 3, give_4 = 4))
+  mutate(sent=dplyr::recode(Donation, give_0 = 0, give_1 = 1, give_2 =2, give_3 = 3, give_4 = 4))
 
 dg_final_norms <- merge.data.frame(dg_appropriateness_sum, dg_norms_var, by = c("sent", "N_treatment")) %>%
   subset.data.frame(subset = value.x == max(value.x[N_treatment == 0]) | value.x == max(value.x[N_treatment == 1])) %>% 
@@ -114,7 +114,7 @@ tog_appropriateness_sum <- norms1_tog %>%
          give_3 = median(c(N_norm14, N_norm24, N_norm34,N_norm44, N_norm54)),
          give_4 = median(c(N_norm15, N_norm25, N_norm35,N_norm45, N_norm55))) %>% group_by(N_treatment) %>%
   summarise_at(vars(give_0:give_4), sum, na.rm=T) %>%
-  pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>% mutate(sent=recode(Donation, give_0 = -3, give_1 = -2, give_2 =-1, give_3 = 0, give_4 = 1))
+  pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>% mutate(sent=dplyr::recode(Donation, give_0 = -3, give_1 = -2, give_2 =-1, give_3 = 0, give_4 = 1))
 
 ## compute variance norm
 tog_norms_var <- norms1_tog %>% 
@@ -126,7 +126,7 @@ tog_norms_var <- norms1_tog %>%
          give_4 = median(c(N_norm15, N_norm25, N_norm35,N_norm45, N_norm55))) %>% group_by(N_treatment) %>%
   summarise_at(vars(give_0:give_4), var, na.rm=T) %>%
   pivot_longer(cols = c(give_0, give_1, give_2, give_3, give_4), names_to = "Donation") %>%
-  mutate(sent=recode(Donation, give_0 = -3, give_1 = -2, give_2 =-1, give_3 = 0, give_4 = 1))
+  mutate(sent=dplyr::recode(Donation, give_0 = -3, give_1 = -2, give_2 =-1, give_3 = 0, give_4 = 1))
 
 tog_final_norms <- merge.data.frame(tog_appropriateness_sum, tog_norms_var, by = c("sent", "N_treatment")) %>%
   subset.data.frame(subset = value.x == max(value.x[N_treatment == 0]) | value.x == max(value.x[N_treatment == 1])) %>% 

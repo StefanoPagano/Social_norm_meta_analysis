@@ -13,7 +13,7 @@ colnames(dg) <- c("Treatment", "sent", "Pdg_coop", "Age", "Experiment")
 
 # add id variable as a progressive numbers
 dg <- dg %>% mutate(id = c(1:374)) %>%
-  mutate(Pdg_cooperate = recode(Pdg_coop, `1` = 0, `2` = 1 ))
+  mutate(Pdg_cooperate = dplyr::recode(Pdg_coop, `1` = 0, `2` = 1 ))
 
 # norms file
 norms=read_excel("DecisionRevealProsocial_NormElicitationData.xlsx", sheet = "datanew")
@@ -23,16 +23,16 @@ colnames(norms) <- c("Condition", "KW00", "KW10", "KW20", "KW30", "KW40", "KW50"
 
 # recoding
 norms <- norms %>% mutate(id = c(1:195)) %>%
-  mutate(sent = recode(Common_DonateChoice, `1` = 0, `2` = 10, `3` = 20, `4` = 30, `5` = 40, `6` = 50)) %>%
-  mutate(KW00_M = recode(KW00, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KW10_M = recode(KW10, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KW20_M = recode(KW20, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KW30_M = recode(KW30, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KW40_M = recode(KW40, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KW50_M = recode(KW50, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KWPDG_Coop = recode(AppropPGG_COOPERATE,`-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         KWPDG_Def = recode(AppropPGG_DEFECT, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
-         EE_PDG = recode(Common_PGG, `1` = 1, `2` = 0))
+  mutate(sent = dplyr::recode(Common_DonateChoice, `1` = 0, `2` = 10, `3` = 20, `4` = 30, `5` = 40, `6` = 50)) %>%
+  mutate(KW00_M = dplyr::recode(KW00, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW10_M = dplyr::recode(KW10, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW20_M = dplyr::recode(KW20, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW30_M = dplyr::recode(KW30, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW40_M = dplyr::recode(KW40, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW50_M = dplyr::recode(KW50, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KWPDG_Coop = dplyr::recode(AppropPGG_COOPERATE,`-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KWPDG_Def = dplyr::recode(AppropPGG_DEFECT, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         EE_PDG = dplyr::recode(Common_PGG, `1` = 1, `2` = 0))
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2020And089", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -206,7 +206,7 @@ finaldf <- meta_dataset %>%
   rbind.data.frame(finaldf)
 
 # PDG Private (mini PGG)----------------- 
-#### recode di defect (F), calcolo di quanti fanno cooperate
+#### dplyr::recode di defect (F), calcolo di quanti fanno cooperate
 # get information on treatment
 # cleaning PGG
 ## Treatment :  1 if private; or 2 if public
