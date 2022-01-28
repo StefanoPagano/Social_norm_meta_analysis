@@ -516,7 +516,7 @@ model_list_sp <- list()
 n_model=1
 # mlogit
 for (i in levels(as.factor(utility_df_treatment_sp$treatment_id))) {
-  model_sp=mclogit::mclogit(cbind(A,choice)~ other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_sp%>% 
+  model_sp=mclogit::mclogit(cbind(A,choice)~ payoff + other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_sp%>% 
                            filter(treatment_id==i))
   model_list_sp[[n_model]] = model_sp
   n_model = n_model +1
