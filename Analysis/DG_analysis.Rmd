@@ -334,17 +334,16 @@ ggplot(df_specificity_per_subject,
 
 # Individual-level analyses {.tabset}
 
-## Standard
+## Social Expectation Model {.tabset}
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-utility_df_long <- df_consistency_beliefs %>% 
-  group_by(subject_id) %>% 
-  mutate(n_actions_positive = sum(KW_Normative>=0), 
-         n_actions_negative=sum(KW_Normative<0), 
-         specificity = n_actions_negative/n_actions_positive)
+* $\pi_k$ indicate the payoff
+* $A_k$ indicate the norm appropriateness 
 
+### Model
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 mean_beliefs <- df_consistency_beliefs %>%
   group_by(treatment_id, scenarios) %>%
   summarise(mean_app = mean(KW_Normative),
@@ -357,33 +356,38 @@ utility_df_treatment <- choices %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
-betas_standard_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
-# mlogit standard
-model_list <- list()
+# mlogit
+model_se_list <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
+  model_se=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
-  model_list[[n_model]] = model
-  n_model = n_model +1
+  model_se_list[[n_model]] = model_se
+  n_model = n_model + 1
 
-  betas_standard_logit <- betas_standard_logit %>% 
+  betas_se_logit <- betas_se_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model$coefficients[1]),
-                                beta=as.numeric(model$coefficients[2]),
-                                SE_alpha=coef(summary(model))[1, "Std. Error"],
-                                SE_beta=coef(summary(model))[2, "Std. Error"],
-                                MRS = 2*as.numeric(model$coefficients[2])/as.numeric(model$coefficients[1])))
+                                alpha = as.numeric(model_se$coefficients[1]),
+                                beta=as.numeric(model_se$coefficients[2]),
+                                SE_alpha=coef(summary(model_se))[1, "Std. Error"],
+                                SE_beta=coef(summary(model_se))[2, "Std. Error"],
+                                MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
 }
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 
 opts <- options(knitr.kable.NA = "")
-kbl(betas_standard_logit,
+kbl(betas_se_logit,
     digits = 4, 
     booktabs = T, 
     align = "lcccc", 
     centering = F, 
-    caption="Coefficients for standard model") %>%
+    caption="Coefficients for Social Expectation model") %>%
   kable_styling(position = "left", 
                 full_width = F) %>%
   column_spec(1, bold = T)
@@ -391,41 +395,93 @@ kbl(betas_standard_logit,
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T)
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-ggplot(betas_standard_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 ```
 
-## With Standard Deviation
+### Demographic analysis {.tabset}
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+# dataset without Her061, missing age and gender
+utility_df_treatment_demo <- utility_df_treatment %>%
+  filter(paper_id != "2018Her061")
+```
+
+#### Gender
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+
+# mlogit
+model_list_gender <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
+  print(i)
+  model_se_gender=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*female, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  model_list_gender[[n_model]] = model_se_gender
+  n_model = n_model +1
+}
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+tab_model(model_list_gender, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+```
+
+#### Age
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+# mlogit standard
+model_list_age <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
+  print(i)
+  model_se_age=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*age, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  model_list_age[[n_model]] = model_se_age
+  n_model = n_model +1
+}
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+```
+
+## Social Expectation Augmented Model
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-betas_cons_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+betas_sea_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
+model_list_sea <- list()
+n_model = 1
 
-# mlogit consistency
+# mlogit consistency on utility_df_treatment
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
+  model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   
-  betas_cons_logit <- betas_cons_logit %>% 
+  model_list_sea[[n_model]] = model_sea
+  n_model = n_model +1  
+  
+  betas_sea_logit <- betas_sea_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model2$coefficients[1]),
-                                beta=as.numeric(model2$coefficients[2]),
-                                delta=as.numeric(model2$coefficients[3]),
-                                SE_alpha=coef(summary(model2))[1, "Std. Error"],
-                                SE_beta=coef(summary(model2))[2, "Std. Error"],
-                                SE_delta=coef(summary(model2))[3, "Std. Error"],
-                                MRS = 2*as.numeric(model2$coefficients[2])/as.numeric(model2$coefficients[1])))
+                                alpha = as.numeric(model_sea$coefficients[1]),
+                                beta=as.numeric(model_sea$coefficients[2]),
+                                delta=as.numeric(model_sea$coefficients[3]),
+                                SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
+                                SE_beta=coef(summary(model_sea))[2, "Std. Error"],
+                                SE_delta=coef(summary(model_sea))[3, "Std. Error"],
+                                MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
 }
+```
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 opts <- options(knitr.kable.NA = "")
-kbl(betas_cons_logit,
+kbl(betas_sea_logit,
     digits = 4, 
     booktabs = T, 
     align = "lcccc", 
@@ -435,147 +491,44 @@ kbl(betas_cons_logit,
                 full_width = F) %>%
   column_spec(1, bold = T)
 
-ggplot(betas_cons_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+
+ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 
-ggplot(betas_cons_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
 ```
 
 
-## Social preferences model
+## Social Preferences model
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-choices_per_social_model <- choices %>% mutate(payoff=endowment-scenarios,
+choices_df_sp <- choices %>% mutate(payoff=endowment-scenarios,
                               other_payoff_ahead=ifelse(payoff>scenarios,payoff-scenarios,0),
                               other_payoff_behind=ifelse(payoff<scenarios,scenarios-payoff,0))
 
-utility_df_treatment_2 <- choices_per_social_model %>%
+utility_df_treatment_sp <- choices_df_sp %>%
   merge.data.frame(mean_beliefs) %>%
   arrange(paper_id,treatment_id,subject_id,scenarios) %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
-betas_standard_logit <- data.frame(paper = NA, rho=NA, sigma=NA, SE_rho=NA, SE_sigma=NA)
-
-model_list2 <- list()
-n_model2=1
+model_list_sp <- list()
+n_model=1
 # mlogit
-for (i in levels(as.factor(utility_df_treatment_2$treatment_id))) {
-  model2=mclogit::mclogit(cbind(A,choice)~ other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_2%>% 
+for (i in levels(as.factor(utility_df_treatment_sp$treatment_id))) {
+  model_sp=mclogit::mclogit(cbind(A,choice)~ other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_sp%>% 
                            filter(treatment_id==i))
-  model_list2[[n_model2]] = model2
-  n_model2 = n_model2 +1
- 
-  
-  # betas_cons_logit <- betas_cons_logit %>% 
-  #   rbind.data.frame(data.frame(paper = i, 
-  #                               rho = as.numeric(model2$coefficients[1]),
-  #                               sigma=as.numeric(model2$coefficients[2]),
-  #                               SE_rho=coef(summary(model2))[1, "Std. Error"],
-  #                               SE_sigma=coef(summary(model2))[2, "Std. Error"]))
-}
-
-# opts <- options(knitr.kable.NA = "")
-# kbl(betas_cons_logit,
-#     digits = 4, 
-#     booktabs = T, 
-#     align = "lccc", 
-#     centering = F, 
-#     caption="Coefficients for model with std") %>%
-#   kable_styling(position = "left", 
-#                 full_width = F) %>%
-#   column_spec(1, bold = T)
-# 
-# ggplot(betas_cons_logit %>% filter(!(is.na(sigma))) %>% arrange(sigma), aes(x=sigma,y=paper)) +
-#   geom_point() +
-#   geom_errorbar(aes(xmin=sigma-2*SE_sigma,xmax=sigma+2*SE_sigma))
-# 
-# ggplot(betas_cons_logit %>% filter(!(is.na(rho))) %>% arrange(rho), aes(x=rho,y=paper)) +
-#   geom_point() +
-#   geom_errorbar(aes(xmin=rho-2*SE_rho,xmax=rho+2*SE_rho))
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_list2, dv.labels = levels(as.factor(utility_df_treatment_2$treatment_id)), show.aic = T, show.loglik = T)
-
-```
-
-## Demographic analysis {.tabset}
-
-### Gender
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-utility_df_long <- df_consistency_beliefs %>% 
-  group_by(subject_id) %>% 
-  mutate(n_actions_positive = sum(KW_Normative>=0), 
-         n_actions_negative=sum(KW_Normative<0), 
-         specificity = n_actions_negative/n_actions_positive)
-
-mean_beliefs <- df_consistency_beliefs %>%
-  group_by(treatment_id, scenarios) %>%
-  summarise(mean_app = mean(KW_Normative),
-            sd_app = sd(KW_Normative))
-
-utility_df_treatment_3 <- choices %>%
-  merge.data.frame(mean_beliefs) %>%
-  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
-  mutate(payoff = endowment - scenarios) %>%
-  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
-           payoff,mean_app,sd_app) %>%
-  filter(paper_id != "2018Her061")
-
-
-# mlogit standard
-model_list3 <- list()
-n_model = 1
-for (i in levels(as.factor(utility_df_treatment_3$treatment_id))) {
-  print(i)
-  model3=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*female, data=utility_df_treatment%>% 
-                           filter(treatment_id==i))
-  model_list3[[n_model]] = model3
+  model_list_sp[[n_model]] = model_sp
   n_model = n_model +1
 }
-
-tab_model(model_list3, dv.labels = levels(as.factor(utility_df_treatment_3$treatment_id)), show.aic = T, show.loglik = T)
 ```
-### Age
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-utility_df_long <- df_consistency_beliefs %>% 
-  group_by(subject_id) %>% 
-  mutate(n_actions_positive = sum(KW_Normative>=0), 
-         n_actions_negative=sum(KW_Normative<0), 
-         specificity = n_actions_negative/n_actions_positive)
+tab_model(model_list_sp, dv.labels = levels(as.factor(utility_df_treatment_sp$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 
-mean_beliefs <- df_consistency_beliefs %>%
-  group_by(treatment_id, scenarios) %>%
-  summarise(mean_app = mean(KW_Normative),
-            sd_app = sd(KW_Normative))
-
-utility_df_treatment_4 <- choices %>%
-  merge.data.frame(mean_beliefs) %>%
-  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
-  mutate(payoff = endowment - scenarios) %>%
-  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
-           payoff,mean_app,sd_app) %>%
-  filter(paper_id != "2018Her061")
-
-
-# mlogit standard
-model_list4 <- list()
-n_model = 1
-for (i in levels(as.factor(utility_df_treatment_4$treatment_id))) {
-  print(i)
-  model4=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*age, data=utility_df_treatment%>% 
-                           filter(treatment_id==i))
-  model_list4[[n_model]] = model4
-  n_model = n_model +1
-}
-
-tab_model(model_list4, dv.labels = levels(as.factor(utility_df_treatment_4$treatment_id)), show.aic = T, show.loglik = T)
 ```
-
