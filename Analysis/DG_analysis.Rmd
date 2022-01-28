@@ -356,6 +356,8 @@ utility_df_treatment <- choices %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
 
+utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
+
 # dataset without Her061, missing age and gender
 utility_df_treatment_demo <- utility_df_treatment %>%
   filter(paper_id != "2018Her061")
@@ -499,7 +501,41 @@ ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=del
 ```
 
 
-## Social Preferences model
+<!-- ## Social Preferences model -->
+
+<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE} -->
+<!-- choices_df_sp <- choices %>% mutate(payoff=endowment-scenarios, -->
+<!--                               other_payoff_ahead=ifelse(payoff>scenarios,payoff-scenarios,0), -->
+<!--                               other_payoff_behind=ifelse(payoff<scenarios,scenarios-payoff,0)) -->
+
+<!-- utility_df_treatment_sp <- choices_df_sp %>% -->
+<!--   merge.data.frame(mean_beliefs) %>% -->
+<!--   arrange(paper_id,treatment_id,subject_id,scenarios) %>% -->
+<!--   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment, -->
+<!--            payoff,mean_app,sd_app)  -->
+
+<!-- utility_df_treatment_sp$id = utility_df_treatment_sp %>% group_indices(subject_id) -->
+
+<!-- model_list_sp <- list() -->
+<!-- n_model=1 -->
+<!-- # mlogit -->
+<!-- for (i in levels(as.factor(utility_df_treatment_sp$treatment_id))) { -->
+<!--   model_sp=mclogit::mclogit(cbind(A,id)~ other_payoff_behind, data=utility_df_treatment_sp%>%  -->
+<!--                            filter(treatment_id==i)) -->
+<!--   model_list_sp[[n_model]] = model_sp -->
+<!--   n_model = n_model +1 -->
+<!-- } -->
+<!-- ``` -->
+
+
+<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""} -->
+<!-- tab_model(model_list_sp, dv.labels = levels(as.factor(utility_df_treatment_sp$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates") -->
+
+<!-- ``` -->
+
+## Social Preferences mlogit model (Fehr & Schimdt 1999)
+
+$U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk})$
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 choices_df_sp <- choices %>% mutate(payoff=endowment-scenarios,
@@ -510,21 +546,29 @@ utility_df_treatment_sp <- choices_df_sp %>%
   merge.data.frame(mean_beliefs) %>%
   arrange(paper_id,treatment_id,subject_id,scenarios) %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
-           payoff,mean_app,sd_app)
+           payoff,mean_app,sd_app) 
 
-model_list_sp <- list()
-n_model=1
+utility_df_treatment_sp$id = utility_df_treatment_sp %>% group_indices(subject_id)
+
+
 # mlogit
-for (i in levels(as.factor(utility_df_treatment_sp$treatment_id))) {
-  model_sp=mclogit::mclogit(cbind(A,choice)~ payoff + other_payoff_ahead + other_payoff_behind, data=utility_df_treatment_sp%>% 
-                           filter(treatment_id==i))
-  model_list_sp[[n_model]] = model_sp
-  n_model = n_model +1
-}
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2016Kim003_7" & subject_id != "2016Kim003_7_2222"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper1 <- mlogit(A~ other_payoff_ahead + other_payoff_behind| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2018Her061_9"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper2 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2019Cha026_1"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper3 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2020Bas115_2a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper4 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4)
 ```
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_list_sp, dv.labels = levels(as.factor(utility_df_treatment_sp$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
-
+tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 ```
