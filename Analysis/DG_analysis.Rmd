@@ -334,14 +334,13 @@ ggplot(df_specificity_per_subject,
 
 # Individual-level analyses {.tabset}
 
-## Social Expectation Model {.tabset}
+## Social Expectation Model
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
 
-* $\pi_k$ indicate the payoff
-* $A_k$ indicate the norm appropriateness 
+* $\pi_k$ indicates the payoff
+* $A_k$ indicates the norm appropriateness 
 
-### Model
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 mean_beliefs <- df_consistency_beliefs %>%
@@ -355,6 +354,10 @@ utility_df_treatment <- choices %>%
   mutate(payoff = endowment - scenarios) %>%
   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
            payoff,mean_app,sd_app)
+
+# dataset without Her061, missing age and gender
+utility_df_treatment_demo <- utility_df_treatment %>%
+  filter(paper_id != "2018Her061")
 
 betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
@@ -375,44 +378,8 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
                                 SE_beta=coef(summary(model_se))[2, "Std. Error"],
                                 MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
 }
-```
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
-
-opts <- options(knitr.kable.NA = "")
-kbl(betas_se_logit,
-    digits = 4, 
-    booktabs = T, 
-    align = "lcccc", 
-    centering = F, 
-    caption="Coefficients for Social Expectation model") %>%
-  kable_styling(position = "left", 
-                full_width = F) %>%
-  column_spec(1, bold = T)
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
-  geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
-```
-
-### Demographic analysis {.tabset}
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-# dataset without Her061, missing age and gender
-utility_df_treatment_demo <- utility_df_treatment %>%
-  filter(paper_id != "2018Her061")
-```
-
-#### Gender
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-
-# mlogit
+# mlogit gender
 model_list_gender <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
@@ -422,17 +389,8 @@ for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
   model_list_gender[[n_model]] = model_se_gender
   n_model = n_model +1
 }
-```
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_list_gender, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
-```
-
-#### Age
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
-# mlogit standard
+# mlogit age
 model_list_age <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
@@ -446,12 +404,49 @@ for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+opts <- options(knitr.kable.NA = "")
+kbl(betas_se_logit,
+    digits = 4, 
+    booktabs = T, 
+    align = "lcccc", 
+    centering = F, 
+    caption="Coefficients for Social Expectation model") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
+  column_spec(1, bold = T)
+
+ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+```
+
+### Model Estimates
+
+#### Standard
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#standard
+tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation")
+```
+
+#### Gender
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#gender
+tab_model(model_list_gender, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
+```
+
+#### Age
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#age
+tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
 ```
 
 ## Social Expectation Augmented Model
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
+
+* $\pi_k$ indicates the payoff
+* $A_k$ indicates the norm appropriateness 
+* $C_k$ indicates the consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 betas_sea_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
