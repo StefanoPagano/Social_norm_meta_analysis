@@ -368,7 +368,7 @@ betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta
 model_se_list <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model_se=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
+  model_se=mclogit::mclogit(cbind(A,choice) ~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   model_se_list[[n_model]] = model_se
   n_model = n_model + 1
@@ -387,7 +387,7 @@ model_list_gender <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
   print(i)
-  model_se_gender=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*female, data=utility_df_treatment%>% 
+  model_se_gender=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app:female, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   model_list_gender[[n_model]] = model_se_gender
   n_model = n_model +1

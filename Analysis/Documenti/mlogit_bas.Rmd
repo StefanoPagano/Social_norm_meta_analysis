@@ -1,0 +1,117 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(mlogit)
+library(readr)
+
+Basic_Verrina_2021 <- read.csv("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020Bas115/Basic_Verrina_2021.csv", sep = ",")
+
+dataset_bas <- Basic_Verrina_2021 %>% 
+  select(code, give, role_DG, social, dg_sn_1:dg_sn_11, demo_gender) %>%
+  filter(role_DG==1 & social==0) %>%
+  mutate(payoff_0 = 10,
+         payoff_1 = 9,
+         payoff_2 = 8,
+         payoff_3 = 7,
+         payoff_4 = 6,
+         payoff_5 = 5,
+         payoff_6 = 4,
+         payoff_7 = 3,
+         payoff_8 = 2,
+         payoff_9 = 1,
+         payoff_10 = 0)  %>%
+  mutate(dg_sn_1 = dplyr::recode(dg_sn_1, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_2 = dplyr::recode(dg_sn_2, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_3 = dplyr::recode(dg_sn_3, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_4 = dplyr::recode(dg_sn_4, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_5 = dplyr::recode(dg_sn_5, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_6 = dplyr::recode(dg_sn_6, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_7 = dplyr::recode(dg_sn_7, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_8 = dplyr::recode(dg_sn_8, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_9 = dplyr::recode(dg_sn_9, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_10 = dplyr::recode(dg_sn_10, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1),
+         dg_sn_11 = dplyr::recode(dg_sn_11, `1` = -1, `2` = -0.6, `3` = -0.3, `4` = 0.3, `5` = 0.6, `6` = 1))
+
+df_long <- reshape(
+  dataset_bas,
+  direction = "long",
+  varying = list(norm_app = 5:15, payoff = 17:27),
+  v.names = c("norms", "payoff"),
+  timevar = "scenarios"
+) %>%
+  arrange(id, scenarios) %>%
+  mutate(scenarios = scenarios - 1) %>%
+  mutate(A = give == scenarios,
+         dictator_final_payoff_position = ifelse(scenarios >= 5,"behind", "ahead"),
+         payoff_factor = as.factor(payoff),
+         female = as.factor(ifelse(demo_gender==1,1,0)))
+```
+
+
+```{r}
+yyy <- xtabs(~norms + A, data=df_long)
+xxx <- xtabs(A ~ norms, data = df_long) #count for each appropriateness level how much subject choice the scenarios
+zzz <- xtabs(~ norms + payoff, data = df_long) 
+plot(yyy)
+plot(xxx)
+plot(zzz)
+```
+
+
+```{r include=FALSE}
+#model
+df_long_model <- mlogit.data(df_long,
+                             shape = "long",
+                             choice = "A",
+                             alt.var = "scenarios")
+```
+
+choice = payoff + norms
+```{r}
+try(m1_int <- mlogit(A ~ payoff + norms, data=df_long_model))
+try(summary(m1_int))
+```
+
+choice = payoff + norms (no intercepts)
+```{r}
+m1_no_int <- mlogit(A ~ 0 + payoff + norms, data=df_long_model, rpar = c(norms = "n"), panel = T)
+summary(m1_no_int)
+```
+
+choice = payoff + norms + dictator_final_payoff_position (no intercepts)
+```{r}
+m2 <- mlogit(A ~ 0 + payoff + norms + dictator_final_payoff_position, data=df_long_model)
+summary(m2)
+```
+
+Likelihood ratio test
+```{r}
+lrtest(m1_no_int,m2)
+```
+
+choice = payoff as factors + norms (no intercepts)
+```{r}
+m3 <- mlogit(A ~ 0 + payoff_factor + norms, data=df_long_model)
+summary(m3)
+
+```
+
+gender interaction
+choice = payoff + norms + gender interaction (no intercepts)
+```{r}
+m4 <- mlogit(A ~ 0 + payoff + norms + norms:female, data=df_long_model)
+summary(m4)
+```
+without variables
+```{r}
+m5 <- mlogit(A ~ 1, data=df_long_model)
+summary(m5)
+```
+
