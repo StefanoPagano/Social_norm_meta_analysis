@@ -4,6 +4,9 @@ rm(list = ls())
 
 # Run paper script
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2013Kru001.R")
+
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2016Kim003.R")
 
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
@@ -49,6 +52,8 @@ source("2017Sen116.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2021Kon127.R")
 
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2007Lis165.R")
 
 rm(list = ls())
 
@@ -56,8 +61,12 @@ rm(list = ls())
 # Create the master file -> merge all csv file
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/")
 
+Paper_001=read.csv("2013Kru001_finaldf.csv", sep=",")
+master <- Paper_001
+
 Paper_003=read.csv("2016Kim003_finaldf.csv", sep=",")
-master <- Paper_003
+master <- Paper_003 %>% 
+  rbind.data.frame(master)
 
 Paper_026=read.csv("2019Cha026_finaldf.csv", sep=",")
 master <- Paper_026 %>% 
@@ -109,6 +118,10 @@ master <- Paper_116 %>%
 
 Paper_127=read.csv("2021Kon127_finaldf.csv", sep=",")
 master <- Paper_127 %>% 
+  rbind.data.frame(master)
+
+Paper_165=read.csv("2007Lis165_finaldf.csv", sep=",")
+master <- Paper_165 %>% 
   rbind.data.frame(master)
 
 
