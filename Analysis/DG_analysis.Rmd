@@ -1,12 +1,14 @@
 ---
-title: "dg_analysis"
-author: "Sp & AG"
+title: "DG e ToG Analysis"
+author: "Pagano S. & Guido A."
 date: "03/02/2022"
 output: 
   html_document:
     toc: True
     toc_float: True
-  
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
@@ -57,30 +59,44 @@ beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>%
 
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>%
   filter(treatment_id %in% levels(as.factor(paste(master$PaperID,"_",master$TreatmentCode, sep=""))))
-
 ```
 
-# Description of data included
-
-## Search criteria
+# Search criteria {.tabset .tabset-pills}
 
 The selection criteria to identify papers in target was:
 
-* **Game type** (cooperation and prosociality games):
-  + Dictator Game
-* Presence of norm elicitation task:
-  + Krupka and Weber (2013);
-* Only monetary incentivized studies (both choices and norms elicitation).
-* Baseline treatment (no framing)
-* Standard game
-  + Not a minigame
-  + Two players
-  + No papers that give the recipient any kind of power (and thereby bring the experiment close to an ultimatum game);
-  + No papers that mix the motive of benevolence with one of sanctioning the recipient
-  + No papers that limit the dictator’s action space such that it does not include the option to give nothing nor to take from the recipient
-  + No real effort task used to determine the dictator’s endowment
-* Both choice and normative task
-* Data available
+-   **Game type** (cooperation and prosociality games):
+
+    -   Dictator Game
+    -   Take or Give Game
+
+-   Presence of norm elicitation task:
+
+    -   Krupka and Weber (2013);
+
+-   Only monetary incentivized studies (both choices and norms
+    elicitation).
+
+-   Baseline treatment (no framing)
+
+-   Standard game
+
+    -   Not a minigame
+    -   Two players
+    -   No papers that give the recipient any kind of power (and thereby
+        bring the experiment close to an ultimatum game);
+    -   No papers that mix the motive of benevolence with one of
+        sanctioning the recipient
+    -   No papers that limit the dictator's action space such that it
+        does not include the option to give nothing nor to take from the
+        recipient
+    -   No real effort task used to determine the dictator's endowment
+
+-   Both choice and normative task
+
+-   Data available
+
+## Dictator Game {.tabset .tabset-pills}
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
@@ -97,10 +113,11 @@ kbl(list_of_paper_in_target,
   column_spec(1, bold = T)
 ```
 
-# Plots {.tabset .tabset-pills}
+### Descriptive Plots {.tabset .tabset-pills}
+
 <!-- tab: beliefs, choices -->
 
-## Beliefs
+#### Beliefs
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 setwd("../")
@@ -154,7 +171,7 @@ do.call('grid.arrange',
         c(list_plot, ncol = 2))
 ```
 
-## Choices
+#### Choices
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 # dataset
@@ -205,16 +222,17 @@ for (i in temp_master$treatment_id) {
 do.call('grid.arrange',c(list_plot, ncol = 2))
 ```
 
-# Consistency and Specificity {.tabset .tabset-pills}
+### Consistency and Specificity {.tabset .tabset-pills}
+
 <!-- tab: consistency, specificity -->
 
-## Formulas
+<!-- #### Formulas -->
 
-$$ consistency = \frac{1}{\sigma_n}$$
+<!-- $$ consistency = \frac{1}{\sigma_n}$$ -->
 
-$$ specificity = \frac{\#\ of\ negative\ actions}{\#\ of\ positive\ actions}$$
+<!-- $$ specificity = \frac{\#\ of\ negative\ actions}{\#\ of\ positive\ actions}$$ -->
 
-## Consistency
+#### Consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # interpolation of appropriateness with scenarios out of game
@@ -302,7 +320,6 @@ output <- merge.data.frame(scenarios_w_max_appropriateness,
 # beliefs %>% filter(scenarios==0) %>% group_by(treatment_id) %>% summarise(n_b=n()) %>% merge.data.frame(o) %>% mutate(test=ifelse(n_b-n_o==0,"ok","n"))
 ```
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 ggplot(output,
        aes(x=treatment_id,
@@ -318,7 +335,7 @@ ggplot(output,
   facet_wrap(~treatment_id, ncol=2)
 ```
 
-## Specificity
+#### Specificity
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 
@@ -339,16 +356,14 @@ ggplot(df_specificity_per_subject,
 
 ```
 
+### Individual-level analyses {.tabset .tabset-pills}
 
-# Individual-level analyses {.tabset .tabset-pills}
-
-## Social Expectation Model
+#### Social Expectation Model
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
 
-* $\pi_k$ indicates the payoff
-* $A_k$ indicates the norm appropriateness 
-
+-   $\pi_k$ indicates the payoff
+-   $A_k$ indicates the norm appropriateness
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 mean_beliefs <- df_consistency_beliefs %>%
@@ -405,13 +420,12 @@ model_list_age <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
   print(i)
-  model_se_age=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app:age, data=utility_df_treatment%>% 
+  model_se_age=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app:age, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   model_list_age[[n_model]] = model_se_age
   n_model = n_model +1
 }
 ```
-
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 opts <- options(knitr.kable.NA = "")
@@ -430,33 +444,34 @@ ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y
   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
 ```
 
-### Model Estimates
+<br> <br> **Model Estimates** <br> *Standard* <br>
 
-#### Standard
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #standard
 tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation")
 ```
 
-#### Gender
+<br> <br> *Gender* <br>
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #gender
 tab_model(model_list_gender, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
 ```
 
-#### Age
+<br> <br> *Age* <br>
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #age
-tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
+tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with age")
 ```
 
-## Social Expectation Augmented Model
+#### Social Expectation Augmented Model
 
 $U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
 
-* $\pi_k$ indicates the payoff
-* $A_k$ indicates the norm appropriateness 
-* $C_k$ indicates the consistency
+-   $\pi_k$ indicates the payoff
+-   $A_k$ indicates the norm appropriateness
+-   $C_k$ indicates the consistency
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 betas_sea_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
@@ -483,7 +498,6 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 }
 ```
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 opts <- options(knitr.kable.NA = "")
 kbl(betas_sea_logit,
@@ -507,40 +521,7 @@ ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=del
   geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
 ```
 
-
-<!-- ## Social Preferences model -->
-
-<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE} -->
-<!-- choices_df_sp <- choices %>% mutate(payoff=endowment-scenarios, -->
-<!--                               other_payoff_ahead=ifelse(payoff>scenarios,payoff-scenarios,0), -->
-<!--                               other_payoff_behind=ifelse(payoff<scenarios,scenarios-payoff,0)) -->
-
-<!-- utility_df_treatment_sp <- choices_df_sp %>% -->
-<!--   merge.data.frame(mean_beliefs) %>% -->
-<!--   arrange(paper_id,treatment_id,subject_id,scenarios) %>% -->
-<!--   relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment, -->
-<!--            payoff,mean_app,sd_app)  -->
-
-<!-- utility_df_treatment_sp$id = utility_df_treatment_sp %>% group_indices(subject_id) -->
-
-<!-- model_list_sp <- list() -->
-<!-- n_model=1 -->
-<!-- # mlogit -->
-<!-- for (i in levels(as.factor(utility_df_treatment_sp$treatment_id))) { -->
-<!--   model_sp=mclogit::mclogit(cbind(A,id)~ other_payoff_behind, data=utility_df_treatment_sp%>%  -->
-<!--                            filter(treatment_id==i)) -->
-<!--   model_list_sp[[n_model]] = model_sp -->
-<!--   n_model = n_model +1 -->
-<!-- } -->
-<!-- ``` -->
-
-
-<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""} -->
-<!-- tab_model(model_list_sp, dv.labels = levels(as.factor(utility_df_treatment_sp$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates") -->
-
-<!-- ``` -->
-
-## Social Preferences mlogit model (Fehr & Schimdt 1999)
+#### Social Preferences mlogit model (Fehr & Schimdt 1999)
 
 $U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk})$
 
@@ -584,7 +565,28 @@ ml.paper7 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6, ml.paper7)
 ```
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a", "2007Lis165_1a", "2012Laz164_3", "2013Kru001"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 ```
+
+## Take or Give Game
+
+### Descriptive Plots {.tabset .tabset-pills}
+
+#### Beliefs
+
+#### Choices
+
+### Consistency and Specificity {.tabset .tabset-pills}
+
+#### Consistency
+
+#### Specificity
+
+### Individual-level analysis {.tabset .tabset-pills}
+
+#### Social Expectation Model
+
+#### Social Expectation Augmented Model
+
+#### Social Preferences mlogit model (Fehr & Schimdt 1999)

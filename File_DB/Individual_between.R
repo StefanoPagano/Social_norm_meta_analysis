@@ -651,7 +651,7 @@ Kru001_bully_beliefs <- Kru001_bully_beliefs %>%
 
 # Paper: 2013Kru001-Lazear ----
 
-# aggragate data ----
+## aggragate data ----
 
 ### set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
