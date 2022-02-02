@@ -310,7 +310,7 @@ ggplot(output,
   geom_boxplot() +
   labs(title="Distribution of appropriateness of most appropriate action (norm)") +
   xlab("Paper") +
-  ylab("Appropriateness")
+  scale_y_continuous(limits = quantile(output$KW_Normative, c(0.1, 0.9))) + ylab("Appropriateness")
 
 ggplot(output,
        aes(x=KW_Normative)) +
@@ -405,7 +405,7 @@ model_list_age <- list()
 n_model = 1
 for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
   print(i)
-  model_se_age=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*age, data=utility_df_treatment%>% 
+  model_se_age=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app:age, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   model_list_age[[n_model]] = model_se_age
   n_model = n_model +1
