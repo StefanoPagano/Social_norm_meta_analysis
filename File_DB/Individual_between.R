@@ -521,6 +521,76 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
+
+#### Paper: 2013Kru001-Lazear ----
+
+# set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+
+## choices
+lazear_choice <- read_excel("Lazear_combined_kru.xlsx") %>%
+  filter(choice == 1,
+         option >= 0,
+         sortingdata == 1) %>%
+  select(option) %>%
+  mutate(id = row_number()) %>%
+  mutate(endowment = 10) %>%
+  mutate(coop = option/endowment) %>%
+  mutate(age= NA) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2012Laz164", "3", id, sep = "_"),
+         treatment_id = paste("2012Laz164", "3", sep = "_"), 
+         paper_id = "2012Laz164")
+  
+Laz164_choices <- as.data.frame(lapply(lazear_choice, rep, 11)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(c(0:10),length(unique(lazear_choice$subject_id))),
+         A= ifelse(option==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, option, endowment, coop, age, female)
+
+colnames(Laz164_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female")
+
+Laz164_choices <- Laz164_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop))
+
+
+## beliefs
+
+lazear_norms=read_excel("merged_2012.xlsx") %>% filter(amount >= 0 &
+                                                  amount <=10 &
+                                                  pass == 1 &
+                                                  passplay == 1 &
+                                                  !is.na(rating)) %>%
+  select(amount, rating, subjectid) %>%
+  mutate(subject_id = paste("2012Laz164", "3", subjectid, sep = "_"),
+         treatment_id = paste("2012Laz164", "3", sep = "_"), 
+         paper_id = "2012Laz164",
+         sent = 10 - amount,
+         female = NA,
+         age = NA) %>%
+  relocate(paper_id, treatment_id, subject_id, sent, rating)
+
+Laz164_beliefs <- lazear_norms %>%
+  select(paper_id, treatment_id, subject_id, sent, rating, female, age) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
+
+colnames(Laz164_beliefs) <- c("treatment_id","paper_id", "subject_id", "scenarios", "KW_Normative", "female", "age", "Game_type", "Separate_sample_beliefs")
+
+Laz164_beliefs <- Laz164_beliefs %>%
+  relocate(subject_id, treatment_id, paper_id, age, female, Game_type, scenarios, KW_Normative) %>% 
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs))
+
+
+
+#### drop ---- 
 rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Kim003_choice_dg", 
                              "Kim003_beliefs_ug",
@@ -532,138 +602,6 @@ rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Her061_choice",
                              "Her061_beliefs",
                              "Bas115_beliefs",
-                             "Bas115_choice"))])
-#### Paper: 2013Kim001-Lazear ----
-
-# set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
-
-lazear_choice <- read.dta("Combined_Clogit_data.dta")
-norms_lazear <- read.dta("merged_2012.dta")
-
-Cha026_beliefs_1 <- Cha026_db_norms_1 %>%
-  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment, order)) %>%
-  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
-
-colnames(Cha026_beliefs_1) <- c("treatment_id", "scenarios", "KW_Normative", "age", "female", "subject_id",  "paper_id", "Game_type", "Separate_sample_beliefs")
-
-Cha026_beliefs_1 <- Cha026_beliefs_1 %>%
-  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, KW_Normative) %>% 
-  mutate(KW_Personal = NA,
-         Bicchieri_Empirical = NA,
-         Bicchieri_Normative = NA,
-         Bicchieri_Personal = NA,
-         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(Separate_sample_beliefs))
-
-Cha026_choice_1 <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, female = NA, age = NA)
-dbbase <- Choice_Cha026_DB_1 %>%
-  mutate(n = c(1:length(Choice_Cha026_DB_1$subject_id)))
-
-j = 1
-
-for (x in dbbase$n) {
-  ewt = dbbase$endowment[x]
-  for (i in 0:ewt) {
-    new_line_DB <- data.frame(p = j,
-                              subject_id = dbbase$subject_id[x], 
-                              treatment_id = dbbase$treatment_id[x],
-                              paper_id = dbbase$paper_id[x],
-                              scenarios = i, 
-                              choice = dbbase$choice[x],
-                              endowment = dbbase$endowment[x],
-                              A = 0,
-                              female = dbbase$female[x],
-                              age = dbbase$age[x])
-    
-    Cha026_choice_1 <- new_line_DB %>% rbind.data.frame(Cha026_choice_1) %>% arrange(p)
-    j = j+1
-    
-  }
-  
-}
-
-Cha026_choice_1 <- Cha026_choice_1 %>%
-  subset.data.frame(subset = endowment >= 0) %>%
-  mutate(A = ifelse(scenarios == choice, 1, 0))
-
-Cha026_choice_1 <- Cha026_choice_1 %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
-  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
-  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(Separate_sample_beliefs))
-
-# treatment frame tax
-# n_progr_1 <- c(1:400)
-Cha026_sub_2 <- Cha026 %>%
-  subset.data.frame(select = coldg, subset = frame_tax == 1) %>%
-  subset.data.frame(subset = elicit_norms == 0) %>%
-  subset.data.frame(subset = order == 1) %>%  
-  subset.data.frame(subset = endowment == 10) %>%
-  mutate(sent = endowment - keep) %>%
-  mutate(coop = sent/endowment) %>%
-  mutate(subject_id = paste("2019Cha026", "2", subject, sep = "_")) %>%
-  mutate(treatment_id = paste("2019Cha026", "2", sep = "_"), paper_id = "2019Cha026")
-
-colnames(Cha026_sub_2) <- c("subject","elicit_norms","frame_tax", "order", "endowment", "keep", "female", "age","choice", "cooperation", "subject_id", "treatment_id", "paper_id")
-
-Cha026_sub_2 <- Cha026_sub_2 %>%
-  subset.data.frame(select = -c(subject, elicit_norms, frame_tax, keep, order)) %>% 
-  relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, female, age) 
-
-Choice_Cha026_DB_2 <- Cha026_sub_2 
-
-Cha026_beliefs_2 <- Cha026_db_norms_2 %>%
-  subset.data.frame(select = -c(elicit_norms, subject, frame_tax, endowment, order)) %>%
-  merge.data.frame(df_merge_game_type, by = c("treatment_id"))
-
-colnames(Cha026_beliefs_2) <- c("treatment_id", "scenarios", "KW_Normative", "age", "female", "subject_id",  "paper_id", "Game_type", "Separate_sample_beliefs")
-
-Cha026_beliefs_2 <- Cha026_beliefs_2 %>%
-  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, KW_Normative) %>% 
-  mutate(KW_Personal = NA,
-         Bicchieri_Empirical = NA,
-         Bicchieri_Normative = NA,
-         Bicchieri_Personal = NA,
-         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(Separate_sample_beliefs))
-
-Cha026_choice_2 <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, female = NA, age = NA, Design = NA)
-dbbase <- Choice_Cha026_DB_2 %>%
-  mutate(n = c(1:length(Choice_Cha026_DB_2$subject_id)))
-
-j = 1
-
-for (x in dbbase$n) {
-  ewt = dbbase$endowment[x]
-  for (i in 0:ewt) {
-    new_line_DB <- data.frame(p = j,
-                              subject_id = dbbase$subject_id[x], 
-                              treatment_id = dbbase$treatment_id[x],
-                              paper_id = dbbase$paper_id[x],
-                              scenarios = i, 
-                              choice = dbbase$choice[x],
-                              endowment = dbbase$endowment[x],
-                              A = 0,
-                              female = dbbase$female[x],
-                              age = dbbase$age[x],
-                              Design = "Between")
-    
-    Cha026_choice_2 <- new_line_DB %>% rbind.data.frame(Cha026_choice_2) %>% arrange(p)
-    j = j+1
-    
-  }
-  
-}
-
-Cha026_choice_2 <- Cha026_choice_2 %>%
-  subset.data.frame(subset = endowment >= 0) %>%
-  mutate(A = ifelse(scenarios == choice, 1, 0))
-
-Cha026_choice_2 <- Cha026_choice_2 %>%
-  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
-  relocate(p, subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
-  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(Separate_sample_beliefs))
-
-
+                             "Bas115_choice",
+                             "Laz164_choices",
+                             "Laz164_beliefs"))])
