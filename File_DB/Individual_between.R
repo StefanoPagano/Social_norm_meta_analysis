@@ -758,7 +758,7 @@ Lis165_base_choices <- Lis165_base_choices %>%
 
 ### beliefs
 
-list_base_norms=read_excel("merged_2012.xlsx") %>% filter(ListTake==T & 
+list_base_norms=read_excel("merged_2012.xlsx") %>% filter(ListGive==T & 
                                                        amount >= 0.0 & 
                                                        amount <= 6.0 & 
                                                        amount != 5.5 &
@@ -824,7 +824,7 @@ Lis165_take1_choices <- Lis165_take1_choices %>%
 
 ### beliefs
 
-list_take1_norms=read_excel("merged_2012.xlsx") %>% filter(ListGive==T & 
+list_take1_norms=read_excel("merged_2012.xlsx") %>% filter(ListTake==T & 
                                                             amount >= 0.0 & 
                                                             amount <= 6.0 & 
                                                             amount != 5.5 &
