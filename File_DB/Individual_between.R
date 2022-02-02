@@ -4,8 +4,7 @@ csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysi
 df_merge_game_type = read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
-#### BETWEEN SUBJECTS DESIGN ----
-#### Paper: 2018Her061 ----
+# Paper: 2018Her061 ----
 
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2018Her061")
@@ -96,7 +95,7 @@ Her061_choice <- Her061_choice %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
 
-#### Paper: 2019Cha026 ----
+# Paper: 2019Cha026 ----
 
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
@@ -281,7 +280,7 @@ Cha026_choice_2 <- Cha026_choice_2 %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
 
-#### Paper: 2016Kim003 ----
+# Paper: 2016Kim003 ----
 
 # set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
@@ -522,12 +521,14 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
 
-#### Paper: 2013Kru001-Lazear ----
+# Paper: 2013Kru001-Lazear ----
 
-# set wd 
+# aggragate data ----
+
+### set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
-## choices
+### choices
 lazear_choice <- read_excel("Lazear_combined_kru.xlsx") %>%
   filter(choice == 1,
          option >= 0,
@@ -554,10 +555,11 @@ Laz164_choices <- Laz164_choices %>%
   merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
-  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop))
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop)) %>%
+  mutate(p=NA)
 
 
-## beliefs
+### beliefs
 
 lazear_norms=read_excel("merged_2012.xlsx") %>% filter(amount >= 0 &
                                                   amount <=10 &
@@ -588,9 +590,144 @@ Laz164_beliefs <- Laz164_beliefs %>%
          Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
+# Paper: 2013Kru001-List ----
+
+df <- read_excel("list_data.xlsx")
+
+## baseline ----
+
+### set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+
+### choices
+list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
+  filter(take == 0) %>%
+  mutate(id = row_number()) %>%
+  mutate(endowment = 5) %>%
+  mutate(coop = Amount/endowment) %>%
+  mutate(age= NA) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2007Lis165", "1a", id, sep = "_"),
+         treatment_id = paste("2007Lis165", "1a", sep = "_"), 
+         paper_id = "2007Lis165")
+
+Lis165_base_choices <- as.data.frame(lapply(list_base_choice, rep, 13)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(seq(-1,5,0.5),length(unique(list_base_choice$subject_id))),
+         A= ifelse(Amount==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, Amount, endowment, coop, age, female) %>%
+  filter(scenarios != -0.5)
+
+colnames(Lis165_base_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "n", "take")
+
+Lis165_base_choices <- Lis165_base_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop, n, take)) %>%
+  mutate(p=NA)
 
 
-#### drop ---- 
+### beliefs
+
+list_base_norms=read_excel("merged_2012.xlsx") %>% filter(ListTake==T & 
+                                                       amount >= 0.0 & 
+                                                       amount <= 6.0 & 
+                                                       amount != 5.5 &
+                                                       !is.na(rating)) %>%
+  select(amount, rating, subjectid) %>%
+  mutate(subject_id = paste("2007Lis165", "1a", subjectid, sep = "_"),
+         treatment_id = paste("2007Lis165", "1a", sep = "_"), 
+         paper_id = "2007Lis165",
+         sent = 5 - amount,
+         female = NA,
+         age = NA) %>%
+  relocate(paper_id, treatment_id, subject_id, sent, rating)
+
+Lis165_base_beliefs <- list_base_norms %>%
+  select(paper_id, treatment_id, subject_id, sent, rating, female, age) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
+
+colnames(Lis165_base_beliefs) <- c("treatment_id","paper_id", "subject_id", "scenarios", "KW_Normative", "female", "age", "Game_type", "Separate_sample_beliefs")
+
+Lis165_base_beliefs <- Lis165_base_beliefs %>%
+  relocate(subject_id, treatment_id, paper_id, age, female, Game_type, scenarios, KW_Normative) %>% 
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
+  arrange(subject_id)
+
+## Take1 ----
+
+## set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+
+### choices
+list_take1_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
+  filter(take == 1) %>%
+  mutate(id = row_number()) %>%
+  mutate(endowment = 5) %>%
+  mutate(coop = Amount/endowment) %>%
+  mutate(age= NA) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2007Lis165", "1b", id, sep = "_"),
+         treatment_id = paste("2007Lis165", "1b", sep = "_"), 
+         paper_id = "2007Lis165")
+
+Lis165_take1_choices <- as.data.frame(lapply(list_take1_choice, rep, 13)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(seq(-1,5,0.5),length(unique(list_take1_choice$subject_id))),
+         A= ifelse(Amount==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, Amount, endowment, coop, age, female) %>%
+  filter(scenarios != -0.5)
+
+colnames(Lis165_take1_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "n", "take")
+
+Lis165_take1_choices <- Lis165_take1_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop, n, take)) %>%
+  mutate(p=NA)
+
+
+### beliefs
+
+list_take1_norms=read_excel("merged_2012.xlsx") %>% filter(ListGive==T & 
+                                                            amount >= 0.0 & 
+                                                            amount <= 6.0 & 
+                                                            amount != 5.5 &
+                                                            !is.na(rating)) %>%
+  select(amount, rating, subjectid) %>%
+  mutate(subject_id = paste("2007Lis165", "1b", subjectid, sep = "_"),
+         treatment_id = paste("2007Lis165", "1b", sep = "_"), 
+         paper_id = "2007Lis165",
+         sent = 5 - amount,
+         female = NA,
+         age = NA) %>%
+  relocate(paper_id, treatment_id, subject_id, sent, rating)
+
+Lis165_take1_beliefs <- list_take1_norms %>%
+  select(paper_id, treatment_id, subject_id, sent, rating, female, age) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
+
+colnames(Lis165_take1_beliefs) <- c("treatment_id","paper_id", "subject_id", "scenarios", "KW_Normative", "female", "age", "Game_type", "Separate_sample_beliefs")
+
+Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
+  relocate(subject_id, treatment_id, paper_id, age, female, Game_type, scenarios, KW_Normative) %>% 
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
+  arrange(subject_id)
+
+
+# Drop ---- 
 rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Kim003_choice_dg", 
                              "Kim003_beliefs_ug",
@@ -604,4 +741,8 @@ rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Bas115_beliefs",
                              "Bas115_choice",
                              "Laz164_choices",
-                             "Laz164_beliefs"))])
+                             "Laz164_beliefs",
+                             "Lis165_base_choices",
+                             "Lis165_base_beliefs",
+                             "Lis165_take1_choices",
+                             "Lis165_take1_beliefs"))])

@@ -1,7 +1,7 @@
 ---
 title: "dg_analysis"
 author: "Sp & AG"
-date: "25/1/2022"
+date: "03/02/2022"
 output: html_document
 ---
 
@@ -98,13 +98,15 @@ kbl(list_of_paper_in_target,
 
 ## Beliefs
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 setwd("../")
 setwd("Paper_csv/")
 
 df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
 df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2012Laz164_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2007Lis165_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 
@@ -149,7 +151,7 @@ do.call('grid.arrange',
 
 ## Choices
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 # dataset
 perc_choices <- choices %>% 
   filter(A==1) %>% 
@@ -296,7 +298,7 @@ output <- merge.data.frame(scenarios_w_max_appropriateness,
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 ggplot(output,
        aes(x=treatment_id,
            y=KW_Normative)) +
@@ -313,7 +315,7 @@ ggplot(output,
 
 ## Specificity
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 
 df_specificity_per_subject <- beliefs %>% 
   group_by(subject_id) %>% 
@@ -360,7 +362,7 @@ utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 
 # dataset without Her061, missing age and gender
 utility_df_treatment_demo <- utility_df_treatment %>%
-  filter(paper_id != "2018Her061")
+  filter(!(paper_id %in% c("2018Her061", "2007Lis165", "2012Laz164")))
 
 betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
@@ -406,7 +408,7 @@ for (i in levels(as.factor(utility_df_treatment_demo$treatment_id))) {
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 opts <- options(knitr.kable.NA = "")
 kbl(betas_se_logit,
     digits = 4, 
@@ -426,19 +428,19 @@ ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y
 ### Model Estimates
 
 #### Standard
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #standard
 tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation")
 ```
 
 #### Gender
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #gender
 tab_model(model_list_gender, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
 ```
 
 #### Age
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 #age
 tab_model(model_list_age, dv.labels = levels(as.factor(utility_df_treatment_demo$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation with gender")
 ```
@@ -477,7 +479,7 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 opts <- options(knitr.kable.NA = "")
 kbl(betas_sea_logit,
     digits = 4, 
@@ -565,10 +567,16 @@ ml.paper3 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2020Bas115_2a"),choice = "A", shape = "long", alt.var = "scenarios")
 ml.paper4 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 
-list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4)
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2007Lis165_1a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper5 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2012Laz164_3"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper6 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6)
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a", "2007Lis165_1a", "2012Laz164_3"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 ```
