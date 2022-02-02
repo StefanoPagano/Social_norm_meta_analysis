@@ -520,6 +520,134 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
   mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
+# Paper: 2013Kru001 ----
+### set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+df <- read_excel("behavior_bully_standard_data_2009_05_18.xlsx")
+
+## standard ----
+
+### choices
+kru_std_choice <- df %>%
+  filter(bully == 0) %>%
+  select(bully, share) %>%
+  mutate(id = row_number()) %>%
+  mutate(endowment = 10) %>%
+  mutate(coop = share/endowment) %>%
+  mutate(age= NA) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2013Kru001", "1a", id, sep = "_"),
+         treatment_id = paste("2013Kru001", "1a", sep = "_"), 
+         paper_id = "2013Kru001")
+
+Kru001_std_choices <- as.data.frame(lapply(kru_std_choice, rep, 11)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(c(0:10),length(unique(kru_std_choice$subject_id))),
+         A= ifelse(share==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, share, endowment, coop, age, female) 
+
+colnames(Kru001_std_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "bully")
+
+Kru001_std_choices <- Kru001_std_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop, bully)) %>%
+  mutate(p=NA)
+
+
+### beliefs
+
+kru_std_norms=read_excel("merged_2012.xlsx") %>% filter(standard==1 & 
+                                                            amount >= 0 & 
+                                                            amount <= 10 &
+                                                            !is.na(rating)) %>%
+  select(amount, rating, subjectid) %>%
+  mutate(subject_id = paste("2013Kru001", "1a", subjectid, sep = "_"),
+         treatment_id = paste("2013Kru001", "1a", sep = "_"), 
+         paper_id = "2013Kru001",
+         sent = 10 - amount,
+         female = NA,
+         age = NA) %>%
+  relocate(paper_id, treatment_id, subject_id, sent, rating)
+
+Kru001_std_beliefs <- kru_std_norms %>%
+  select(paper_id, treatment_id, subject_id, sent, rating, female, age) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
+
+colnames(Kru001_std_beliefs) <- c("treatment_id","paper_id", "subject_id", "scenarios", "KW_Normative", "female", "age", "Game_type", "Separate_sample_beliefs")
+
+Kru001_std_beliefs <- Kru001_std_beliefs %>%
+  relocate(subject_id, treatment_id, paper_id, age, female, Game_type, scenarios, KW_Normative) %>% 
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
+  arrange(subject_id)
+
+## bully ----
+
+#### choices
+kru_bully_choice <- df %>%
+  filter(bully == 1) %>%
+  select(bully, share) %>%
+  mutate(id = row_number()) %>%
+  mutate(endowment = 5) %>%
+  mutate(coop = (share-5)/endowment) %>%
+  mutate(age= NA) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2013Kru001", "1b", id, sep = "_"),
+         treatment_id = paste("2013Kru001", "1b", sep = "_"), 
+         paper_id = "2013Kru001")
+
+Kru001_bully_choices <- as.data.frame(lapply(kru_bully_choice, rep, 11)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(c(-5:5),length(unique(kru_bully_choice$subject_id))),
+         A= ifelse(share==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, share, endowment, coop, age, female) 
+
+colnames(Kru001_bully_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "bully")
+
+Kru001_bully_choices <- Kru001_bully_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, id, coop, bully)) %>%
+  mutate(p=NA)
+
+
+### beliefs
+
+kru_bully_norms=read_excel("merged_2012.xlsx") %>% filter(bully==1 & 
+                                                          amount >= 0 & 
+                                                          amount <= 10 &
+                                                          !is.na(rating)) %>%
+  select(amount, rating, subjectid) %>%
+  mutate(subject_id = paste("2013Kru001", "1b", subjectid, sep = "_"),
+         treatment_id = paste("2013Kru001", "1b", sep = "_"), 
+         paper_id = "2013Kru001",
+         sent = 5 - amount,
+         female = NA,
+         age = NA) %>%
+  relocate(paper_id, treatment_id, subject_id, sent, rating)
+
+Kru001_bully_beliefs <- kru_bully_norms %>%
+  select(paper_id, treatment_id, subject_id, sent, rating, female, age) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) 
+
+colnames(Kru001_bully_beliefs) <- c("treatment_id","paper_id", "subject_id", "scenarios", "KW_Normative", "female", "age", "Game_type", "Separate_sample_beliefs")
+
+Kru001_bully_beliefs <- Kru001_bully_beliefs %>%
+  relocate(subject_id, treatment_id, paper_id, age, female, Game_type, scenarios, KW_Normative) %>% 
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
+  arrange(subject_id)
 
 # Paper: 2013Kru001-Lazear ----
 
@@ -745,4 +873,8 @@ rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Lis165_base_choices",
                              "Lis165_base_beliefs",
                              "Lis165_take1_choices",
-                             "Lis165_take1_beliefs"))])
+                             "Lis165_take1_beliefs",
+                             "Kru001_std_beliefs",
+                             "Kru001_std_choices",
+                             "Kru001_bully_choices",
+                             "Kru001_bully_beliefs"))])

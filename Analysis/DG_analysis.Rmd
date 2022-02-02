@@ -2,7 +2,11 @@
 title: "dg_analysis"
 author: "Sp & AG"
 date: "03/02/2022"
-output: html_document
+output: 
+  html_document:
+    toc: True
+    toc_float: True
+  
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
@@ -93,7 +97,7 @@ kbl(list_of_paper_in_target,
   column_spec(1, bold = T)
 ```
 
-# Plots {.tabset}
+# Plots {.tabset .tabset-pills}
 <!-- tab: beliefs, choices -->
 
 ## Beliefs
@@ -104,6 +108,7 @@ setwd("Paper_csv/")
 
 df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
 df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2013Kru001_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2012Laz164_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2007Lis165_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
@@ -200,7 +205,7 @@ for (i in temp_master$treatment_id) {
 do.call('grid.arrange',c(list_plot, ncol = 2))
 ```
 
-# Consistency and Specificity {.tabset}
+# Consistency and Specificity {.tabset .tabset-pills}
 <!-- tab: consistency, specificity -->
 
 ## Formulas
@@ -335,7 +340,7 @@ ggplot(df_specificity_per_subject,
 ```
 
 
-# Individual-level analyses {.tabset}
+# Individual-level analyses {.tabset .tabset-pills}
 
 ## Social Expectation Model
 
@@ -362,7 +367,7 @@ utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 
 # dataset without Her061, missing age and gender
 utility_df_treatment_demo <- utility_df_treatment %>%
-  filter(!(paper_id %in% c("2018Her061", "2007Lis165", "2012Laz164")))
+  filter(!(paper_id %in% c("2018Her061", "2007Lis165", "2012Laz164", "2013Kru001")))
 
 betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
@@ -573,10 +578,13 @@ ml.paper5 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2012Laz164_3"),choice = "A", shape = "long", alt.var = "scenarios")
 ml.paper6 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 
-list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6)
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2013Kru001_1a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper7 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6, ml.paper7)
 ```
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
-tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a", "2007Lis165_1a", "2012Laz164_3"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
+tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a", "2007Lis165_1a", "2012Laz164_3", "2013Kru001"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 ```

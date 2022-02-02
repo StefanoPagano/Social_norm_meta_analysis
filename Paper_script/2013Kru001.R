@@ -115,7 +115,8 @@ kw_bly_appropriateness_sum <- norms_kw_bly %>%
 
 colnames(kw_bly_appropriateness_sum) <- c("kept", "appropriateness", "n_sub", "Kw_m", "donation")
 
-db_appropriateness <- kw_bly_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2013Kru001", TreatmentCode = "1b")
+db_appropriateness <- kw_bly_appropriateness_sum %>% select(donation, Kw_m) %>% mutate(PaperID = "2013Kru001", TreatmentCode = "1b") %>%
+  rbind.data.frame(db_appropriateness)
 
 positive_appropriateness <- kw_bly_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
   mutate(delta_max = max(Kw_m) - Kw_m)
