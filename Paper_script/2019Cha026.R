@@ -3,7 +3,7 @@ setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysi
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
-dg=read_excel("data.xls", sheet = "Sheet1", 
+master_df=read_excel("data.xls", sheet = "Sheet1", 
               col_types = c("numeric", "numeric", "numeric", 
                             "numeric", "numeric", "numeric", 
                             "numeric", "numeric", "numeric", 
@@ -11,7 +11,7 @@ dg=read_excel("data.xls", sheet = "Sheet1",
                             "numeric", "numeric", "numeric"))
 
 ## the next file contains all data except the conditional PG elicitations, which we did later
-norms <- dg %>% 
+norms <- master_df %>% 
   subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order,  norm), 
                     subset = elicit_norms == 1) %>%
   subset.data.frame(subset = endowment == 10) %>%
@@ -35,7 +35,8 @@ meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja
 coldg = c("subject","elicit_norms", "order", "frame_tax","endowment", "keep")
 
 # 1. Choice dataframe ----
-dgn_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
+dgn_dta_coop <- master_df %>% 
+  subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
   subset.data.frame(subset = endowment == 10) %>%
   subset.data.frame(subset = order == 1) %>%  
@@ -86,6 +87,7 @@ if (min(dgn_appropriateness_sum$Kw_m) < 0){
 ## compute variance norm
 dgn_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 0) %>%
+  mutate(action=endowment-action) %>%
   group_by(action) %>%
   summarise(var_norm = var(norm))
   # cbind.data.frame(donation=label_col)
@@ -123,7 +125,8 @@ finaldf <- meta_dataset %>%
 ## keep: for subjects in the choice experiment, the number of tokens they kept for themselves.
 
 # 1. Choice dataframe ----
-dgt_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = frame_tax == 1) %>%
+dgt_dta_coop <- master_df %>% 
+  subset.data.frame(select = coldg, subset = frame_tax == 1) %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
   subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 10) %>%
@@ -175,6 +178,7 @@ if (min(dgt_appropriateness_sum$Kw_m) < 0){
 ## compute variance norm
 dgt_norms_var <- norms %>%
   subset.data.frame(subset = frame_tax == 1) %>%
+  mutate(action=endowment-action) %>%
   group_by(action) %>%
   summarise(var_norm = var(norm))
 # cbind.data.frame(donation=label_col)
@@ -197,9 +201,87 @@ finaldf <- meta_dataset %>%
   merge.data.frame(dgt_dta_coop, by = c("PaperID","TreatmentCode")) %>%
   merge.data.frame(dgt_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
   subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
+  rbind.data.frame(finaldf)
+
+
+# ToG (subset 5-5) ---------------
+
+norms_tog <- master_df %>% 
+  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order,  norm), 
+                    subset = elicit_norms == 1) %>%
+  subset.data.frame(subset = endowment == 5) %>%
+  subset.data.frame(subset = order == 1)
+
+# 1. Choice dataframe ----
+tog_dta_coop <- master_df %>% 
+  subset.data.frame(select = coldg, subset = frame_tax == 0) %>%
+  subset.data.frame(subset = elicit_norms == 0) %>%
+  subset.data.frame(subset = order == 1) %>%  
+  subset.data.frame(subset = endowment == 5) %>%
+  mutate(cooperation = (endowment - keep)/endowment) %>% 
+  summarise(Avg_coop = mean(cooperation, na.rm =T),
+            Var_coop = var(cooperation, na.rm = T)) %>% 
+  mutate(PaperID = "2019Cha026", TreatmentCode = 3)
+
+# 2. Beliefs dataframe ----
+
+n_sub_N = norms_tog %>%
+  subset.data.frame(subset = frame_tax == 0 & order == 1 & endowment == 5 & elicit_norms == 1) %>% summarise(n_sub_N = n()/11)
+
+## compute norm 
+tog_appropriateness_sum <- norms_tog %>%
+  subset.data.frame(subset = frame_tax == 0) %>%
+  mutate(action=endowment-action) %>%
+  group_by(action) %>%
+  summarise(coop = sum(norm)) %>%
+  mutate(n_sub_N, Kw_m = coop/n_sub_N)
+
+db_appropriateness <- tog_appropriateness_sum %>% select(action, Kw_m) %>% mutate(PaperID = "2019Cha026", TreatmentCode = 3, donation = action) %>% select(-c(action)) %>%
+  rbind.data.frame(db_appropriateness)
+
+positive_appropriateness <- tog_appropriateness_sum %>% subset.data.frame(subset = Kw_m > 0) %>% 
+  mutate(delta_max = max(Kw_m) - Kw_m)
+
+if (min(tog_appropriateness_sum$Kw_m) < 0){
+  
+  negative_appropriateness <- tog_appropriateness_sum %>% subset.data.frame(subset = Kw_m < 0) %>% 
+    mutate(abs_Kw_m = abs(Kw_m), delta_max = max(Kw_m) - Kw_m)
+  
+} else {
+  
+  negative_appropriateness <- tog_appropriateness_sum %>% mutate(delta_max = 0)
+  
+}
+
+
+## compute variance norm
+tog_norms_var <- norms_tog %>%
+  subset.data.frame(subset = frame_tax == 0) %>%
+  mutate(action=endowment-action) %>%
+  group_by(action) %>%
+  summarise(var_norm = var(norm))
+# cbind.data.frame(donation=label_col)
+
+tog_final_norms <- merge.data.frame(tog_appropriateness_sum, tog_norms_var, by = "action") %>% 
+  subset.data.frame(subset = coop == max(coop)) %>% 
+  mutate(PaperID = "2019Cha026", 
+         TreatmentCode = 3, 
+         Avg_NE = action/5,
+         Var_NE = var_norm, Avg_KW_m = Kw_m,
+         Sd_Avg_NE = sd(tog_appropriateness_sum$Kw_m),
+         Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),
+         specificity_plus = sum(positive_appropriateness$delta_max)/((length(positive_appropriateness$delta_max)-1)),
+         specificity_min = if (length(negative_appropriateness$delta_max)==1) {0} else {sum(negative_appropriateness$delta_max)/((length(negative_appropriateness$delta_max)-1))},
+         max_sigma = sd(c(rep(-1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N-1)/2)), rep(1, ifelse(n_sub_N%%2==0, n_sub_N/2, (n_sub_N+1)/2))))) %>%
+  subset.data.frame(select = -c(coop, var_norm, action))
+
+# 3. combine dataset ----
+finaldf <- meta_dataset %>% 
+  merge.data.frame(tog_dta_coop, by = c("PaperID","TreatmentCode")) %>%
+  merge.data.frame(tog_final_norms, all.x=T, by = c("PaperID","TreatmentCode")) %>%
+  subset.data.frame(select = -c(n_sub_N, Kw_m)) %>%
   rbind.data.frame(finaldf) %>%
   mutate(Avg_EE = NA, Avg_PNB = NA, Var_EE = NA, Var_PNB = NA)
-
 
 write.csv(finaldf, file = paste(csv_path_output, paste(finaldf$PaperID[1], "_finaldf.csv", sep = ""), sep = ""), row.names = F)
 
