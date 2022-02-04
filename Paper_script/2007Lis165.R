@@ -1,4 +1,4 @@
-# set wd - data linked with krupka and weber 2013
+# set wd - norms data linked with krupka and weber 2013
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_csv/"
@@ -14,6 +14,7 @@ length(unique(dg$id))
 # norms file
 norms=read_excel("merged_2012.xlsx")
 
+## amount = keep!!!
 norms_list_give <- norms %>% filter(ListGive==T & 
                                       amount >= 0.0 & 
                                       amount <= 6.0 & 

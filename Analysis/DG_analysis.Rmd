@@ -799,7 +799,7 @@ utility_df_treatment <- choices_tog %>%
 
 utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 
-# dataset without Her061, missing age and gender
+# dataset without paper with missing age and gender
 utility_df_treatment_demo <- utility_df_treatment %>%
   filter(!(paper_id %in% c("2007Lis165", "2013Kru001")))
 

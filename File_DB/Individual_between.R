@@ -812,7 +812,7 @@ df <- read_excel("list_data.xlsx")
 ### set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
-### choices
+### choices (df file has summarized data: n= subjects that choose an action)
 list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
   filter(take == 0) %>%
   mutate(id = row_number()) %>%
@@ -824,6 +824,7 @@ list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
          treatment_id = paste("2007Lis165", "1a", sep = "_"), 
          paper_id = "2007Lis165")
 
+# long format
 Lis165_base_choices <- as.data.frame(lapply(list_base_choice, rep, 13)) %>%
   arrange(subject_id) %>%
   mutate(scenarios = rep(seq(-1,5,0.5),length(unique(list_base_choice$subject_id))),
@@ -833,6 +834,7 @@ Lis165_base_choices <- as.data.frame(lapply(list_base_choice, rep, 13)) %>%
 
 colnames(Lis165_base_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "n", "take")
 
+# merge with descriptive information
 Lis165_base_choices <- Lis165_base_choices %>%
   merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
   relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
@@ -878,7 +880,7 @@ Lis165_base_beliefs <- Lis165_base_beliefs %>%
 ## set wd 
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
-### choices
+### choices (df file has summarized data: n= subjects that choose an action)
 list_take1_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
   filter(take == 1) %>%
   mutate(id = row_number()) %>%
