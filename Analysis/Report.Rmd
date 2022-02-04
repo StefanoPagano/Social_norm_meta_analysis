@@ -2,9 +2,10 @@
 title: "Social Norms Meta"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  html_document:
-    toc: True
-    toc_float: True
+  html_document: 
+    toc: yes
+    toc_float: yes
+    df_print: kable
 ---
 
 # Analysis Treatment-level: All Games
@@ -33,31 +34,48 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")))
 ```
 
-
 ## HP1: Relation between norms and actions
 
 <br>
 
-<h4><i>Are norms and cooperation behavior related?</i></h4>
+<h4>
+
+<i>Are norms and cooperation behavior related?</i>
+
+</h4>
 
 The content of the norm and behavior correlate positively.
 
+Number of papers: `r length(unique(master$PaperID))`.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-cor.test(master$Avg_NE, master$Avg_coop, method= "spearman", exact = F)
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") + stat_cor(method = "spearman") + xlab("Cooperation Norm (as % of endowment)") + ylab("Cooperation (% of endowment)")
-ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") + facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")
+
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + 
+  geom_point(aes(shape=Game_type)) + 
+  scale_shape_manual(values=c(0,3,2,5,7,15,16)) +
+  geom_smooth(method = "lm") + 
+  ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") +
+  stat_cor(method = "spearman") + 
+  xlab("Cooperation Norm (as % of endowment)") + 
+  ylab("Cooperation (% of endowment)")
+
+ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + 
+  geom_point(aes(shape=Game_type)) + 
+  scale_shape_manual(values=c(0,3,2,5,7,15,16)) +
+  geom_smooth(method = "lm") + 
+  ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") +
+  facet_wrap(~Game_type, ncol=3) + 
+  stat_cor(method = "spearman") +
+  theme(legend.position="none")
 ```
 
 ### Results
-- Evidence from testing H1 shows that there is a positive and significant correlation between social expectations and cooperative behavior (Fig. 1).
-- By splitting data by game type, there is evidence of positive and significant correlation in DG (and Donation game), while norms are not heterogeneous in other game types. 
-- Hence, the analysis including all games possibly makes more sense here.
 
+-   Evidence from testing H1 shows that there is a positive and significant correlation between social expectations and cooperative behavior (Fig. 1). <!-- - By splitting data by game type, there is evidence of positive and significant correlation in DG (and Donation game), while norms are not heterogeneous in other game types.  --> <!-- - Hence, the analysis including all games possibly makes more sense here. -->
 
 <br>
 
 ## HP2 : Is compliance related to norm strength? {.tabset}
-
 
 ## Summary of computed variables {.tabset}
 
@@ -77,9 +95,9 @@ master = master %>% mutate(consistency=1-sqrt(Var_NE)/max_sigma,
 
 ### DELTA ANALYSIS
 
-We compute **Compliance** as 
+We compute **Compliance** as
 
-* $Delta = \frac{NE_{avg}-Coop_{avg}}{NE_{avg}}$
+-   $Delta = \frac{NE_{avg}-Coop_{avg}}{NE_{avg}}$
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Delta)
@@ -97,14 +115,14 @@ where:
 
 **Specificity** indicates how appropriate is prevailing social norm relative to other possible action
 
-* $NE_{Specificity} = \frac{1}{\sigma_j}$ $\forall KW_j$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions j
+-   $NE_{Specificity} = \frac{1}{\sigma_j}$ $\forall KW_j$ is the reciprocal of the standard deviation computed on Krupka-Weber average appropriateness scores across all actions j
 
 **Consistency** indicates what it is the consensus around a prevailing social norm
 
-* $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action N
-
+-   $NE_{Consistency} = {1 \over \sigma_{N}}$ is the reciprocal of the standard deviation computed on the most appropriate action N
 
 #### Norm Strength
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength_old)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength_old)) +
@@ -117,6 +135,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_
 ```
 
 #### Specificity_old
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specifity_old)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_old)) +
@@ -129,6 +148,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Sd_Av
 ```
 
 #### consistency_old
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency_old)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency_old)) +
@@ -139,7 +159,6 @@ geom_histogram(bins = 7, col=I("black")) + ggtitle("Histogram of Consistency") +
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency_old, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency_old, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
-
 
 ### STRENGTH NEW ANALYSIS {.tabset}
 
@@ -153,21 +172,22 @@ where:
 
 **Specificity** indicates how appropriate is the prevailing social norm relative to other possible action
 
-* $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)}$ $\forall KW_i > 0$
+-   $NE_{Specificity^+} = \frac{{\sum_{i=1}^{N-1} max(KW)-KW_i}}{(N-1)}$ $\forall KW_i > 0$
 
 We also computed the specificity for inappropriate actions (this is not used in the computation of norm strenght)
 
-* $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)}$ $\forall KW_i < 0$
+-   $NE_{Specificity^-} = \frac{{\sum_{i=1}^{N-1} max(|KW|)-|KW|_i}}{(N-1)}$ $\forall KW_i < 0$
 
 **Consistency** indicates what it is the consensus around a prevailing social norm
 
-* $NE_{Consistency} = 1- {\sigma_{N} \over max(\sigma_{N})}$
+-   $NE_{Consistency} = 1- {\sigma_{N} \over max(\sigma_{N})}$
 
 **Content** indicates the mean appropriateness level of a norm.
 
-* $E[max_j(KW_j)] \forall j \in A$ where A is the action space
+-   $E[max_j(KW_j)] \forall j \in A$ where A is the action space
 
 #### Norm Strenght
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$Norm_Strength)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_Strength)) +
@@ -180,6 +200,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Norm_
 ```
 
 #### Specificity plus
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$specificity_plus)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_plus)) +
@@ -192,6 +213,7 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=speci
 ```
 
 #### Consistency
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 summary(master$consistency)
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=consistency)) +
@@ -218,19 +240,22 @@ ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_K
 
 #### Relation among variables
 
-** Norm Content and Specificity plus **
+\*\* Norm Content and Specificity plus \*\*
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=specificity_plus)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
-** Norm Content and Consistency **
+\*\* Norm Content and Consistency \*\*
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=Avg_KW_m, y=consistency)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
 ```
 
 #### Delta vs Spec. neg.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm") + stat_cor(method = "spearman") #geom_text(aes(label=PaperID))
 ggplot(data=master%>% subset.data.frame(Choice_Method!="OnlyNorms"), aes(x=specificity_min, y=Delta)) + geom_point() + geom_smooth(method = "lm")+ facet_wrap(~Game_type, ncol=3) + stat_cor(method = "spearman")# + geom_text(aes(label=PaperID))
@@ -241,7 +266,6 @@ DG <- master %>% subset.data.frame(Game_type=="DG" & Choice_Method!= "OnlyNorms"
 DG_UG <- master %>% subset.data.frame(Game_type=="DG"|Game_type=="UG")
 UG <- master %>% subset.data.frame(Game_type=="UG"& Choice_Method!= "OnlyNorms")
 ```
-
 
 ## HP3: Effect of punishment on norms and actions
 
@@ -267,22 +291,21 @@ hp4plus_mean <- hp4_mean %>% add_row(Game_type = "Difference (M.W.W. p-value)", 
 
 We test the hypothesis whether :
 
-* **Cooperation** ($Coop_{avg}$) in DG is lower than UG.
+-   **Cooperation** ($Coop_{avg}$) in DG is lower than UG.
 
-  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_coop$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
+    -   The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_coop$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
 
 <!-- * **Normative Expectation** ($NE_{avg}$) in DG and Donation Game is lower then UG. -->
 
 <!--   + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_norm$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level). -->
-  
-* **Delta** in DG is higher than UG.
-  
-  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_delta$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
-  
-* **Norm Strength** in DG is higher than UG.
 
-  + The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_strength$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level).
-  
+-   **Delta** in DG is higher than UG.
+
+    -   The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_delta$p.value, digits = 4)`, therefore we *can* reject the null hypothesis (at .05 significance level).
+
+-   **Norm Strength** in DG is higher than UG.
+
+    -   The p-value of Mann-Whitney-Wilcoxon Test is `r round(wilc_strength$p.value, digits = 4)`, therefore we *can't* reject the null hypothesis (at .05 significance level).
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 opts <- options(knitr.kable.NA = "")
@@ -330,29 +353,29 @@ kbl(hp4plus_SP_CS, digits = 4, booktabs = T, align = "lcc", centering = F, capti
 #ggplot(master_test) + geom_density(aes(color = Game_type, x=consistency)) + xlab("Consistency"), common.legend = T)
 ```
 
-
-
 # Individual-level analysis {.tabset}
 
 ## Standard Utility framework {.tabset}
-Here we estimate a random utility model using a conditional logit model (McFadden 1975).
-We split our individual-level analysis into 2 steps:
 
-1. *Within subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited for the same subject
-2. *Between subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited using distinct subjects
+Here we estimate a random utility model using a conditional logit model (McFadden 1975). We split our individual-level analysis into 2 steps:
 
+1.  *Within subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited for the same subject
+2.  *Between subject design belief elicitation*: we estimate the utility function when beliefs and actions are elicited using distinct subjects
 
 For 1., the model we estimate is the following:
 
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{ij}$ 
+
+$U_{ij} = \alpha \pi_j + \beta S_{ij}$
+
 </center>
 
-<br>
-while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
+<br> while for 2., we use $S_j=\Sigma S_{ij}/N$ from the external sample with which social norms were elicited. Hence the model becomes:
 
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{j}$ 
+
+$U_{ij} = \alpha \pi_j + \beta S_{j}$
+
 </center>
 
 <br>
@@ -365,12 +388,12 @@ i=0
 ```
 
 ### Within-subjects Design {.tabset}
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_w <- beliefs %>% subset.data.frame(subset = Design=="Within") #%>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,KW_Normative,Game_type))
 choices_w <- choices %>% subset.data.frame(subset = Design=="Within") #%>% subset.data.frame(select = c(paper_id,treatment_id,subject_id,scenarios,A,choice,Game_type, endowment))
 individual_db_w <- choices_w %>% merge.data.frame(beliefs_w)
 ```
-
 
 #### 2020Bas115
 
@@ -413,6 +436,7 @@ dataframe_betas[i,] <- c("2020Bas115",4, "UG",model$coefficients["payoff"],model
 ```
 
 ### Between-subjects Design {.tabset}
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 beliefs_temp <- beliefs %>% subset.data.frame(subset = Design=="Between"&Game_type=="DG") %>% group_by(paper_id, scenarios) %>% summarise(KW_Normative = mean(KW_Normative, rm.na=T))
 Kim003_interpolation <- beliefs_temp %>% subset.data.frame(paper_id == "2016Kim003") %>% 
@@ -425,6 +449,7 @@ individual_db_b <- merge.data.frame(choices_b, beliefs_b)
 ```
 
 #### 2016Kim003
+
 For DG game
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -435,8 +460,8 @@ summary(clogit.kim_dg)
 dataframe_betas[i,] <- c("2016Kim003",1,"DG",clogit.kim_dg$coefficients["payoff"],clogit.kim_dg$coefficients["KW_Normative"],sqrt(clogit.kim_dg$var[1,1]),sqrt(clogit.kim_dg$var[2,2]),mean(Kim003_dg$endowment))
 ```
 
-
 For UG game
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Kim003_ug = individual_db_b %>% subset.data.frame(paper_id=="2016Kim003"&Game_type=="UG") %>% mutate(payoff=endowment-scenarios) %>% subset.data.frame(subject_id!="2016Kim003_8_1804" & subject_id!="2016Kim003_8_2411")
@@ -461,6 +486,7 @@ dataframe_betas[i,] <- c("2016Kim003",2,"UG",clogit.kim_ug$coefficients["payoff"
 ```
 
 #### 2018Her061
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Her061 = individual_db_b %>% subset.data.frame(paper_id=="2018Her061") %>% mutate(payoff=endowment-scenarios)
@@ -468,7 +494,6 @@ clogit.her <- clogit(A ~ payoff + KW_Normative + strata(subject_id), data=Her061
 summary(clogit.her)
 dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],clogit.her$coefficients["KW_Normative"],sqrt(clogit.her$var[1,1]),sqrt(clogit.her$var[2,2]),mean(Her061$endowment))
 ```
-
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # Her061_m <- dfidx(Her061 %>% mutate(scenarios=as.factor(scenarios)),
@@ -487,7 +512,7 @@ dataframe_betas[i,] <- c("2018Her061",1,"DG",clogit.her$coefficients["payoff"],c
 
 Treatment 1
 
-``` {r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 Cha026 = individual_db_b %>% subset.data.frame(paper_id=="2019Cha026") %>% mutate(payoff=endowment-scenarios)
 #Cha026_m <- dfidx(Cha026 %>% mutate(scenarios=as.factor(scenarios)),
@@ -500,7 +525,6 @@ summary(clogit.cha_1)
 dataframe_betas[i,] <- c("2019Cha026",1, "DG", clogit.cha_1$coefficients["payoff"],clogit.cha_1$coefficients["KW_Normative"],sqrt(clogit.cha_1$var[1,1]),sqrt(clogit.cha_1$var[2,2]),mean(Cha026$endowment))
 ```
 
-
 Treatment 2
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
@@ -511,6 +535,7 @@ dataframe_betas[i,] <- c("2019Cha026",2, "DG", clogit.cha_2$coefficients["payoff
 ```
 
 ### All papers results
+
 ```{r echo=F, message=FALSE, warning=FALSE}
 allpaperdata <- dataframe_betas %>% 
   mutate_at(.vars = vars(alpha:SE_beta), as.numeric) %>% 
@@ -531,24 +556,26 @@ ggplot(allpaperdata %>% mutate(uniqueID=paste(ID,t,sep = "_t")) %>% arrange(beta
 
 Here we augment the standard utility framework by including a measure of norm specificity either at the individual level and at the choice level depending on the nature of the data (between-subject elicitation or within-subject elicitation).
 
-
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{ij} + \eta S_{ij}*\sigma_i(S_{ij})$ 
+
+$U_{ij} = \alpha \pi_j + \beta S_{ij} + \eta S_{ij}*\sigma_i(S_{ij})$
+
 </center>
 
 where $\sigma(\cdot)$ is the standard deviation of $S_{ij}$ representing uncertainty around the norm.
 
-
 <center>
-$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta S_{j}*\sigma_j(S_{ij})$ 
-</center>
 
+$U_{ij} = \alpha \pi_j + \beta S_{j} + \eta S_{j}*\sigma_j(S_{ij})$
+
+</center>
 
 ### Within-subjects elicitation {.tabset}
 
 #### 2020Bas115
 
 DG - T1
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=1
 SDi= Bas115_dg %>% group_by(subject_id) %>% summarise(sdi=sd(KW_Normative))
@@ -565,6 +592,7 @@ dataframe_betas_augmented <- data.frame(ID="2020Bas115",t=1,game_type="DG",alpha
 ```
 
 DG - T2
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 model <- clogit(A~ payoff + KW_Normative+ KW_Normative:sdi + strata(subject_id), data = Bas115_dg%>% subset.data.frame(subset = treatment_id=="2020Bas115_2a"))
@@ -583,6 +611,7 @@ dataframe_betas_augmented[i,] <- c(ID="2020Bas115",t=2,game_type="DG",alpha=mode
 #### 2016Kim003
 
 DG game
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 SDj= beliefs %>% group_by(paper_id, treatment_id, scenarios) %>% summarise(sdj=sd(KW_Normative))
 i=i+1
@@ -599,6 +628,7 @@ dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=1,game_type="DG",
 ```
 
 For UG game
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 #SDj= Kim003_ug %>% group_by(scenarios) %>% summarise(sdj=sd(KW_Normative))
@@ -613,7 +643,6 @@ dataframe_betas_augmented[i,] <- c(ID="2016Kim003",t=2,game_type="UG",alpha=mode
                                         SE_gamma=sqrt(model$var[3,3]))
 ```
 
-
 ## Individual analysis of norm compliance {.tabset}
 
 ```{r}
@@ -625,14 +654,17 @@ tab_model(ml1)
 
 # Appendix {.tabset}
 
-
-
 ## Effect of varibility on norms and actions
 
 <br>
 
-- a. Does a higher norm variability lead to lower cooperation?
-- b. Does a higher norm variability lead to higher cooperation variance?
+-   
+
+    a.  Does a higher norm variability lead to lower cooperation?
+
+-   
+
+    b.  Does a higher norm variability lead to higher cooperation variance?
 
 <br>
 
@@ -640,7 +672,11 @@ to do so we computed VAR_NE ($NE_{var}$) as:
 
 $$ NE_{var} = \sigma^2_{i}(max\{\mu_j(NE)\}) $$
 
-<h4><i>a. Does a higher norm variability lead to lower cooperation?</i></h4>
+<h4>
+
+<i>a. Does a higher norm variability lead to lower cooperation?</i>
+
+</h4>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Var_NE, master$Avg_coop, method= "spearman", exact = F)
@@ -650,7 +686,11 @@ ggplot(data=master, aes(x=Var_NE, y=Avg_coop)) + geom_point() + ggtitle("Fig. 4 
 
 <br>
 
-<h4><i>b. Does a higher norm variability lead to higher cooperation var.?</i></h4>
+<h4>
+
+<i>b. Does a higher norm variability lead to higher cooperation var.?</i>
+
+</h4>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 cor.test(master$Var_NE, master$Var_coop, method= "spearman", exact = F)
@@ -659,7 +699,8 @@ ggplot(data=master, aes(x=Var_NE, y=Var_coop)) + geom_point() + geom_smooth(meth
 ```
 
 ## Papers included
-``` {r echo=F}
+
+```{r echo=F}
 n_subjects_choice <- choices %>% subset.data.frame(A==1) %>% group_by(paper_id, treatment_id) %>% summarise(N_choices=length(A)) %>% rename(PaperID=paper_id) %>% mutate(TreatmentCode=str_split_fixed(treatment_id,"_",2)[,2]) %>% subset.data.frame(select = -c(treatment_id))
 n_subjects_beliefs <- beliefs %>% group_by(subject_id) %>% filter(row_number()==1)%>%group_by(paper_id, treatment_id) %>% summarise(N_beliefs=length(scenarios))%>% rename(PaperID=paper_id) %>% mutate(TreatmentCode=str_split_fixed(treatment_id,"_",2)[,2]) %>% subset.data.frame(select = -c(treatment_id))
 list_of_paper <- master %>% 
@@ -674,6 +715,7 @@ datatable(master %>% subset.data.frame(select = c(PaperID, TreatmentCode, Game_t
 ```
 
 ## Conditional logit model (Overall model)
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 i=i+1
 between <-clogit(A~ payoff*paper_id + KW_Normative*paper_id + strata(subject_id), data = individual_db_b)
@@ -713,7 +755,6 @@ df_avg_kw <- read.csv("2021Kon127_avg_kw.csv", sep = ",") %>% rbind.data.frame(d
 
 ```
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 temp_master <- df_avg_kw %>% distinct(PaperID)
 
@@ -722,4 +763,3 @@ for (i in temp_master$PaperID) {
   print(ggplot(temp_master_for, aes(x=donation, y=Kw_m)) + geom_bar(stat = "identity") + labs(title = i) + facet_wrap(~TreatmentCode, ncol = 2))
 }
 ```
-
