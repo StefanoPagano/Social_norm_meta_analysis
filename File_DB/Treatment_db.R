@@ -49,8 +49,8 @@ source("2020Bas115.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2017Sen116.R")
 
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
-source("2021Kon127.R")
+# setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+# source("2021Kon127.R")
 
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2012Laz164.R")
@@ -118,10 +118,10 @@ master <- Paper_115 %>%
 Paper_116=read.csv("2017Sen116_finaldf.csv", sep=",")
 master <- Paper_116 %>% 
   rbind.data.frame(master)
-
-Paper_127=read.csv("2021Kon127_finaldf.csv", sep=",")
-master <- Paper_127 %>% 
-  rbind.data.frame(master)
+# 
+# Paper_127=read.csv("2021Kon127_finaldf.csv", sep=",")
+# master <- Paper_127 %>% 
+#   rbind.data.frame(master)
 
 Paper_164=read.csv("2012Laz164_finaldf.csv", sep=",")
 master <- Paper_164 %>% 

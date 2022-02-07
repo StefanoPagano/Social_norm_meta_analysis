@@ -2,13 +2,7 @@
 title: "DG e ToG Analysis"
 author: "Pagano S. & Guido A."
 date: "03/02/2022"
-output: 
-  html_document:
-    toc: True
-    toc_float: True
-editor_options: 
-  markdown: 
-    wrap: 72
+output: html_document
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
