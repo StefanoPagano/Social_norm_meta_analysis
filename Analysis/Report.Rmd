@@ -52,7 +52,7 @@ Number of papers: `r length(unique(master$PaperID))`.
 
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + 
   geom_point(aes(shape=Game_type)) + 
-  scale_shape_manual(values=c(0,3,2,5,7,15,16)) +
+  scale_shape_manual(values=c(0,3,2,5,7,15,16,17)) +
   geom_smooth(method = "lm") + 
   ggtitle("Fig. 1: H1 : Correlation Between Average Cooperation and Norm (NE)") +
   stat_cor(method = "spearman") + 
@@ -61,7 +61,7 @@ ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) +
 
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + 
   geom_point(aes(shape=Game_type)) + 
-  scale_shape_manual(values=c(0,3,2,5,7,15,16)) +
+  scale_shape_manual(values=c(0,3,2,5,7,15,16,17)) +
   geom_smooth(method = "lm") + 
   ggtitle("Fig. 2: H1 : Correlation Between Average Cooperation and Norm (NE)") +
   facet_wrap(~Game_type, ncol=3) + 

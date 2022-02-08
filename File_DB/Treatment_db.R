@@ -58,6 +58,9 @@ source("2012Laz164.R")
 setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2007Lis165.R")
 
+setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Paper_script/")
+source("2022Tve168.R")
+
 rm(list = ls())
 
 
@@ -129,6 +132,10 @@ master <- Paper_164 %>%
 
 Paper_165=read.csv("2007Lis165_finaldf.csv", sep=",")
 master <- Paper_165 %>% 
+  rbind.data.frame(master)
+
+Paper_168=read.csv("2022Tve168_finaldf.csv", sep=",")
+master <- Paper_168 %>% 
   rbind.data.frame(master)
 
 
