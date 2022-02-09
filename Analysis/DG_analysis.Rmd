@@ -41,6 +41,7 @@ df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(d
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 ```
 
+
 # Search criteria {.tabset .tabset-pills}
 
 The selection criteria to identify papers in target was:
