@@ -477,46 +477,74 @@ n_model = 1
 
 # mlogit consistency on utility_df_treatment
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
+  model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   
   model_list_sea[[n_model]] = model_sea
   n_model = n_model +1  
   
-  betas_sea_logit <- betas_sea_logit %>% 
-    rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model_sea$coefficients[1]),
-                                beta=as.numeric(model_sea$coefficients[2]),
-                                delta=as.numeric(model_sea$coefficients[3]),
-                                SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
-                                SE_beta=coef(summary(model_sea))[2, "Std. Error"],
-                                SE_delta=coef(summary(model_sea))[3, "Std. Error"],
-                                MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
+  # betas_sea_logit <- betas_sea_logit %>% 
+  #   rbind.data.frame(data.frame(paper = i, 
+  #                               alpha = as.numeric(model_sea$coefficients[1]),
+  #                               beta=as.numeric(model_sea$coefficients[2]),
+  #                               delta=as.numeric(model_sea$coefficients[3]),
+  #                               SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
+  #                               SE_beta=coef(summary(model_sea))[2, "Std. Error"],
+  #                               SE_delta=coef(summary(model_sea))[3, "Std. Error"],
+  #                               MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
+}
+
+model_list_sea1 <- list()
+n_model = 1
+
+# mlogit consistency on utility_df_treatment
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea1=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app:sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea1[[n_model]] = model_sea1
+  n_model = n_model +1  
+}
+
+model_list_sea2 <- list()
+n_model = 1
+
+# mlogit consistency on utility_df_treatment
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app*sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea2[[n_model]] = model_sea2
+  n_model = n_model +1  
 }
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
-opts <- options(knitr.kable.NA = "")
-kbl(betas_sea_logit,
-    digits = 4, 
-    booktabs = T, 
-    align = "lcccc", 
-    centering = F, 
-    caption="Coefficients for model with std") %>%
-  kable_styling(position = "left", 
-                full_width = F) %>%
-  column_spec(1, bold = T)
+# opts <- options(knitr.kable.NA = "")
+# kbl(betas_sea_logit,
+#     digits = 4, 
+#     booktabs = T, 
+#     align = "lcccc", 
+#     centering = F, 
+#     caption="Coefficients for model with std") %>%
+#   kable_styling(position = "left", 
+#                 full_width = F) %>%
+#   column_spec(1, bold = T)
 
 tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+tab_model(model_list_sea1, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 
-ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
-  geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
-
-ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
-  geom_point() + 
-  geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
+# ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+# 
+# ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
 ```
+
+
 
 #### Social Preferences mlogit model (Fehr & Schimdt 1999)
 
@@ -885,7 +913,7 @@ $U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
 
 -   $\pi_k$ indicates the payoff
 -   $A_k$ indicates the norm appropriateness
--   $C_k$ indicates the consistency
+-   $C_k$ indicates the standard deviation
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 betas_sea_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
@@ -893,46 +921,81 @@ model_list_sea <- list()
 n_model = 1
 
 # mlogit consistency on utility_df_treatment
+# for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+#   model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app, data=utility_df_treatment%>% 
+#                            filter(treatment_id==i))
+#   
+#   model_list_sea[[n_model]] = model_sea
+#   n_model = n_model +1  
+  
+  # betas_sea_logit <- betas_sea_logit %>% 
+  #   rbind.data.frame(data.frame(paper = i, 
+  #                               alpha = as.numeric(model_sea$coefficients[1]),
+  #                               beta=as.numeric(model_sea$coefficients[2]),
+  #                               delta=as.numeric(model_sea$coefficients[3]),
+  #                               SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
+  #                               SE_beta=coef(summary(model_sea))[2, "Std. Error"],
+  #                               SE_delta=coef(summary(model_sea))[3, "Std. Error"],
+  #                               MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
+# }
+
+model_list_sea1 <- list()
+n_model = 1
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
-  model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app * sd_app, data=utility_df_treatment%>% 
+  model_sea1=mclogit::mclogit(cbind(A,choice)~ payoff + sd_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
   
-  model_list_sea[[n_model]] = model_sea
+  model_list_sea1[[n_model]] = model_sea1
   n_model = n_model +1  
+}
+
+model_list_sea2 <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app:sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
   
-  betas_sea_logit <- betas_sea_logit %>% 
-    rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model_sea$coefficients[1]),
-                                beta=as.numeric(model_sea$coefficients[2]),
-                                delta=as.numeric(model_sea$coefficients[3]),
-                                SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
-                                SE_beta=coef(summary(model_sea))[2, "Std. Error"],
-                                SE_delta=coef(summary(model_sea))[3, "Std. Error"],
-                                MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
+  model_list_sea2[[n_model]] = model_sea2
+  n_model = n_model +1  
+}
+
+model_list_sea3 <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea3=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app*sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea3[[n_model]] = model_sea3
+  n_model = n_model +1  
 }
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
-opts <- options(knitr.kable.NA = "")
-kbl(betas_sea_logit,
-    digits = 4, 
-    booktabs = T, 
-    align = "lcccc", 
-    centering = F, 
-    caption="Coefficients for model with std") %>%
-  kable_styling(position = "left", 
-                full_width = F) %>%
-  column_spec(1, bold = T)
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center"}
+# opts <- options(knitr.kable.NA = "")
+# kbl(betas_sea_logit,
+#     digits = 4, 
+#     booktabs = T, 
+#     align = "lcccc", 
+#     centering = F, 
+#     caption="Coefficients for model with std") %>%
+#   kable_styling(position = "left", 
+#                 full_width = F) %>%
+#   column_spec(1, bold = T)
 
-tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+# tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates mean_app")
+tab_model(model_list_sea1, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates sd_app")
+tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates mean_app:sd_app")
+tab_model(model_list_sea3, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates mean_app:sd_app")
 
-ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
-  geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+# ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+# 
+# ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
 
-ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
-  geom_point() + 
-  geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
+ggplot(data=utility_df_treatment, aes(x=mean_app, y=sd_app)) + geom_point() + geom_smooth() + geom_jitter()
 ```
 
 #### Social Preferences mlogit model (Fehr & Schimdt 1999)
