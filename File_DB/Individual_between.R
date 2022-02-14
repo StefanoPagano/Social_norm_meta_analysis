@@ -299,8 +299,8 @@ Cha026_sub_3 <- Cha026 %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
   subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 5) %>%
-  mutate(sent = endowment - keep) %>%
-  mutate(coop = sent/endowment) %>%
+  mutate(sent = 10 - keep) %>%
+  mutate(coop = sent/10) %>%
   mutate(subject_id = paste("2019Cha026", "3", subject, sep = "_")) %>%
   mutate(treatment_id = paste("2019Cha026", "3", sep = "_"), paper_id = "2019Cha026")
 
@@ -335,7 +335,7 @@ j = 1
 
 for (x in dbbase$n) {
   ewt = dbbase$endowment[x]
-  for (i in -5:5) {
+  for (i in 0:10) {
     new_line_DB <- data.frame(p = j,
                               subject_id = dbbase$subject_id[x], 
                               treatment_id = dbbase$treatment_id[x],
@@ -678,8 +678,8 @@ kru_bully_choice <- df %>%
   filter(bully == 1) %>%
   select(bully, share) %>%
   mutate(id = row_number()) %>%
-  mutate(endowment = 5) %>%
-  mutate(share = share - 5) %>%
+  mutate(endowment = 10) %>%
+  mutate(share = share) %>%
   mutate(coop = (share)/endowment) %>%
   mutate(age= NA) %>%
   mutate(female = NA) %>%
@@ -689,7 +689,7 @@ kru_bully_choice <- df %>%
 
 Kru001_bully_choices <- as.data.frame(lapply(kru_bully_choice, rep, 11)) %>%
   arrange(subject_id) %>%
-  mutate(scenarios = rep(c(-5:5),length(unique(kru_bully_choice$subject_id))),
+  mutate(scenarios = rep(c(0:10),length(unique(kru_bully_choice$subject_id))),
          A= ifelse(share==scenarios, 1, 0)) %>%
   relocate(paper_id, treatment_id, subject_id, id, scenarios, A, share, endowment, coop, age, female) 
 
@@ -713,7 +713,7 @@ kru_bully_norms=read_excel("merged_2012.xlsx") %>% filter(bully==1 &
   mutate(subject_id = paste("2013Kru001", "1b", subjectid, sep = "_"),
          treatment_id = paste("2013Kru001", "1b", sep = "_"), 
          paper_id = "2013Kru001",
-         sent = 5 - amount,
+         sent = 10 - amount,
          female = NA,
          age = NA) %>%
   relocate(paper_id, treatment_id, subject_id, sent, rating)

@@ -12,11 +12,11 @@ master_df=read_excel("data.xls", sheet = "Sheet1",
 
 ## the next file contains all data except the conditional PG elicitations, which we did later
 norms <- master_df %>% 
-  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order,  norm), 
+  subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order, norm),
                     subset = elicit_norms == 1) %>%
   subset.data.frame(subset = endowment == 10) %>%
   subset.data.frame(subset = order == 1)
-  
+
 
 # meta-information dataset
 meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2019Cha026", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
@@ -205,7 +205,7 @@ finaldf <- meta_dataset %>%
 
 
 # ToG (subset 5-5) ---------------
-
+## as dg: cooperation and norms computed on dictator final allocation
 norms_tog <- master_df %>% 
   subset.data.frame(select = c(subject, elicit_norms, frame_tax, endowment, action, order,  norm), 
                     subset = elicit_norms == 1) %>%
@@ -218,7 +218,7 @@ tog_dta_coop <- master_df %>%
   subset.data.frame(subset = elicit_norms == 0) %>%
   subset.data.frame(subset = order == 1) %>%  
   subset.data.frame(subset = endowment == 5) %>%
-  mutate(cooperation = (endowment - keep)/endowment) %>% 
+  mutate(cooperation = (10 - keep)/10) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2019Cha026", TreatmentCode = 3)
@@ -231,7 +231,7 @@ n_sub_N = norms_tog %>%
 ## compute norm 
 tog_appropriateness_sum <- norms_tog %>%
   subset.data.frame(subset = frame_tax == 0) %>%
-  mutate(action=endowment-action) %>%
+  mutate(action=10-action) %>% # endowment is 10 because we must follow the entire endowment in the economy
   group_by(action) %>%
   summarise(coop = sum(norm)) %>%
   mutate(n_sub_N, Kw_m = coop/n_sub_N)
@@ -257,7 +257,7 @@ if (min(tog_appropriateness_sum$Kw_m) < 0){
 ## compute variance norm
 tog_norms_var <- norms_tog %>%
   subset.data.frame(subset = frame_tax == 0) %>%
-  mutate(action=endowment-action) %>%
+  mutate(action=10-action) %>%
   group_by(action) %>%
   summarise(var_norm = var(norm))
 # cbind.data.frame(donation=label_col)
@@ -266,7 +266,7 @@ tog_final_norms <- merge.data.frame(tog_appropriateness_sum, tog_norms_var, by =
   subset.data.frame(subset = coop == max(coop)) %>% 
   mutate(PaperID = "2019Cha026", 
          TreatmentCode = 3, 
-         Avg_NE = action/5,
+         Avg_NE = action/10,
          Var_NE = var_norm, Avg_KW_m = Kw_m,
          Sd_Avg_NE = sd(tog_appropriateness_sum$Kw_m),
          Sd_Avg_NE_min_max = max(positive_appropriateness$Kw_m) - min(positive_appropriateness$Kw_m),

@@ -95,7 +95,7 @@ finaldf <- meta_dataset %>% merge.data.frame(kw_std_coop, by = c("PaperID","Trea
 kw_bly_coop <- dg %>% 
   select(id, bully, share) %>%
   filter(bully == 1) %>%
-  mutate(endowment = 5, cooperation = (share-5)/endowment) %>% 
+  mutate(endowment = 10, cooperation = share/endowment) %>% 
   summarise(Avg_coop = mean(cooperation, na.rm =T),
             Var_coop = var(cooperation, na.rm = T)) %>% 
   mutate(PaperID = "2013Kru001", TreatmentCode = "1b")
@@ -111,7 +111,7 @@ kw_bly_appropriateness_sum <- norms_kw_bly %>%
   summarise(sum = as.numeric(sum(rating)),
             n = as.numeric(n_sub_N), 
             Kw_m=as.numeric(sum/n_sub_N))%>%
-  mutate(donation = 5 - amount) 
+  mutate(donation = 10-amount) 
 
 colnames(kw_bly_appropriateness_sum) <- c("kept", "appropriateness", "n_sub", "Kw_m", "donation")
 
@@ -136,7 +136,7 @@ if (min(kw_bly_appropriateness_sum$Kw_m) < 0){
 kw_bly_norms_var <- norms_kw_bly %>%
   group_by(amount) %>%
   summarise(var = var(rating)) %>%
-  mutate(donation = 5 - amount)
+  mutate(donation = 10 - amount)
 
 colnames(kw_bly_norms_var) <- c("kept", "var","donation")
 
