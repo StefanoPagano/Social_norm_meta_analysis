@@ -552,8 +552,8 @@ $U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 choices_df_sp <- choices_dg %>% mutate(payoff=endowment-scenarios,
-                              other_payoff_ahead=ifelse(payoff>scenarios,payoff-scenarios,0),
-                              other_payoff_behind=ifelse(payoff<scenarios,scenarios-payoff,0))
+                              other_payoff_ahead=ifelse(payoff>scenarios,10-payoff,0),
+                              other_payoff_behind=ifelse(payoff<scenarios,10-payoff,0))
 
 utility_df_treatment_sp <- choices_df_sp %>%
   merge.data.frame(mean_beliefs) %>%
