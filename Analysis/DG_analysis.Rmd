@@ -546,14 +546,14 @@ tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$tre
 
 
 
-#### Social Preferences mlogit model (Fehr & Schimdt 1999)
+#### Inequality Aversion model (Fehr & Schimdt 1999)
 
 $U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk})$
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 choices_df_sp <- choices_dg %>% mutate(payoff=endowment-scenarios,
-                              other_payoff_ahead=ifelse(payoff>scenarios,endowment-payoff,0),
-                              other_payoff_behind=ifelse(payoff<scenarios,endowment-payoff,0))
+                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
 
 utility_df_treatment_sp <- choices_df_sp %>%
   merge.data.frame(mean_beliefs) %>%
@@ -998,14 +998,14 @@ tab_model(model_list_sea3, dv.labels = levels(as.factor(utility_df_treatment$tre
 ggplot(data=utility_df_treatment, aes(x=mean_app, y=sd_app)) + geom_point() + geom_smooth() + geom_jitter()
 ```
 
-#### Social Preferences mlogit model (Fehr & Schimdt 1999)
+#### Inequality Aversion model (Fehr & Schimdt 1999)
 
 $U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk})$
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
 choices_df_sp <- choices_tog %>% mutate(payoff=endowment-scenarios,
-                              other_payoff_ahead=ifelse(payoff>scenarios,endowment-payoff,0),
-                              other_payoff_behind=ifelse(payoff<scenarios,endowment-payoff,0))
+                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
 
 utility_df_treatment_sp <- choices_df_sp %>%
   merge.data.frame(mean_beliefs) %>%
