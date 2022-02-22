@@ -941,6 +941,122 @@ Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
   subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
   arrange(subject_id)
 
+# Paper: 2020And089 ----
+### set wd 
+setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020And089")
+
+df_choice <- read_excel("2020And089_data.xlsx") %>%
+  subset.data.frame(select = c(1,4,19:20))
+colnames(df_choice) <- c("Treatment", "sent", "Age", "Experiment")
+# add id variable as a progressive numbers
+df_choice <- df_choice %>% mutate(id = c(1:374)) 
+
+df_norm <- read_excel("DecisionRevealProsocial_NormElicitationData.xlsx") %>%
+  filter(Gender %in% c(1,2))
+
+colnames(df_norm) <- c("Condition", "KW00", "KW10", "KW20", "KW30", "KW40", "KW50", "AppropPGG_COOPERATE", "AppropPGG_DEFECT","Approp_Switch","Approp_DontSwitch","Approp_Suffocate","AppropDontSuffocate","Common_DonateChoice","Common_DonateAverage","Common_PGG","Common_UtilSwitch","Common_UtilSuffocateBaby","Age","female")
+
+# recoding
+df_norm <- df_norm %>% mutate(id = c(1:190)) %>%
+  mutate(KW00 = dplyr::recode(KW00, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW10 = dplyr::recode(KW10, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW20 = dplyr::recode(KW20, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW30 = dplyr::recode(KW30, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW40 = dplyr::recode(KW40, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         KW50 = dplyr::recode(KW50, `-1` = -1/3, `-2` = -1, `1` = 1/3, `2` = 1),
+         female= ifelse(female==1, 1, 0)) %>%
+  select(id, Condition, KW00:KW50, female, Age)
+
+## private ----
+
+### choices
+and_private_choice <- df_choice %>%
+  filter(Experiment==1, Treatment == 1) %>%
+  mutate(endowment = 50) %>%
+  mutate(coop = sent/endowment) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2020And089", "1", id, sep = "_"),
+         treatment_id = paste("2020And089", "1", sep = "_"), 
+         paper_id = "2020And089")
+
+and089_pvt_choices <- as.data.frame(lapply(and_private_choice, rep, 6)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(seq(0,50,10),length(unique(and_private_choice$subject_id))),
+         A= ifelse(sent==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, sent, endowment, coop, Age, female) 
+
+colnames(and089_pvt_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "Treatment", "Experiment")
+
+and089_pvt_choices <- and089_pvt_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Experiment, Treatment, id, Separate_sample_beliefs, coop)) %>%
+  mutate(p=NA)
+
+### beliefs
+and089_pvt_beliefs <- df_norm %>%
+  filter(Condition==0) %>%
+  mutate(subject_id = paste("2020And089", "1","norms", id, sep = "_")) %>%
+  mutate(treatment_id = paste("2020And089", "1", sep = "_"), paper_id = "2020And089") %>%
+  pivot_longer(!c(id, Condition, female, Age, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_Normative") %>%
+  mutate(scenarios = as.numeric(dplyr::recode(scenarios, `KW00` = 0, `KW10` = 10, `KW20` = 20, `KW30` = 30, `KW40` = 40, `KW50` = 50))) %>%
+  subset.data.frame(select = -c(Condition, id)) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         female = NA,
+         age = Age,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, Age))
+
+## public ----
+
+### choices
+and_pub_choice <- df_choice %>%
+  filter(Experiment==1, Treatment == 2) %>%
+  mutate(endowment = 50) %>%
+  mutate(coop = sent/endowment) %>%
+  mutate(female = NA) %>%
+  mutate(subject_id = paste("2020And089", "2", id, sep = "_"),
+         treatment_id = paste("2020And089", "2", sep = "_"), 
+         paper_id = "2020And089")
+
+and089_pub_choices <- as.data.frame(lapply(and_pub_choice, rep, 6)) %>%
+  arrange(subject_id) %>%
+  mutate(scenarios = rep(seq(0,50,10),length(unique(and_pub_choice$subject_id))),
+         A= ifelse(sent==scenarios, 1, 0)) %>%
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, sent, endowment, coop, Age, female) 
+
+colnames(and089_pub_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "Treatment", "Experiment")
+
+and089_pub_choices <- and089_pub_choices %>%
+  merge.data.frame(df_merge_game_type, by = "treatment_id") %>%
+  relocate(subject_id, treatment_id, paper_id, Game_type, scenarios, choice, A, endowment, female, age) %>%
+  mutate(Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Experiment, Treatment, id, Separate_sample_beliefs, coop)) %>%
+  mutate(p=NA)
+
+### beliefs
+and089_pub_beliefs <- df_norm %>%  
+  filter(Condition==0) %>%
+  mutate(subject_id = paste("2020And089", "2","norms", id, sep = "_")) %>%
+  mutate(treatment_id = paste("2020And089", "2", sep = "_"), paper_id = "2020And089") %>%
+  pivot_longer(!c(id, Condition, female, Age, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_Normative") %>%
+  mutate(scenarios = as.numeric(dplyr::recode(scenarios, `KW00` = 0, `KW10` = 10, `KW20` = 20, `KW30` = 30, `KW40` = 40, `KW50` = 50))) %>%
+  subset.data.frame(select = -c(Condition, id)) %>%
+  merge.data.frame(df_merge_game_type, by = c("treatment_id")) %>%
+  mutate(KW_Personal = NA,
+         Bicchieri_Empirical = NA,
+         Bicchieri_Normative = NA,
+         Bicchieri_Personal = NA,
+         female = NA,
+         age = Age,
+         Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
+  subset.data.frame(select = -c(Separate_sample_beliefs, Age))
+
 
 # Drop ---- 
 rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
@@ -966,4 +1082,8 @@ rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "Kru001_std_beliefs",
                              "Kru001_std_choices",
                              "Kru001_bully_choices",
-                             "Kru001_bully_beliefs"))])
+                             "Kru001_bully_beliefs",
+                             "and089_pvt_choices",
+                             "and089_pvt_beliefs",
+                             "and089_pub_choices",
+                             "and089_pub_beliefs"))])
