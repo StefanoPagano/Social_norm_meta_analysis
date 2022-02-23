@@ -52,7 +52,7 @@ Number of papers: `r length(unique(master$PaperID))`.
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 ggplot(data=master, aes(x=Avg_NE, y=Avg_coop)) + 
-  geom_point(aes(color=Game_type, shape=Method_elicitation), size=3) + 
+  geom_point(aes(color=Game_type, shape=Method_elicitation), size=1.5) + 
   scale_shape_manual(values=c(1,17)) +
   scale_color_manual(values = pal_jco()(9)) +
   scale_y_continuous(breaks = seq(0,1,0.1))+

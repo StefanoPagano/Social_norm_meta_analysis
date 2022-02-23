@@ -22,6 +22,7 @@ library(kableExtra)
 library(car)
 library(DT)
 library(zoo)
+library(AICcmodavg)
 
 setwd("../")
 
@@ -391,6 +392,7 @@ n_model = 1
 for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
   model_se=mclogit::mclogit(cbind(A,choice) ~ payoff + mean_app, data=utility_df_treatment%>% 
                            filter(treatment_id==i))
+  
   model_se_list[[n_model]] = model_se
   n_model = n_model + 1
 
@@ -533,7 +535,7 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 #                 full_width = F) %>%
 #   column_spec(1, bold = T)
 
-tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+prova_model <- tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 tab_model(model_list_sea1, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 
@@ -588,6 +590,54 @@ ml.paper6 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
 
 df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2013Kru001_1a"),choice = "A", shape = "long", alt.var = "scenarios")
 ml.paper7 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6, ml.paper7)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+tab_model(list_model, dv.labels = c("2016Kim003_7", "2018Her061_9", "2019Cha026_1", "2020Bas115_2a", "2007Lis165_1a", "2012Laz164_3", "2013Kru001"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
+```
+
+#### Inequality Aversion & Social Expectation model
+
+$U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk}) +\delta A_k$
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+choices_df_sp <- choices_dg %>% mutate(payoff=endowment-scenarios,
+                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
+
+utility_df_treatment_sp <- choices_df_sp %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app) 
+
+utility_df_treatment_sp$id = utility_df_treatment_sp %>% group_indices(subject_id)
+
+
+# mlogit
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2016Kim003_7" & subject_id != "2016Kim003_7_2222"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper1 <- mlogit(A~ other_payoff_ahead + other_payoff_behind + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2018Her061_9"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper2 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2019Cha026_1"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper3 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2020Bas115_2a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper4 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2007Lis165_1a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper5 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2012Laz164_3"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper6 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2013Kru001_1a"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper7 <- mlogit(A~other_payoff_ahead + other_payoff_behind  + mean_app| 0, df)
 
 list_model = list(ml.paper1, ml.paper2, ml.paper3, ml.paper4, ml.paper5, ml.paper6, ml.paper7)
 ```
@@ -1435,3 +1485,7 @@ list_model = list(ml.paper1, ml.paper2)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
+```
+
+## AIC: Model Comparison {.tabset .tabset-pills}
+
