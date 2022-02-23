@@ -123,7 +123,7 @@ Cha026_db_norms_1 <- Cha026 %>%
   mutate(subject_id = paste("2019Cha026", "1", "norms", subject, sep = "_"),
          treatment_id =  paste("2019Cha026", "1", sep = "_"),
          paper_id = "2019Cha026",
-         action = endowment-action)
+         action = 10-action)
 
 Cha026_db_norms_2 <- Cha026 %>%
   subset.data.frame(select = c(1,4,5,6,7,8,9,13,14)) %>%
@@ -134,7 +134,7 @@ Cha026_db_norms_2 <- Cha026 %>%
   mutate(subject_id = paste("2019Cha026", "2", "norms", subject, sep = "_"),
          treatment_id =  paste("2019Cha026", "2", sep = "_"),
          paper_id = "2019Cha026",
-         action = endowment-action)
+         action = 10-action)
 
 Cha026_db_norms_3 <- Cha026 %>%
   subset.data.frame(select = c(1,4,5,6,7,8,9,13,14)) %>%
@@ -145,7 +145,7 @@ Cha026_db_norms_3 <- Cha026 %>%
   mutate(subject_id = paste("2019Cha026", "3", "norms", subject, sep = "_"),
          treatment_id =  paste("2019Cha026", "3", sep = "_"),
          paper_id = "2019Cha026",
-         action = endowment-action)
+         action = 10-action)
 
 # treatment neutrally
 # n_progr_1 <- c(1:227)
@@ -946,7 +946,7 @@ Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
 setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020And089")
 
 df_choice <- read_excel("2020And089_data.xlsx") %>%
-  subset.data.frame(select = c(1,4,19:20))
+  subset.data.frame(select = c(1,4,19,20))
 colnames(df_choice) <- c("Treatment", "sent", "Age", "Experiment")
 # add id variable as a progressive numbers
 df_choice <- df_choice %>% mutate(id = c(1:374)) 
@@ -971,7 +971,7 @@ df_norm <- df_norm %>% mutate(id = c(1:190)) %>%
 
 ### choices
 and_private_choice <- df_choice %>%
-  filter(Experiment==1, Treatment == 1) %>%
+  filter(Treatment == 1) %>%
   mutate(endowment = 50) %>%
   mutate(coop = sent/endowment) %>%
   mutate(female = NA) %>%
@@ -1016,7 +1016,7 @@ and089_pvt_beliefs <- df_norm %>%
 
 ### choices
 and_pub_choice <- df_choice %>%
-  filter(Experiment==1, Treatment == 2) %>%
+  filter(Treatment == 2) %>%
   mutate(endowment = 50) %>%
   mutate(coop = sent/endowment) %>%
   mutate(female = NA) %>%
@@ -1041,7 +1041,7 @@ and089_pub_choices <- and089_pub_choices %>%
 
 ### beliefs
 and089_pub_beliefs <- df_norm %>%  
-  filter(Condition==0) %>%
+  filter(Condition==1) %>%
   mutate(subject_id = paste("2020And089", "2","norms", id, sep = "_")) %>%
   mutate(treatment_id = paste("2020And089", "2", sep = "_"), paper_id = "2020And089") %>%
   pivot_longer(!c(id, Condition, female, Age, subject_id, paper_id, treatment_id), names_to = "scenarios", values_to = "KW_Normative") %>%

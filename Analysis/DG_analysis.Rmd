@@ -1,7 +1,7 @@
 ---
-title: "DG e ToG Analysis"
+title: "DG-ToG-Donation Analysis"
 author: "Pagano S. & Guido A."
-date: "03/02/2022"
+date: "23/02/2022"
 output: html_document
 ---
 
@@ -37,7 +37,8 @@ df_avg_kw <- read.csv("2013Kru001_avg_kw.csv", sep = ",") %>% rbind.data.frame(d
 df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2012Laz164_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
 df_avg_kw <- read.csv("2007Lis165_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
-df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
+df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) 
+df_avg_kw <- read.csv("2020And089_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
   mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
 ```
 
@@ -50,6 +51,7 @@ The selection criteria to identify papers in target was:
 
     -   Dictator Game
     -   Take or Give Game
+    -   Donation Game
 
 -   Presence of norm elicitation task:
 
@@ -1034,3 +1036,402 @@ list_model = list(ml.paper1, ml.paper2, ml.paper3)
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 tab_model(list_model, dv.labels = c("2007Lis165_1b", "2013Kru001_1b", "2019Cha026_3"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 ```
+
+## Donation Game {.tabset .tabset-pills}
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+# subset of dg data
+master_don <- master %>% 
+  filter(Game_type == "Donation Game") %>%
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & 
+                      Choice_Method != "OnlyNorms" & 
+                      StatusTreatment_Roma == "6-Complete" & 
+                      Baseline %in% c(NA, 1)) %>% 
+  mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
+
+# list of treatments in target
+list_of_paper_in_target <- master_don %>% 
+                    select(PaperID, TreatmentCode, TreatmentName_paper, 
+                               Year, Game_type, Standard_game, 
+                               Baseline, Group_size, Rounds, 
+                               Method_elicitation, Avg_coop, Avg_NE, 
+                               Var_coop, Var_NE, Avg_KW_m)
+
+# read file beliefs and choices
+beliefs_don <- beliefs %>%
+  filter(treatment_id %in% levels(as.factor(paste(master_don$PaperID,"_",master_don$TreatmentCode, sep=""))))
+
+choices_don <- choices  %>%
+  filter(treatment_id %in% levels(as.factor(paste(master_don$PaperID,"_",master_don$TreatmentCode, sep=""))))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+# print table of "list_of_paper_in_target"
+opts <- options(knitr.kable.NA = "")
+kbl(list_of_paper_in_target,
+    digits = 4, 
+    booktabs = T, 
+    align = "llllllllllrrrrrr", 
+    centering = F, 
+    caption="List of paper after selection criteria applied") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
+  column_spec(1, bold = T)
+```
+
+### Descriptive Plots {.tabset .tabset-pills}
+
+<!-- tab: beliefs, choices -->
+
+#### Beliefs
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14}
+
+DON_avg_kw <- df_avg_kw %>% merge.data.frame(master_don %>% 
+                                               subset.data.frame(select = c(PaperID, 
+                                                                            TreatmentName_paper, 
+                                                                            TreatmentCode, 
+                                                                            treatment_id)), 
+                                             by = c("PaperID","TreatmentCode","treatment_id")) %>% 
+  filter(!(is.na(TreatmentName_paper)))
+temp_master <- DON_avg_kw %>% 
+  distinct(treatment_id)
+
+# inizializing variable for loop
+n=1
+list_plot <- c()
+
+# creation of a plots list
+for (i in temp_master$treatment_id) {
+  
+  # dataset
+  temp_master_for <- DON_avg_kw %>% 
+    filter(treatment_id == i)
+  
+  # list
+  list_plot[[n]] <- ggplot(temp_master_for, 
+                           aes(x=donation, y=Kw_m)) + 
+    geom_bar(stat = "identity") + 
+    labs(title = i, 
+         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+    ylim(-1,1) +
+    xlab("Scenario") + 
+    ylab("Appropriateness (average)")
+  
+  n=n+1
+}
+
+# merge plots in one figure
+do.call('grid.arrange', 
+        c(list_plot, ncol = 2))
+```
+
+#### Choices
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14}
+# dataset
+perc_choices <- choices_don %>% 
+  filter(A==1) %>% 
+  group_by(treatment_id, choice) %>% 
+  summarise(n_of_sub = n(),
+            endowment = mean(endowment)) %>%
+  merge.data.frame(master_don %>% 
+                     subset.data.frame(select = c(PaperID, TreatmentName_paper, 
+                                                  TreatmentCode, treatment_id)), 
+                   by = "treatment_id") %>% 
+  filter(!(is.na(TreatmentName_paper)))
+
+temp_master <- choices_don %>% 
+  distinct(treatment_id)
+
+# inizializing variables for loop
+n=1
+list_plot <- c()
+
+# creation of a plots list
+for (i in temp_master$treatment_id) {
+  
+  # dataset
+  temp_master_for <- perc_choices %>% 
+    filter(treatment_id == i)
+  temp_master_for <- temp_master_for %>% 
+    mutate(total = sum(n_of_sub), 
+           perc_per_action = round(n_of_sub/total*100, digits=2))
+  print(temp_master_for$endowment)
+  # list
+  list_plot[[n]] <- ggplot(temp_master_for, 
+                           aes(x=choice, 
+                               y=perc_per_action)) + 
+    geom_bar(stat = "identity") + 
+    labs(title = i, 
+         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+    xlim(min(choices_don %>% filter(treatment_id==i) %>% select(scenarios))-10,
+         max(choices_don %>% filter(treatment_id==i) %>% select(scenarios))+10) +
+    ylim(0,100) +
+    xlab("Choice") + 
+    ylab("Subjects (%)")
+  
+  n=n+1
+}
+
+# merge plots in one figure
+do.call('grid.arrange',c(list_plot, ncol = 2))
+```
+
+### Consistency and Specificity {.tabset .tabset-pills}
+
+<!-- tab: consistency, specificity -->
+
+<!-- #### Formulas -->
+
+<!-- $$ consistency = \frac{1}{\sigma_n}$$ -->
+
+<!-- $$ specificity = \frac{\#\ of\ negative\ actions}{\#\ of\ positive\ actions}$$ -->
+
+#### Consistency
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# dataset to plot consistency
+df_consistency_beliefs <- beliefs_don %>%
+  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  merge.data.frame(master_don %>%
+                     subset.data.frame(select = c(treatment_id,
+                                                  max_sigma)),
+                   by="treatment_id") 
+
+scenarios_w_max_appropriateness <- beliefs_don %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(KW=mean(KW_Normative)) %>%
+  summarise(scenarios=scenarios[which(KW==max(KW))])
+
+output <- merge.data.frame(scenarios_w_max_appropriateness,
+                           df_consistency_beliefs,
+                           all.x = T,
+                           by=c("treatment_id", "scenarios"))
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14}
+ggplot(output,
+       aes(x=treatment_id,
+           y=KW_Normative)) +
+  geom_boxplot() +
+  labs(title="Distribution of appropriateness of most appropriate action (norm)") +
+  xlab("Paper") +
+  scale_y_continuous(limits = quantile(output$KW_Normative, c(0.1, 0.9))) + ylab("Appropriateness")
+
+ggplot(output,
+       aes(x=KW_Normative)) +
+  geom_density() +
+  facet_wrap(~treatment_id, ncol=2)
+```
+
+#### Specificity
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+
+df_specificity_per_subject <- beliefs_don %>% 
+  group_by(subject_id) %>% 
+  mutate(n_actions_positive = sum(KW_Normative>0), 
+         n_actions_negative=sum(KW_Normative<=0), 
+         specificity = n_actions_negative/n_actions_positive)
+
+#box plot of specificity
+ggplot(df_specificity_per_subject, 
+       aes(x=treatment_id, 
+           y=specificity)) + 
+  geom_boxplot() + 
+  labs(title="Boxplot of specificity per paper") +
+  xlab("Paper") + 
+  ylab("Specificity")
+
+```
+
+### Individual-level analyses {.tabset .tabset-pills}
+
+#### Social Expectation Model
+
+$U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
+
+-   $\pi_k$ indicates the payoff
+-   $A_k$ indicates the norm appropriateness
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+mean_beliefs <- df_consistency_beliefs %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(mean_app = mean(KW_Normative),
+            sd_app = sd(KW_Normative))
+
+utility_df_treatment <- choices_don %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  mutate(payoff = endowment - scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app)
+
+utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
+
+betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+
+# mlogit
+model_se_list <- list()
+n_model = 1
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_se=mclogit::mclogit(cbind(A,choice) ~ payoff + mean_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  model_se_list[[n_model]] = model_se
+  n_model = n_model + 1
+
+  betas_se_logit <- betas_se_logit %>% 
+    rbind.data.frame(data.frame(paper = i, 
+                                alpha = as.numeric(model_se$coefficients[1]),
+                                beta=as.numeric(model_se$coefficients[2]),
+                                SE_alpha=coef(summary(model_se))[1, "Std. Error"],
+                                SE_beta=coef(summary(model_se))[2, "Std. Error"],
+                                MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
+}
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+opts <- options(knitr.kable.NA = "")
+kbl(betas_se_logit,
+    digits = 4, 
+    booktabs = T, 
+    align = "lcccc", 
+    centering = F, 
+    caption="Coefficients for Social Expectation model") %>%
+  kable_styling(position = "left", 
+                full_width = F) %>%
+  column_spec(1, bold = T)
+
+ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+```
+
+<br> <br> **Model Estimates** <br> *Standard* <br>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+#standard
+tab_model(model_se_list, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model estimates for social expectation")
+```
+
+
+#### Social Expectation Augmented Model
+
+$U_{ik} = \alpha \pi_k + \beta A_k + \delta C_k + \epsilon_{ik}$
+
+-   $\pi_k$ indicates the payoff
+-   $A_k$ indicates the norm appropriateness
+-   $C_k$ indicates the consistency
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+betas_sea_logit <- data.frame(paper = NA, alpha=NA, beta=NA, delta=NA, SE_alpha=NA, SE_beta=NA, SE_delta=NA, MRS=NA)
+model_list_sea <- list()
+n_model = 1
+
+# mlogit consistency on utility_df_treatment
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea=mclogit::mclogit(cbind(A,choice)~ payoff + sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea[[n_model]] = model_sea
+  n_model = n_model +1  
+  
+  # betas_sea_logit <- betas_sea_logit %>% 
+  #   rbind.data.frame(data.frame(paper = i, 
+  #                               alpha = as.numeric(model_sea$coefficients[1]),
+  #                               beta=as.numeric(model_sea$coefficients[2]),
+  #                               delta=as.numeric(model_sea$coefficients[3]),
+  #                               SE_alpha=coef(summary(model_sea))[1, "Std. Error"],
+  #                               SE_beta=coef(summary(model_sea))[2, "Std. Error"],
+  #                               SE_delta=coef(summary(model_sea))[3, "Std. Error"],
+  #                               MRS = 2*as.numeric(model_sea$coefficients[2])/as.numeric(model_sea$coefficients[1])))
+}
+
+model_list_sea1 <- list()
+n_model = 1
+
+# mlogit consistency on utility_df_treatment
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea1=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app:sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea1[[n_model]] = model_sea1
+  n_model = n_model +1  
+}
+
+model_list_sea2 <- list()
+n_model = 1
+
+# mlogit consistency on utility_df_treatment
+for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
+  model_sea2=mclogit::mclogit(cbind(A,choice)~ payoff + mean_app + mean_app*sd_app, data=utility_df_treatment%>% 
+                           filter(treatment_id==i))
+  
+  model_list_sea2[[n_model]] = model_sea2
+  n_model = n_model +1  
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+# opts <- options(knitr.kable.NA = "")
+# kbl(betas_sea_logit,
+#     digits = 4, 
+#     booktabs = T, 
+#     align = "lcccc", 
+#     centering = F, 
+#     caption="Coefficients for model with std") %>%
+#   kable_styling(position = "left", 
+#                 full_width = F) %>%
+#   column_spec(1, bold = T)
+
+tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+tab_model(model_list_sea1, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+
+# ggplot(betas_sea_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+# 
+# ggplot(betas_sea_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
+#   geom_point() + 
+#   geom_errorbar(aes(xmin=delta-2*SE_delta,xmax=delta+2*SE_delta))
+```
+
+
+
+#### Inequality Aversion model (Fehr & Schimdt 1999)
+
+$U_{ik} = \pi_k - \alpha*max( \pi_{jk} - \pi_{ik}) - \beta*max( \pi_{ik} - \pi_{jk})$
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+choices_df_sp <- choices_don %>% mutate(payoff=endowment-scenarios,
+                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
+
+utility_df_treatment_sp <- choices_df_sp %>%
+  merge.data.frame(mean_beliefs) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app) 
+
+utility_df_treatment_sp$id = utility_df_treatment_sp %>% group_indices(subject_id)
+
+
+# mlogit
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2020And089_1"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper1 <- mlogit(A~ other_payoff_ahead + other_payoff_behind| 0, df)
+
+df <- mlogit.data(utility_df_treatment_sp %>% filter(treatment_id=="2020And089_2"),choice = "A", shape = "long", alt.var = "scenarios")
+ml.paper2 <- mlogit(A~other_payoff_ahead + other_payoff_behind | 0, df)
+
+
+list_model = list(ml.paper1, ml.paper2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
+tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
