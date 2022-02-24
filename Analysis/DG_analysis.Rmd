@@ -535,7 +535,7 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 #                 full_width = F) %>%
 #   column_spec(1, bold = T)
 
-prova_model <- tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
+tab_model(model_list_sea, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 tab_model(model_list_sea1, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 tab_model(model_list_sea2, dv.labels = levels(as.factor(utility_df_treatment$treatment_id)), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates")
 
@@ -1489,3 +1489,116 @@ tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = 
 
 ## AIC: Model Comparison {.tabset .tabset-pills}
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+master_aic_analysis <- master %>% 
+  filter(Game_type %in% c("DG","ToG", "Donation Game")) %>%
+  subset.data.frame(subset = !(Standard_game %in% c("N")) & 
+                      Choice_Method != "OnlyNorms" & 
+                      StatusTreatment_Roma == "6-Complete" & 
+                      Baseline %in% c(NA, 1)) %>% 
+  mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
+
+
+# read file beliefs and choices
+choices_aic_analysis <- choices  %>%
+  filter(treatment_id %in% levels(as.factor(paste(master_aic_analysis$PaperID,"_",master_aic_analysis$TreatmentCode, sep=""))))
+
+choices_aic_analysis <- choices_aic_analysis %>% mutate(payoff=endowment-scenarios,
+                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
+
+beliefs_aic_analysis <- beliefs %>%
+  filter(treatment_id %in% levels(as.factor(paste(master_aic_analysis$PaperID,"_",master_aic_analysis$TreatmentCode, sep=""))))
+
+beliefs_only_kim <- beliefs_aic_analysis %>%
+  filter(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
+  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  mutate(KW_Normative_temp = KW_Normative)
+
+n_subj = length(levels(as.factor(beliefs_only_kim$subject_id)))
+
+kim003_interpolation <- data.frame(paper_id=NA,
+                           treatment_id=NA,
+                           subject_id = NA,
+                           scenarios=NA,
+                           KW_Normative=NA,
+                           KW_Normative_temp=NA)
+
+for (subj in levels(as.factor(beliefs_only_kim$subject_id))) {
+  subj_df <- data.frame(paper_id="2016Kim003",
+                        treatment_id="2016Kim003_7",
+                        subject_id = subj,
+                        scenarios=seq(1,15,2),
+                        KW_Normative = NA,
+                        KW_Normative_temp=NA)
+  
+  subj_beliefs <- beliefs_only_kim %>%
+    filter(subject_id == subj)
+  #print(subj_beliefs)
+  
+  subj_beliefs <- subj_beliefs %>%
+    rbind.data.frame(subj_df) %>%
+    arrange(paper_id, treatment_id, subject_id, scenarios) %>%
+    mutate(KW_Normative = na.approx(KW_Normative_temp,
+                                    maxgap = 1,
+                                    rule = 1))
+  
+  kim003_interpolation <- subj_beliefs %>%
+    rbind.data.frame(kim003_interpolation)
+}
+
+
+beliefs_aic_analysis <- beliefs_aic_analysis %>%
+  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  filter(paper_id != "2016Kim003") %>%
+  rbind.data.frame(kim003_interpolation %>% select(-KW_Normative_temp))
+                              
+mean_beliefs_aic_analysis <- beliefs_aic_analysis %>%
+  group_by(treatment_id, scenarios) %>%
+  summarise(mean_app = mean(KW_Normative),
+            sd_app = sd(KW_Normative))
+
+utility_df_treatment_aic_analysis <- choices_aic_analysis %>%
+  merge.data.frame(mean_beliefs_aic_analysis) %>%
+  arrange(paper_id,treatment_id,subject_id,scenarios) %>%
+  relocate(paper_id,treatment_id,subject_id,scenarios,choice,A,endowment,
+           payoff,mean_app,sd_app) 
+
+utility_df_treatment_aic_analysis$id = utility_df_treatment_aic_analysis %>% group_indices(subject_id)
+
+# function for iteration
+comparison_aic = function(treatment) {
+  
+  print(treatment)
+  social_expectation_model=clogit(A ~ payoff + mean_app + strata(subject_id), 
+                                  data=utility_df_treatment_aic_analysis %>% 
+                                    filter(treatment_id==treatment))
+  print(social_expectation_model)
+  
+  social_expectation_augmented_model=clogit(A ~ payoff + mean_app + mean_app*sd_app + strata(subject_id), 
+                                  data=utility_df_treatment_aic_analysis %>% 
+                                    filter(treatment_id==treatment))
+  print(social_expectation_augmented_model)
+  
+  inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), 
+                                  data=utility_df_treatment_aic_analysis %>% 
+                                    filter(treatment_id==treatment))
+  print(inequality_aversion_model)
+  
+  inequality_social_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + mean_app + strata(subject_id), 
+                                  data=utility_df_treatment_aic_analysis %>% 
+                                    filter(treatment_id==treatment))
+  print(inequality_social_model)
+  
+  models <- list(social_expectation_model,social_expectation_augmented_model,inequality_aversion_model,inequality_social_model)
+  model.names <- c('social expectation', 'social expectation augmented', 'inequality aversion', 'inequality & social')
+  print(aictab(cand.set = models, modnames = model.names))
+  
+}
+
+for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
+  comparison_aic(t)
+}
+
+```
