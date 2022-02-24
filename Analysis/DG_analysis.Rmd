@@ -360,7 +360,7 @@ ggplot(df_specificity_per_subject,
 
 #### Social Expectation Model
 
-$U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
+$U_{ik} = \delta \pi_k + \gamma A_k + \epsilon_{ik}$
 
 -   $\pi_k$ indicates the payoff
 -   $A_k$ indicates the norm appropriateness
@@ -384,7 +384,7 @@ utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 utility_df_treatment_demo <- utility_df_treatment %>%
   filter(!(paper_id %in% c("2018Her061", "2007Lis165", "2012Laz164", "2013Kru001")))
 
-betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+betas_se_logit <- data.frame(paper = NA, delta=NA, gamma=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
 
 # mlogit
 model_se_list <- list()
@@ -398,10 +398,10 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 
   betas_se_logit <- betas_se_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model_se$coefficients[1]),
-                                beta=as.numeric(model_se$coefficients[2]),
-                                SE_alpha=coef(summary(model_se))[1, "Std. Error"],
-                                SE_beta=coef(summary(model_se))[2, "Std. Error"],
+                                delta = as.numeric(model_se$coefficients[1]),
+                                gamma=as.numeric(model_se$coefficients[2]),
+                                SE_delta=coef(summary(model_se))[1, "Std. Error"],
+                                SE_gamma=coef(summary(model_se))[2, "Std. Error"],
                                 MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
 }
 
@@ -440,9 +440,9 @@ kbl(betas_se_logit,
                 full_width = F) %>%
   column_spec(1, bold = T)
 
-ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(gamma), aes(x=gamma,y=paper)) + 
   geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+  geom_errorbar(aes(xmin=gamma-2*SE_gamma,xmax=gamma+2*SE_gamma))
 ```
 
 <br> <br> **Model Estimates** <br> *Standard* <br>
@@ -854,7 +854,7 @@ ggplot(df_specificity_per_subject,
 
 #### Social Expectation Model
 
-$U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
+$U_{ik} = \delta \pi_k + \gamma A_k + \epsilon_{ik}$
 
 -   $\pi_k$ indicates the payoff
 -   $A_k$ indicates the norm appropriateness
@@ -878,7 +878,7 @@ utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 utility_df_treatment_demo <- utility_df_treatment %>%
   filter(!(paper_id %in% c("2007Lis165", "2013Kru001")))
 
-betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+betas_se_logit <- data.frame(paper = NA, delta=NA, gamma=NA, SE_delta=NA, SE_gamma=NA, MRS=NA)
 
 # mlogit
 model_se_list <- list()
@@ -891,10 +891,10 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 
   betas_se_logit <- betas_se_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model_se$coefficients[1]),
-                                beta=as.numeric(model_se$coefficients[2]),
-                                SE_alpha=coef(summary(model_se))[1, "Std. Error"],
-                                SE_beta=coef(summary(model_se))[2, "Std. Error"],
+                                delta = as.numeric(model_se$coefficients[1]),
+                                gamma=as.numeric(model_se$coefficients[2]),
+                                SE_delta=coef(summary(model_se))[1, "Std. Error"],
+                                SE_gamma=coef(summary(model_se))[2, "Std. Error"],
                                 MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
 }
 
@@ -935,7 +935,7 @@ kbl(betas_se_logit,
 
 ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+  geom_errorbar(aes(xmin=gamma-2*SE_gamma,xmax=gamma+2*SE_gamma))
 ```
 
 <br> <br> **Model Estimates** <br> *Standard* <br>
@@ -1302,7 +1302,7 @@ ggplot(df_specificity_per_subject,
 
 #### Social Expectation Model
 
-$U_{ik} = \alpha \pi_k + \beta A_k + \epsilon_{ik}$
+$U_{ik} = \delta \pi_k + \gamma A_k + \epsilon_{ik}$
 
 -   $\pi_k$ indicates the payoff
 -   $A_k$ indicates the norm appropriateness
@@ -1322,7 +1322,7 @@ utility_df_treatment <- choices_don %>%
 
 utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 
-betas_se_logit <- data.frame(paper = NA, alpha=NA, beta=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+betas_se_logit <- data.frame(paper = NA, delta=NA, gamma=NA, SE_delta=NA, SE_gamma=NA, MRS=NA)
 
 # mlogit
 model_se_list <- list()
@@ -1335,10 +1335,10 @@ for (i in levels(as.factor(utility_df_treatment$treatment_id))) {
 
   betas_se_logit <- betas_se_logit %>% 
     rbind.data.frame(data.frame(paper = i, 
-                                alpha = as.numeric(model_se$coefficients[1]),
-                                beta=as.numeric(model_se$coefficients[2]),
-                                SE_alpha=coef(summary(model_se))[1, "Std. Error"],
-                                SE_beta=coef(summary(model_se))[2, "Std. Error"],
+                                delta = as.numeric(model_se$coefficients[1]),
+                                gamma=as.numeric(model_se$coefficients[2]),
+                                SE_delta=coef(summary(model_se))[1, "Std. Error"],
+                                SE_gamma=coef(summary(model_se))[2, "Std. Error"],
                                 MRS = 2*as.numeric(model_se$coefficients[2])/as.numeric(model_se$coefficients[1])))
 }
 
@@ -1358,7 +1358,7 @@ kbl(betas_se_logit,
 
 ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
   geom_point() + 
-  geom_errorbar(aes(xmin=beta-2*SE_beta,xmax=beta+2*SE_beta))
+  geom_errorbar(aes(xmin=gamma-2*SE_gamma,xmax=gamma+2*SE_gamma))
 ```
 
 <br> <br> **Model Estimates** <br> *Standard* <br>
@@ -1567,38 +1567,49 @@ utility_df_treatment_aic_analysis <- choices_aic_analysis %>%
 
 utility_df_treatment_aic_analysis$id = utility_df_treatment_aic_analysis %>% group_indices(subject_id)
 
+
 # function for iteration
 comparison_aic = function(treatment) {
   
-  print(treatment)
   social_expectation_model=clogit(A ~ payoff + mean_app + strata(subject_id), 
                                   data=utility_df_treatment_aic_analysis %>% 
                                     filter(treatment_id==treatment))
-  print(social_expectation_model)
-  
-  social_expectation_augmented_model=clogit(A ~ payoff + mean_app + mean_app*sd_app + strata(subject_id), 
-                                  data=utility_df_treatment_aic_analysis %>% 
-                                    filter(treatment_id==treatment))
-  print(social_expectation_augmented_model)
-  
+
   inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), 
                                   data=utility_df_treatment_aic_analysis %>% 
                                     filter(treatment_id==treatment))
-  print(inequality_aversion_model)
+
+  models <- list(social_expectation_model,inequality_aversion_model)
+  model.names <- c('social expectation', 'inequality aversion')
+  aic_comp_t <- aictab(cand.set = models, modnames = model.names)
+  row.names(aic_comp_t) <- aic_comp_t[,1]
+  paper_and_aic <- list(treatment, aic_comp_t)
+  names(paper_and_aic) <- c("paper","aic")
+  invisible(paper_and_aic)
   
-  inequality_social_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + mean_app + strata(subject_id), 
-                                  data=utility_df_treatment_aic_analysis %>% 
-                                    filter(treatment_id==treatment))
-  print(inequality_social_model)
-  
-  models <- list(social_expectation_model,social_expectation_augmented_model,inequality_aversion_model,inequality_social_model)
-  model.names <- c('social expectation', 'social expectation augmented', 'inequality aversion', 'inequality & social')
-  print(aictab(cand.set = models, modnames = model.names))
   
 }
 
+aic_table <-data.frame()
+
 for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
-  comparison_aic(t)
+  x = comparison_aic(t)
+  treatment = x[[1]]
+  delta_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality aversion",3]]
+  
+  aic_table <- aic_table %>% 
+    rbind.data.frame(data.frame(Treatment = treatment, 
+                                Delta_AIC = delta_aic))
 }
+
+aic_table <- aic_table %>%
+  mutate(Best_model=ifelse(Delta_AIC<0,"Social Expectation", "Inequality Aversion"))
+
+ggplot(data = aic_table, aes(Delta_AIC, reorder(Treatment,-Delta_AIC))) + 
+  geom_col(aes(fill=Best_model)) + 
+  ggtitle("AIC difference between Social expectation and Inequality aversion models") +
+  xlab("AIC Delta") +
+  ylab("Treatment") +
+  theme_minimal()
 
 ```
