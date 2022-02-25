@@ -23,11 +23,13 @@ library(car)
 library(DT)
 library(zoo)
 library(AICcmodavg)
+library(boot)
 
 setwd("../")
 
 # read data beliefs and choices with ALL DATA
-master <- read.csv("File_DB/Output/Treatment.csv")
+master <- read.csv("File_DB/Output/Treatment.csv") %>%
+  mutate(treatment_id=paste(PaperID,TreatmentCode,sep="_"))
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
 
@@ -1490,7 +1492,6 @@ tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = 
 ## AIC: Model Comparison {.tabset .tabset-pills}
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-
 master_aic_analysis <- master %>% 
   filter(Game_type %in% c("DG","ToG", "Donation Game")) %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")) & 
@@ -1568,29 +1569,65 @@ utility_df_treatment_aic_analysis <- choices_aic_analysis %>%
 utility_df_treatment_aic_analysis$id = utility_df_treatment_aic_analysis %>% group_indices(subject_id)
 
 
-# function for iteration
+# function
 comparison_aic = function(treatment) {
+  df_master <- utility_df_treatment_aic_analysis %>% 
+                                    filter(treatment_id==treatment)
   
   social_expectation_model=clogit(A ~ payoff + mean_app + strata(subject_id), 
-                                  data=utility_df_treatment_aic_analysis %>% 
-                                    filter(treatment_id==treatment))
+                                  data=df_master)
+  # boot.clogit <- function(data, indices){
+  # new_data <- data[indices,] 
+  # mod <- clogit(A ~ payoff + mean_app + strata(subject_id), data = new_data, x=T, y=T)
+  # coefficients(mod)
+  # }
+  # 
+  # boot_data <- boot(data=ciao, statistic=boot.clogit, R=1000)
+  
+  social_delta = as.numeric(social_expectation_model$coefficients[1])
+  social_gamma = as.numeric(social_expectation_model$coefficients[2])
+  social_delta_se = coef(summary(social_expectation_model))[1, "se(coef)"]
+  social_gamma_se = coef(summary(social_expectation_model))[2, "se(coef)"]
 
   inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), 
-                                  data=utility_df_treatment_aic_analysis %>% 
-                                    filter(treatment_id==treatment))
+                                  data=df_master)
+  
+  inequality_alpha = as.numeric(inequality_aversion_model$coefficients[1])
+  inequality_beta = as.numeric(inequality_aversion_model$coefficients[2])
+  inequality_alpha_se = coef(summary(inequality_aversion_model))[1, "se(coef)"]
+  inequality_beta_se = coef(summary(inequality_aversion_model))[2, "se(coef)"]
 
   models <- list(social_expectation_model,inequality_aversion_model)
   model.names <- c('social expectation', 'inequality aversion')
   aic_comp_t <- aictab(cand.set = models, modnames = model.names)
   row.names(aic_comp_t) <- aic_comp_t[,1]
-  paper_and_aic <- list(treatment, aic_comp_t)
-  names(paper_and_aic) <- c("paper","aic")
-  invisible(paper_and_aic)
+  paper_and_aic_coeff <- list(treatment, 
+                              aic_comp_t,
+                              social_delta,
+                              social_gamma,
+                              social_delta_se,
+                              social_gamma_se,
+                              inequality_alpha,
+                              inequality_beta,
+                              inequality_alpha_se,
+                              inequality_beta_se)
+  names(paper_and_aic_coeff) <- c("treatment", 
+                                  "aic_comp_t",
+                                  "social_delta",
+                                  "social_gamma",
+                                  "social_delta_se",
+                                  "social_gamma_se",
+                                  "inequality_alpha",
+                                  "inequality_beta",
+                                  "inequality_alpha_se",
+                                  "inequality_beta_se")
+  invisible(paper_and_aic_coeff)
   
   
 }
 
 aic_table <-data.frame()
+social_coeff <- data.frame()
 
 for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
   x = comparison_aic(t)
@@ -1598,18 +1635,97 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
   delta_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality aversion",3]]
   
   aic_table <- aic_table %>% 
-    rbind.data.frame(data.frame(Treatment = treatment, 
+    rbind.data.frame(data.frame(treatment_id = treatment, 
                                 Delta_AIC = delta_aic))
+  
+  social_coeff <- social_coeff %>% 
+    rbind.data.frame(data.frame(treatment_id = treatment, 
+                                i_alpha = x$inequality_alpha,
+                                i_beta= x$inequality_beta,
+                                i_SE_alpha= x$inequality_alpha_se,
+                                i_SE_beta= x$inequality_alpha_se,
+                                s_delta = x$social_delta,
+                                s_gamma= x$social_gamma,
+                                s_SE_delta= x$social_delta_se,
+                                s_SE_gamma= x$social_gamma_se))
 }
 
 aic_table <- aic_table %>%
-  mutate(Best_model=ifelse(Delta_AIC<0,"Social Expectation", "Inequality Aversion"))
+  mutate(Best_model=ifelse(Delta_AIC<0,"Social Expectation", "Inequality Aversion")) %>%
+  left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
+  arrange(Game_type, Delta_AIC)
 
-ggplot(data = aic_table, aes(Delta_AIC, reorder(Treatment,-Delta_AIC))) + 
+social_coeff <- social_coeff %>%
+  left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
+  add_row(treatment_id="Average", social_coeff%>%summarise_at(.vars = vars(i_alpha:s_SE_gamma), mean), Game_type="Average")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+ggplot(data = aic_table, aes(Delta_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
   geom_col(aes(fill=Best_model)) + 
-  ggtitle("AIC difference between Social expectation and Inequality aversion models") +
+  xlim(-max(abs(aic_table$Delta_AIC))*1.2,max(abs(aic_table$Delta_AIC))*1.2) +
+  #ggtitle("AIC difference between Social expectation and Inequality aversion models") +
   xlab("AIC Delta") +
   ylab("Treatment") +
-  theme_minimal()
+  theme_light() +
+  theme(legend.position="bottom",
+        #strip.background = element_rect(color="white", fill="#FFFFFF", size=1.5, linetype="solid"),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
+        strip.background = element_blank()) +
+  scale_fill_brewer(palette="Set1") +
+  facet_wrap(~Game_type) + 
+  geom_point(shape=1) +
+  geom_vline(xintercept = 0)
+```
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+# social expectation model
+plot_s_delta <- ggplot(social_coeff, aes(x=s_delta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=s_delta-2*s_SE_delta,xmax=s_delta+2*s_SE_delta, color=Game_type), shape=20) +
+  ylab("Treatment ID") +
+  xlab("Coefficient of payoff (delta)") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_s_gamma <- ggplot(social_coeff, aes(x=s_gamma,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=s_gamma-2*s_SE_gamma,xmax=s_gamma+2*s_SE_gamma, color=Game_type), shape=20) +
+  xlab("Coefficient of norm expectation (gamma)") +
+  theme_light() +
+  theme(axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+  
+ggarrange(plot_s_delta, plot_s_gamma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+# inequality aversion model
+plot_i_alpha <- ggplot(social_coeff, aes(x=i_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=i_alpha-2*i_SE_alpha,xmax=i_alpha+2*i_SE_alpha, color=Game_type), shape=20) +
+  ylab("Treatment ID") +
+  xlab("Coefficient of other payoff ahead (alpha)") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_i_beta <- ggplot(social_coeff, aes(x=i_beta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=i_beta-2*i_SE_beta,xmax=i_beta+2*i_SE_beta, color=Game_type), shape=20) +
+  xlab("Coefficient of other payoff behind (beta)") +
+  theme_light() +
+  theme(axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+  
+ggarrange(plot_i_alpha, plot_i_beta, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
