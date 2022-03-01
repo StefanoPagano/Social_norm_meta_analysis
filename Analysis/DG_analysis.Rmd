@@ -386,7 +386,7 @@ utility_df_treatment$id = utility_df_treatment %>% group_indices(subject_id)
 utility_df_treatment_demo <- utility_df_treatment %>%
   filter(!(paper_id %in% c("2018Her061", "2007Lis165", "2012Laz164", "2013Kru001")))
 
-betas_se_logit <- data.frame(paper = NA, delta=NA, gamma=NA, SE_alpha=NA, SE_beta=NA, MRS=NA)
+betas_se_logit <- data.frame(paper = NA, delta=NA, gamma=NA, SE_delta=NA, SE_gamma=NA, MRS=NA)
 
 # mlogit
 model_se_list <- list()
@@ -935,7 +935,7 @@ kbl(betas_se_logit,
                 full_width = F) %>%
   column_spec(1, bold = T)
 
-ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+ggplot(betas_se_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=gamma-2*SE_gamma,xmax=gamma+2*SE_gamma))
 ```
@@ -1358,7 +1358,7 @@ kbl(betas_se_logit,
                 full_width = F) %>%
   column_spec(1, bold = T)
 
-ggplot(betas_se_logit %>% filter(!(is.na(beta))) %>% arrange(beta), aes(x=beta,y=paper)) + 
+ggplot(betas_se_logit %>% filter(!(is.na(delta))) %>% arrange(delta), aes(x=delta,y=paper)) + 
   geom_point() + 
   geom_errorbar(aes(xmin=gamma-2*SE_gamma,xmax=gamma+2*SE_gamma))
 ```
