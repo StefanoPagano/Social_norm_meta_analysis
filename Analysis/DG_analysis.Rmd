@@ -1558,7 +1558,8 @@ beliefs_aic_analysis <- beliefs_aic_analysis %>%
 mean_beliefs_aic_analysis <- beliefs_aic_analysis %>%
   group_by(treatment_id, scenarios) %>%
   summarise(mean_app = mean(KW_Normative),
-            sd_app = sd(KW_Normative))
+            sd_app = sd(KW_Normative),
+            log_sd_app = log(sd_app))
 
 utility_df_treatment_aic_analysis <- choices_aic_analysis %>%
   merge.data.frame(mean_beliefs_aic_analysis) %>%
