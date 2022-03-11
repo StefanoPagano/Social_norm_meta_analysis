@@ -1507,7 +1507,9 @@ choices_aic_analysis <- choices  %>%
 
 choices_aic_analysis <- choices_aic_analysis %>% mutate(payoff=endowment-scenarios,
                               other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
-                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0))
+                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0),
+                              sqr_other_payoff_ahead=other_payoff_ahead^2,
+                              sqr_other_payoff_behind=other_payoff_behind^2)
 
 beliefs_aic_analysis <- beliefs %>%
   filter(treatment_id %in% levels(as.factor(paste(master_aic_analysis$PaperID,"_",master_aic_analysis$TreatmentCode, sep=""))))
@@ -1590,7 +1592,7 @@ comparison_aic = function(treatment) {
   social_delta_se = coef(summary(social_expectation_model))[1, "se(coef)"]
   social_gamma_se = coef(summary(social_expectation_model))[2, "se(coef)"]
 
-  inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), 
+  inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + sqr_other_payoff_behind + strata(subject_id), 
                                   data=df_master)
   
   inequality_alpha = as.numeric(inequality_aversion_model$coefficients[1])
