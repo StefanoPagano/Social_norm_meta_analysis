@@ -1592,16 +1592,28 @@ comparison_aic = function(treatment) {
   social_delta_se = coef(summary(social_expectation_model))[1, "se(coef)"]
   social_gamma_se = coef(summary(social_expectation_model))[2, "se(coef)"]
 
-  inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + sqr_other_payoff_behind + strata(subject_id), 
+  inequality_aversion_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), 
                                   data=df_master)
   
   inequality_alpha = as.numeric(inequality_aversion_model$coefficients[1])
   inequality_beta = as.numeric(inequality_aversion_model$coefficients[2])
   inequality_alpha_se = coef(summary(inequality_aversion_model))[1, "se(coef)"]
   inequality_beta_se = coef(summary(inequality_aversion_model))[2, "se(coef)"]
+  
+  inequality_aversion_sqr_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + sqr_other_payoff_behind + strata(subject_id), 
+                                  data=df_master)
+  
+  inequality_sqr_alpha = as.numeric(inequality_aversion_sqr_model$coefficients[1])
+  inequality_sqr_beta = as.numeric(inequality_aversion_sqr_model$coefficients[2])
+  inequality_sqr_delta = as.numeric(inequality_aversion_sqr_model$coefficients[3])
+  inequality_sqr_gamma = as.numeric(inequality_aversion_sqr_model$coefficients[4])
+  inequality_sqr_alpha_se = coef(summary(inequality_aversion_sqr_model))[1, "se(coef)"]
+  inequality_sqr_beta_se = coef(summary(inequality_aversion_sqr_model))[2, "se(coef)"]
+  inequality_sqr_delta_se = coef(summary(inequality_aversion_sqr_model))[3, "se(coef)"]
+  inequality_sqr_gamma_se = coef(summary(inequality_aversion_sqr_model))[4, "se(coef)"]
 
-  models <- list(social_expectation_model,inequality_aversion_model)
-  model.names <- c('social expectation', 'inequality aversion')
+  models <- list(social_expectation_model,inequality_aversion_model, inequality_aversion_sqr_model)
+  model.names <- c('social expectation', 'inequality aversion', "inequality sqr")
   aic_comp_t <- aictab(cand.set = models, modnames = model.names)
   row.names(aic_comp_t) <- aic_comp_t[,1]
   paper_and_aic_coeff <- list(treatment, 
@@ -1613,7 +1625,16 @@ comparison_aic = function(treatment) {
                               inequality_alpha,
                               inequality_beta,
                               inequality_alpha_se,
-                              inequality_beta_se)
+                              inequality_beta_se,
+                              inequality_sqr_alpha,
+                              inequality_sqr_beta,
+                              inequality_sqr_delta,
+                              inequality_sqr_gamma,
+                              inequality_sqr_alpha_se,
+                              inequality_sqr_beta_se,
+                              inequality_sqr_delta_se,
+                              inequality_sqr_gamma_se,
+                              models)
   names(paper_and_aic_coeff) <- c("treatment", 
                                   "aic_comp_t",
                                   "social_delta",
@@ -1623,10 +1644,18 @@ comparison_aic = function(treatment) {
                                   "inequality_alpha",
                                   "inequality_beta",
                                   "inequality_alpha_se",
-                                  "inequality_beta_se")
+                                  "inequality_beta_se",
+                                  "inequality_sqr_alpha",
+                                  "inequality_sqr_beta",
+                                  "inequality_sqr_delta",
+                                  "inequality_sqr_gamma",
+                                  "inequality_sqr_alpha_se",
+                                  "inequality_sqr_beta_se",
+                                  "inequality_sqr_delta_se",
+                                  "inequality_sqr_gamma_se",
+                                  "models")
   invisible(paper_and_aic_coeff)
-  
-  
+  print(models)
 }
 
 aic_table <-data.frame()
@@ -1635,18 +1664,30 @@ social_coeff <- data.frame()
 for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
   x = comparison_aic(t)
   treatment = x[[1]]
-  delta_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality aversion",3]]
+  delta_se_ia_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality aversion",3]]
+  delta_ia_iasqr_aic = x[[2]][["inequality aversion",3]] - x[[2]][["inequality sqr",3]]
+  delta_se_iasqr_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality sqr",3]]
   
   aic_table <- aic_table %>% 
     rbind.data.frame(data.frame(treatment_id = treatment, 
-                                Delta_AIC = delta_aic))
+                                Delta_SE_IA_AIC = delta_se_ia_aic,
+                                Delta_IA_IASQR_AIC = delta_ia_iasqr_aic,
+                                Delta_SE_IASQR_AIC = delta_se_iasqr_aic))
   
   social_coeff <- social_coeff %>% 
     rbind.data.frame(data.frame(treatment_id = treatment, 
                                 i_alpha = x$inequality_alpha,
                                 i_beta= x$inequality_beta,
                                 i_SE_alpha= x$inequality_alpha_se,
-                                i_SE_beta= x$inequality_alpha_se,
+                                i_SE_beta= x$inequality_beta_se,
+                                ia_sqr_alpha = x$inequality_sqr_alpha,
+                                ia_sqr_beta= x$inequality_sqr_beta,
+                                ia_sqr_delta = x$inequality_sqr_delta,
+                                ia_sqr_gamma= x$inequality_sqr_gamma,
+                                ia_sqr_SE_alpha= x$inequality_sqr_alpha_se,
+                                ia_sqr_SE_beta= x$inequality_sqr_beta_se,
+                                ia_sqr_SE_delta= x$inequality_sqr_delta_se,
+                                ia_sqr_SE_gamma= x$inequality_sqr_gamma_se,
                                 s_delta = x$social_delta,
                                 s_gamma= x$social_gamma,
                                 s_SE_delta= x$social_delta_se,
@@ -1654,9 +1695,11 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
 }
 
 aic_table <- aic_table %>%
-  mutate(Best_model=ifelse(Delta_AIC<0,"Social Expectation", "Inequality Aversion")) %>%
+  mutate(Best_model_se_ia=ifelse(Delta_SE_IA_AIC<0,"Social Expectation", "Inequality Aversion"),
+         Best_model_ia_iasqr=ifelse(Delta_IA_IASQR_AIC<0,"Inequality Aversion", "Inequality sqr"),
+         Best_model_se_iasqr=ifelse(Delta_SE_IASQR_AIC<0,"Social Expectation", "Inequality sqr")) %>%
   left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
-  arrange(Game_type, Delta_AIC)
+  arrange(Game_type)
 
 social_coeff <- social_coeff %>%
   left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
@@ -1665,15 +1708,46 @@ social_coeff <- social_coeff %>%
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-ggplot(data = aic_table, aes(Delta_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
-  geom_col(aes(fill=Best_model)) + 
-  xlim(-max(abs(aic_table$Delta_AIC))*1.2,max(abs(aic_table$Delta_AIC))*1.2) +
-  #ggtitle("AIC difference between Social expectation and Inequality aversion models") +
+ggplot(data = aic_table, aes(Delta_SE_IA_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_col(aes(fill=Best_model_se_ia)) + 
+  xlim(-max(abs(aic_table$Delta_SE_IA_AIC))*1.2,max(abs(aic_table$Delta_SE_IA_AIC))*1.2) +
   xlab("AIC Delta") +
   ylab("Treatment") +
+  labs(title = "Social expectation vs Inequality Aversion model")+
   theme_light() +
   theme(legend.position="bottom",
-        #strip.background = element_rect(color="white", fill="#FFFFFF", size=1.5, linetype="solid"),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
+        strip.background = element_blank()) +
+  scale_fill_brewer(palette="Set1") +
+  facet_wrap(~Game_type) + 
+  geom_point(shape=1) +
+  geom_vline(xintercept = 0)
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+ggplot(data = aic_table, aes(Delta_IA_IASQR_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_col(aes(fill=Best_model_ia_iasqr)) + 
+  xlim(-max(abs(aic_table$Delta_IA_IASQR_AIC))*1.2,max(abs(aic_table$Delta_IA_IASQR_AIC))*1.2) +
+  xlab("AIC Delta") +
+  ylab("Treatment") +
+  labs(title = "Inequality Aversion model vs Inequality sqr model")+
+  theme_light() +
+  theme(legend.position="bottom",
+        strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
+        strip.background = element_blank()) +
+  scale_fill_brewer(palette="Set1") +
+  facet_wrap(~Game_type) + 
+  geom_point(shape=1) +
+  geom_vline(xintercept = 0)
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+ggplot(data = aic_table, aes(Delta_SE_IASQR_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_col(aes(fill=Best_model_se_iasqr)) + 
+  xlim(-max(abs(aic_table$Delta_SE_IASQR_AIC))*1.2,max(abs(aic_table$Delta_SE_IASQR_AIC))*1.2) +
+  xlab("AIC Delta") +
+  ylab("Treatment") +
+  labs(title = "Social expectation vs Inequality sqr model")+
+  theme_light() +
+  theme(legend.position="bottom",
         strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
         strip.background = element_blank()) +
   scale_fill_brewer(palette="Set1") +
