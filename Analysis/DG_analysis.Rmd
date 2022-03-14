@@ -1655,7 +1655,6 @@ comparison_aic = function(treatment) {
                                   "inequality_sqr_gamma_se",
                                   "models")
   invisible(paper_and_aic_coeff)
-  print(models)
 }
 
 aic_table <-data.frame()
