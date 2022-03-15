@@ -1659,6 +1659,8 @@ comparison_aic = function(treatment) {
 
 aic_table <-data.frame()
 social_coeff <- data.frame()
+models <- list()
+names_model <- c()
 
 for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
   x = comparison_aic(t)
@@ -1691,6 +1693,9 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
                                 s_gamma= x$social_gamma,
                                 s_SE_delta= x$social_delta_se,
                                 s_SE_gamma= x$social_gamma_se))
+
+models[[length(models)+1]] <- x$models
+names_model <- append(names_model, x$treatment)
 }
 
 aic_table <- aic_table %>%
