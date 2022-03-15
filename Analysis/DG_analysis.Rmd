@@ -1818,7 +1818,7 @@ plot_i_beta <- ggplot(social_coeff, aes(x=i_beta,y=fct_rev(fct_reorder(treatment
 ggarrange(plot_i_alpha, plot_i_beta, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.height=7}
 
 # inequality aversion sqr model
 plot_ia_sqr_alpha <- ggplot(social_coeff, aes(x=ia_sqr_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
