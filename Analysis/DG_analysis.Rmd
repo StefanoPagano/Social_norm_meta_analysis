@@ -1700,9 +1700,21 @@ aic_table <- aic_table %>%
   left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
   arrange(Game_type)
 
+n_subject <- choices %>%
+  group_by(treatment_id) %>%
+  summarise(n=length(unique(subject_id)))
+
 social_coeff <- social_coeff %>%
   left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
-  add_row(treatment_id="Average", social_coeff%>%summarise_at(.vars = vars(i_alpha:s_SE_gamma), mean), Game_type="Average")
+  left_join(n_subject, by = "treatment_id") %>%
+  mutate(i_SE_beta=ifelse(i_SE_beta>100, NA, i_SE_beta),
+         ia_sqr_SE_beta=ifelse(ia_sqr_SE_beta>100, NA, ia_sqr_SE_beta),
+         ia_sqr_SE_gamma=ifelse(ia_sqr_SE_gamma>100, NA, ia_sqr_SE_gamma)) 
+
+average_coeff <- social_coeff %>% summarise(across(i_alpha:s_SE_gamma, ~weighted.mean(., w = n, na.rm=T)))
+
+social_coeff <- social_coeff %>%
+   add_row(treatment_id="Average", average_coeff , Game_type="Average", n=sum(social_coeff$n))
 ```
 
 
@@ -1804,4 +1816,48 @@ plot_i_beta <- ggplot(social_coeff, aes(x=i_beta,y=fct_rev(fct_reorder(treatment
   geom_vline(xintercept = 0)
   
 ggarrange(plot_i_alpha, plot_i_beta, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+
+# inequality aversion sqr model
+plot_ia_sqr_alpha <- ggplot(social_coeff, aes(x=ia_sqr_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=ia_sqr_alpha-2*ia_sqr_SE_alpha,xmax=ia_sqr_alpha+2*ia_sqr_SE_alpha, color=Game_type), shape=20) +
+  ylab("Treatment ID") +
+  xlab("Coefficient of other payoff ahead (alpha)") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_ia_sqr_beta <- ggplot(social_coeff, aes(x=ia_sqr_beta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=ia_sqr_beta-2*ia_sqr_SE_beta,xmax=ia_sqr_beta+2*ia_sqr_SE_beta, color=Game_type), shape=20) +
+  ylab("Treatment ID") +
+  xlab("Coefficient of other payoff behind (beta)") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_ia_sqr_delta <- ggplot(social_coeff, aes(x=ia_sqr_delta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=ia_sqr_delta-2*ia_sqr_SE_delta,xmax=ia_sqr_delta+2*ia_sqr_SE_delta, color=Game_type), shape=20) +
+  xlab("Coefficient of other payoff behind (alpha2)") +
+  theme_light() +
+  theme(axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_ia_sqr_gamma <- ggplot(social_coeff, aes(x=ia_sqr_gamma,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=ia_sqr_gamma-2*ia_sqr_SE_gamma,xmax=ia_sqr_gamma+2*ia_sqr_SE_gamma, color=Game_type), shape=20) +
+  xlab("Coefficient of other payoff behind (beta2)") +
+  theme_light() +
+  theme(axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+  
+ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_delta, plot_ia_sqr_beta, plot_ia_sqr_gamma, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
