@@ -1493,7 +1493,7 @@ tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 master_aic_analysis <- master %>% 
-  filter(Game_type %in% c("DG","ToG", "Donation Game")) %>%
+  filter(Game_type %in% c("DG")) %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")) & 
                       Choice_Method != "OnlyNorms" & 
                       StatusTreatment_Roma == "6-Complete" & 
@@ -1605,12 +1605,12 @@ comparison_aic = function(treatment) {
   
   inequality_sqr_alpha = as.numeric(inequality_aversion_sqr_model$coefficients[1])
   inequality_sqr_beta = as.numeric(inequality_aversion_sqr_model$coefficients[2])
-  inequality_sqr_delta = as.numeric(inequality_aversion_sqr_model$coefficients[3])
-  inequality_sqr_gamma = as.numeric(inequality_aversion_sqr_model$coefficients[4])
+  inequality_sqr_alpha2 = as.numeric(inequality_aversion_sqr_model$coefficients[3])
+  #inequality_sqr_beta2 = as.numeric(inequality_aversion_sqr_model$coefficients[4])
   inequality_sqr_alpha_se = coef(summary(inequality_aversion_sqr_model))[1, "se(coef)"]
   inequality_sqr_beta_se = coef(summary(inequality_aversion_sqr_model))[2, "se(coef)"]
-  inequality_sqr_delta_se = coef(summary(inequality_aversion_sqr_model))[3, "se(coef)"]
-  inequality_sqr_gamma_se = coef(summary(inequality_aversion_sqr_model))[4, "se(coef)"]
+  inequality_sqr_alpha2_se = coef(summary(inequality_aversion_sqr_model))[3, "se(coef)"]
+  #inequality_sqr_beta2_se = coef(summary(inequality_aversion_sqr_model))[4, "se(coef)"]
 
   models <- list(social_expectation_model,inequality_aversion_model, inequality_aversion_sqr_model)
   model.names <- c('social expectation', 'inequality aversion', "inequality sqr")
@@ -1628,12 +1628,12 @@ comparison_aic = function(treatment) {
                               inequality_beta_se,
                               inequality_sqr_alpha,
                               inequality_sqr_beta,
-                              inequality_sqr_delta,
-                              inequality_sqr_gamma,
+                              inequality_sqr_alpha2,
+                              #inequality_sqr_beta2,
                               inequality_sqr_alpha_se,
                               inequality_sqr_beta_se,
-                              inequality_sqr_delta_se,
-                              inequality_sqr_gamma_se,
+                              inequality_sqr_alpha2_se,
+                              #inequality_sqr_beta2_se,
                               models)
   names(paper_and_aic_coeff) <- c("treatment", 
                                   "aic_comp_t",
@@ -1647,16 +1647,19 @@ comparison_aic = function(treatment) {
                                   "inequality_beta_se",
                                   "inequality_sqr_alpha",
                                   "inequality_sqr_beta",
-                                  "inequality_sqr_delta",
-                                  "inequality_sqr_gamma",
+                                  "inequality_sqr_alpha2",
+                                  #"inequality_sqr_beta2",
                                   "inequality_sqr_alpha_se",
                                   "inequality_sqr_beta_se",
-                                  "inequality_sqr_delta_se",
-                                  "inequality_sqr_gamma_se",
+                                  "inequality_sqr_alpha2_se",
+                                  #"inequality_sqr_beta2_se",
                                   "models")
   invisible(paper_and_aic_coeff)
 }
+```
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 aic_table <-data.frame()
 social_coeff <- data.frame()
 models <- list()
@@ -1679,24 +1682,26 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
     rbind.data.frame(data.frame(treatment_id = treatment, 
                                 i_alpha = x$inequality_alpha,
                                 i_beta= x$inequality_beta,
-                                i_SE_alpha= x$inequality_alpha_se,
-                                i_SE_beta= x$inequality_beta_se,
                                 ia_sqr_alpha = x$inequality_sqr_alpha,
                                 ia_sqr_beta= x$inequality_sqr_beta,
-                                ia_sqr_delta = x$inequality_sqr_delta,
-                                ia_sqr_gamma= x$inequality_sqr_gamma,
-                                ia_sqr_SE_alpha= x$inequality_sqr_alpha_se,
-                                ia_sqr_SE_beta= x$inequality_sqr_beta_se,
-                                ia_sqr_SE_delta= x$inequality_sqr_delta_se,
-                                ia_sqr_SE_gamma= x$inequality_sqr_gamma_se,
+                                ia_sqr_alpha2 = x$inequality_sqr_alpha2,
+                                #ia_sqr_beta2= x$inequality_sqr_beta2,
                                 s_delta = x$social_delta,
                                 s_gamma= x$social_gamma,
+                                i_SE_alpha= x$inequality_alpha_se,
+                                i_SE_beta= x$inequality_beta_se,
+                                ia_sqr_SE_alpha= x$inequality_sqr_alpha_se,
+                                ia_sqr_SE_beta= x$inequality_sqr_beta_se,
+                                ia_sqr_SE_alpha2= x$inequality_sqr_alpha2_se,
+                                #ia_sqr_SE_beta2= x$inequality_sqr_beta2_se,
                                 s_SE_delta= x$social_delta_se,
                                 s_SE_gamma= x$social_gamma_se))
 
 models[[length(models)+1]] <- x$models
 names_model <- append(names_model, x$treatment)
 }
+
+names(models) <- names_model
 
 aic_table <- aic_table %>%
   mutate(Best_model_se_ia=ifelse(Delta_SE_IA_AIC<0,"Social Expectation", "Inequality Aversion"),
@@ -1714,12 +1719,14 @@ social_coeff <- social_coeff %>%
   left_join(n_subject, by = "treatment_id") %>%
   mutate(i_SE_beta=ifelse(i_SE_beta>100, NA, i_SE_beta),
          ia_sqr_SE_beta=ifelse(ia_sqr_SE_beta>100, NA, ia_sqr_SE_beta),
-         ia_sqr_SE_gamma=ifelse(ia_sqr_SE_gamma>100, NA, ia_sqr_SE_gamma)) 
+         #ia_sqr_SE_beta2=ifelse(ia_sqr_SE_beta2>100, NA, ia_sqr_SE_beta2),
+         weight_SE=(n)^2) 
 
-average_coeff <- social_coeff %>% summarise(across(i_alpha:s_SE_gamma, ~weighted.mean(., w = n, na.rm=T)))
+average_coeff <- social_coeff %>% summarise(across(i_alpha:s_gamma, ~weighted.mean(., w = n, na.rm=T)))
+average_SE <- social_coeff %>% summarise(across(i_SE_alpha:s_SE_gamma, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 
 social_coeff <- social_coeff %>%
-   add_row(treatment_id="Average", average_coeff , Game_type="Average", n=sum(social_coeff$n))
+   add_row(treatment_id="Average", average_coeff , sqrt(average_SE), Game_type="Average", n=sum(social_coeff$n), weight_SE=sum(social_coeff$weight_SE))
 ```
 
 
@@ -1823,7 +1830,7 @@ plot_i_beta <- ggplot(social_coeff, aes(x=i_beta,y=fct_rev(fct_reorder(treatment
 ggarrange(plot_i_alpha, plot_i_beta, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.height=7}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.height=5}
 
 # inequality aversion sqr model
 plot_ia_sqr_alpha <- ggplot(social_coeff, aes(x=ia_sqr_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
@@ -1844,8 +1851,8 @@ plot_ia_sqr_beta <- ggplot(social_coeff, aes(x=ia_sqr_beta,y=fct_rev(fct_reorder
         panel.grid.minor = element_blank()) +
   geom_vline(xintercept = 0)
 
-plot_ia_sqr_delta <- ggplot(social_coeff, aes(x=ia_sqr_delta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
-  geom_pointrange(aes(xmin=ia_sqr_delta-2*ia_sqr_SE_delta,xmax=ia_sqr_delta+2*ia_sqr_SE_delta, color=Game_type), shape=20) +
+plot_ia_sqr_alpha2 <- ggplot(social_coeff, aes(x=ia_sqr_alpha2,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=ia_sqr_alpha2-2*ia_sqr_SE_alpha2,xmax=ia_sqr_alpha2+2*ia_sqr_SE_alpha2, color=Game_type), shape=20) +
   xlab("Coefficient of other payoff behind (alpha2)") +
   theme_light() +
   theme(axis.text.y=element_blank(),
@@ -1854,15 +1861,15 @@ plot_ia_sqr_delta <- ggplot(social_coeff, aes(x=ia_sqr_delta,y=fct_rev(fct_reord
         panel.grid.minor = element_blank()) +
   geom_vline(xintercept = 0)
 
-plot_ia_sqr_gamma <- ggplot(social_coeff, aes(x=ia_sqr_gamma,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
-  geom_pointrange(aes(xmin=ia_sqr_gamma-2*ia_sqr_SE_gamma,xmax=ia_sqr_gamma+2*ia_sqr_SE_gamma, color=Game_type), shape=20) +
-  xlab("Coefficient of other payoff behind (beta2)") +
-  theme_light() +
-  theme(axis.text.y=element_blank(),
-        axis.title.y=element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +
-  geom_vline(xintercept = 0)
+# plot_ia_sqr_beta2 <- ggplot(social_coeff, aes(x=ia_sqr_beta2,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+#   geom_pointrange(aes(xmin=ia_sqr_beta2-2*ia_sqr_SE_beta2,xmax=ia_sqr_beta2+2*ia_sqr_SE_beta2, color=Game_type), shape=20) +
+#   xlab("Coefficient of other payoff behind (beta2)") +
+#   theme_light() +
+#   theme(axis.text.y=element_blank(),
+#         axis.title.y=element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank()) +
+#   geom_vline(xintercept = 0)
   
-ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_delta, plot_ia_sqr_beta, plot_ia_sqr_gamma, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
+ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_alpha2, plot_ia_sqr_beta, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
