@@ -1879,7 +1879,10 @@ list_treatment=unique(master_aic_analysis$treatment_id)
 
 scenarios_treatment <- choices_aic_analysis %>%
   group_by(treatment_id) %>%
-  summarise(n_scen=length(unique(scenarios)))
+  summarise(n_scen=length(unique(scenarios)),
+            first_scen = min(scenarios),
+            last_scen = max(scenarios),
+            step_scen = round((last_scen-first_scen+1)/n_scen, digits = 1))
 
 df_real <- choices_aic_analysis %>%
   filter(A==1) %>%
@@ -1890,33 +1893,52 @@ df_real <- choices_aic_analysis %>%
          percentage=round(n_sub/tot_sub*100, digits = 2)) %>%
   left_join(scenarios_treatment, by = "treatment_id")
 
+n=1
+list_plot <- c()
 
 for (i in list_treatment) {
   
   # dataset
   temp_choice <- df_real %>% 
-    filter(treatment_id == i)
+    filter(treatment_id == i) %>%
+    mutate(model="real")
   temp_model <- models[[i]]
-  data.frame(scenarios=,pre=predict(temp_model[[1]], type = "expected")[1:11]*100, scen=c(0:10))
-  # list
-  list_plot[[n]] <- ggplot() + 
-                    geom_bar(temp_choice, 
-                             aes(x=choice, 
-                                 y=percentage),
-                             stat = "identity",
-                             alpha=0.5) + 
-                    geom_bar(temp_models[[1]],
-                             aes(x=scenarios_treatment %>% filter(treatment_id==t) %>% select(n_scen),
-                                 y=predict(temp_models[[1]][1:max(scenarios_treatment %>% filter(treatment_id==t) %>% select(n_scen))])),
-                             stat = "identity") +
-                    labs(title = i, 
-                         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-                    xlim(min(scenarios_treatment %>% filter(treatment_id==i) %>% select(scenarios))-1,
-                         max(scenarios_treatment %>% filter(treatment_id==i) %>% select(scenarios))+1) +
-                    ylim(0,100) +
-                    xlab("Choice") + 
-                    ylab("Subjects (%)")
+  temp_predict_se <- data.frame(choice=seq(as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"first_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"last_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"step_scen"])),
+                                percentage=predict(temp_model[[1]], type = "expected")[1:as.integer(scenarios_treatment[scenarios_treatment$treatment_id==i,"n_scen"])]*100) %>%
+    mutate(model="social",
+           treatment_id=i)
   
+  temp_predict_ia <- data.frame(choice=seq(as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"first_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"last_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"step_scen"])),
+                                percentage=predict(temp_model[[2]], type = "expected")[1:as.integer(scenarios_treatment[scenarios_treatment$treatment_id==i,"n_scen"])]*100)%>%
+    mutate(model="inequality",
+           treatment_id=i)
+  
+  temp_predict_sqr <- data.frame(choice=seq(as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"first_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"last_scen"]), 
+                                              as.numeric(scenarios_treatment[scenarios_treatment$treatment_id==i,"step_scen"])),
+                                percentage=predict(temp_model[[3]], type = "expected")[1:as.integer(scenarios_treatment[scenarios_treatment$treatment_id==i,"n_scen"])]*100)%>%
+    mutate(model="sqr",
+           treatment_id=i)
+  
+
+  
+  
+  # list
+  p <- ggplot(rbind.data.frame(temp_choice %>% select(treatment_id,choice, percentage, model), temp_predict_se, temp_predict_ia, temp_predict_sqr), 
+             aes(x=choice, 
+                 y=percentage, fill=model)) + 
+            geom_bar(stat="identity", position = "dodge") + 
+      labs(title = i) +
+      xlab("Choice") + 
+      ylab("Subjects (%)")
+  # 
+  list_plot[[n]] <- p
   n=n+1
 }
+
+do.call('grid.arrange',c(list_plot, ncol = 3))
 ```
