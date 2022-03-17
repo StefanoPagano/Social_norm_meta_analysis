@@ -2,14 +2,14 @@ library(tidyverse)
 library(readxl)
 rm(list = ls())
 
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/")
+setwd("~/Documents/GitHub/Social_norm_meta_analysis/File_DB")
 source("Treatment_db.R") # create treatment-level database
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/")
+setwd("~/Documents/GitHub/Social_norm_meta_analysis/File_DB")
 source("Individual_within.R") # create subject-level database for within-subject design paper 
-setwd("C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/")
+setwd("~/Documents/GitHub/Social_norm_meta_analysis/File_DB")
 source("Individual_between.R") # create subject-level database for between-subject design paper
 
-csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/Output/"
+csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/File_DB/Output/"
 
 # Subjects choices file
 Choice_DB <- rbind(Cha026_choice_1, Cha026_choice_2, Cha026_choice_3, Her061_choice, Kim003_choice_dg, Kim003_choice_ug, Bas115_choice, Laz164_choices, Lis165_base_choices, Lis165_take1_choices, Kru001_std_choices, Kru001_bully_choices, and089_pub_choices, and089_pvt_choices) %>% 

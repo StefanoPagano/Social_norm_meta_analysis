@@ -228,7 +228,7 @@ The selection criteria to identify papers in target was:
 
 ```{r descriptive_2_1, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #### SOCIAL NORMS META-ANALYSIS INFORMATION ####
-meta_dataset <- read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
+meta_dataset <- read_xlsx(path = "/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
 
 game_type_in_target = c("DG", "PGG", "PDG", "Donation Game", "UG", "TG", "ToG", "CPR", "GEG", "DG Tax", "BG", "Lying DG", "Third-Party Lying DG", "Tax Game", "Investment Game")
 
