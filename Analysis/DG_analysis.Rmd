@@ -1600,7 +1600,7 @@ comparison_aic = function(treatment) {
   inequality_alpha_se = coef(summary(inequality_aversion_model))[1, "se(coef)"]
   inequality_beta_se = coef(summary(inequality_aversion_model))[2, "se(coef)"]
   
-  inequality_aversion_sqr_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + sqr_other_payoff_behind + strata(subject_id), 
+  inequality_aversion_sqr_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + strata(subject_id), 
                                   data=df_master)
   
   inequality_sqr_alpha = as.numeric(inequality_aversion_sqr_model$coefficients[1])
@@ -1831,7 +1831,6 @@ ggarrange(plot_i_alpha, plot_i_beta, ncol = 2, common.legend=T, legend="bottom",
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.height=5}
-
 # inequality aversion sqr model
 plot_ia_sqr_alpha <- ggplot(social_coeff, aes(x=ia_sqr_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
   geom_pointrange(aes(xmin=ia_sqr_alpha-2*ia_sqr_SE_alpha,xmax=ia_sqr_alpha+2*ia_sqr_SE_alpha, color=Game_type), shape=20) +
@@ -1872,4 +1871,52 @@ plot_ia_sqr_alpha2 <- ggplot(social_coeff, aes(x=ia_sqr_alpha2,y=fct_rev(fct_reo
 #   geom_vline(xintercept = 0)
   
 ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_alpha2, plot_ia_sqr_beta, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+list_treatment=unique(master_aic_analysis$treatment_id)
+
+scenarios_treatment <- choices_aic_analysis %>%
+  group_by(treatment_id) %>%
+  summarise(n_scen=length(unique(scenarios)))
+
+df_real <- choices_aic_analysis %>%
+  filter(A==1) %>%
+  group_by(treatment_id, choice) %>%
+  summarise(n_sub=n()) %>%
+  group_by(treatment_id) %>%
+  mutate(tot_sub=sum(n_sub),
+         percentage=round(n_sub/tot_sub*100, digits = 2)) %>%
+  left_join(scenarios_treatment, by = "treatment_id")
+
+
+for (i in list_treatment) {
+  
+  # dataset
+  temp_choice <- df_real %>% 
+    filter(treatment_id == i)
+  temp_model <- models[[i]]
+  data.frame(scenarios=,pre=predict(temp_model[[1]], type = "expected")[1:11]*100, scen=c(0:10))
+  # list
+  list_plot[[n]] <- ggplot() + 
+                    geom_bar(temp_choice, 
+                             aes(x=choice, 
+                                 y=percentage),
+                             stat = "identity",
+                             alpha=0.5) + 
+                    geom_bar(temp_models[[1]],
+                             aes(x=scenarios_treatment %>% filter(treatment_id==t) %>% select(n_scen),
+                                 y=predict(temp_models[[1]][1:max(scenarios_treatment %>% filter(treatment_id==t) %>% select(n_scen))])),
+                             stat = "identity") +
+                    labs(title = i, 
+                         subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
+                    xlim(min(scenarios_treatment %>% filter(treatment_id==i) %>% select(scenarios))-1,
+                         max(scenarios_treatment %>% filter(treatment_id==i) %>% select(scenarios))+1) +
+                    ylim(0,100) +
+                    xlab("Choice") + 
+                    ylab("Subjects (%)")
+  
+  n=n+1
+}
 ```
