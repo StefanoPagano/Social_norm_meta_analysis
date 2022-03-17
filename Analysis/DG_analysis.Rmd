@@ -1940,5 +1940,5 @@ for (i in list_treatment) {
   n=n+1
 }
 
-do.call('grid.arrange',c(list_plot, ncol = 3))
+do.call('grid.arrange',c(list_plot, ncol = 3, nrow = 3, common.legend=T, legend="bottom"))
 ```
