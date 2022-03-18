@@ -1506,10 +1506,10 @@ choices_aic_analysis <- choices  %>%
   filter(treatment_id %in% levels(as.factor(paste(master_aic_analysis$PaperID,"_",master_aic_analysis$TreatmentCode, sep=""))))
 
 choices_aic_analysis <- choices_aic_analysis %>% mutate(payoff=endowment-scenarios,
-                              other_payoff_ahead=ifelse(payoff-scenarios>0,payoff-scenarios,0),
-                              other_payoff_behind=ifelse(scenarios-payoff>0,scenarios-payoff,0),
-                              sqr_other_payoff_ahead=other_payoff_ahead^2,
-                              sqr_other_payoff_behind=other_payoff_behind^2)
+                              other_payoff_ahead=-ifelse(payoff-scenarios>0,payoff-scenarios,0),
+                              other_payoff_behind=-ifelse(scenarios-payoff>0,scenarios-payoff,0),
+                              sqr_other_payoff_ahead=-other_payoff_ahead^2,
+                              sqr_other_payoff_behind=-other_payoff_behind^2)
 
 beliefs_aic_analysis <- beliefs %>%
   filter(treatment_id %in% levels(as.factor(paste(master_aic_analysis$PaperID,"_",master_aic_analysis$TreatmentCode, sep=""))))
