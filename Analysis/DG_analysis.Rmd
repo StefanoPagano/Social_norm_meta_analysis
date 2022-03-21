@@ -1612,8 +1612,18 @@ comparison_aic = function(treatment) {
   inequality_sqr_alpha2_se = coef(summary(inequality_aversion_sqr_model))[3, "se(coef)"]
   #inequality_sqr_beta2_se = coef(summary(inequality_aversion_sqr_model))[4, "se(coef)"]
 
-  models <- list(social_expectation_model,inequality_aversion_model, inequality_aversion_sqr_model)
-  model.names <- c('social expectation', 'inequality aversion', "inequality sqr")
+  mixed_model=clogit(A ~ other_payoff_ahead + other_payoff_behind + mean_app + strata(subject_id), 
+                                  data=df_master)
+  
+  mixed_alpha = as.numeric(mixed_model$coefficients[1])
+  mixed_beta = as.numeric(mixed_model$coefficients[2])
+  mixed_gamma = as.numeric(mixed_model$coefficients[3])
+  mixed_alpha_se = coef(summary(mixed_model))[1, "se(coef)"]
+  mixed_beta_se = coef(summary(mixed_model))[2, "se(coef)"]
+  mixed_gamma_se = coef(summary(mixed_model))[3, "se(coef)"]
+
+  models <- list(social_expectation_model,inequality_aversion_model, inequality_aversion_sqr_model, mixed_model)
+  model.names <- c('social expectation', 'inequality aversion', "inequality sqr", "mixed")
   aic_comp_t <- aictab(cand.set = models, modnames = model.names)
   row.names(aic_comp_t) <- aic_comp_t[,1]
   paper_and_aic_coeff <- list(treatment, 
@@ -1634,6 +1644,12 @@ comparison_aic = function(treatment) {
                               inequality_sqr_beta_se,
                               inequality_sqr_alpha2_se,
                               #inequality_sqr_beta2_se,
+                              mixed_alpha,
+                              mixed_beta,
+                              mixed_gamma,
+                              mixed_alpha_se,
+                              mixed_beta_se,
+                              mixed_gamma_se,
                               models)
   names(paper_and_aic_coeff) <- c("treatment", 
                                   "aic_comp_t",
@@ -1653,6 +1669,12 @@ comparison_aic = function(treatment) {
                                   "inequality_sqr_beta_se",
                                   "inequality_sqr_alpha2_se",
                                   #"inequality_sqr_beta2_se",
+                                  "mixed_alpha",
+                                  "mixed_beta",
+                                  "mixed_gamma",
+                                  "mixed_alpha_se",
+                                  "mixed_beta_se",
+                                  "mixed_gamma_se",
                                   "models")
   invisible(paper_and_aic_coeff)
 }
@@ -1671,12 +1693,14 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
   delta_se_ia_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality aversion",3]]
   delta_ia_iasqr_aic = x[[2]][["inequality aversion",3]] - x[[2]][["inequality sqr",3]]
   delta_se_iasqr_aic = x[[2]][["social expectation",3]] - x[[2]][["inequality sqr",3]]
+  delta_se_mixed_aic = x[[2]][["social expectation",3]] - x[[2]][["mixed",3]]
   
   aic_table <- aic_table %>% 
     rbind.data.frame(data.frame(treatment_id = treatment, 
                                 Delta_SE_IA_AIC = delta_se_ia_aic,
                                 Delta_IA_IASQR_AIC = delta_ia_iasqr_aic,
-                                Delta_SE_IASQR_AIC = delta_se_iasqr_aic))
+                                Delta_SE_IASQR_AIC = delta_se_iasqr_aic,
+                                Delta_SE_MIXED_AIC = delta_se_mixed_aic))
   
   social_coeff <- social_coeff %>% 
     rbind.data.frame(data.frame(treatment_id = treatment, 
@@ -1688,6 +1712,9 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
                                 #ia_sqr_beta2= x$inequality_sqr_beta2,
                                 s_delta = x$social_delta,
                                 s_gamma= x$social_gamma,
+                                mixed_alpha =x$mixed_alpha,
+                                mixed_beta =x$mixed_beta,
+                                mixed_gamma =x$mixed_gamma,
                                 i_SE_alpha= x$inequality_alpha_se,
                                 i_SE_beta= x$inequality_beta_se,
                                 ia_sqr_SE_alpha= x$inequality_sqr_alpha_se,
@@ -1695,7 +1722,10 @@ for (t in levels(as.factor(utility_df_treatment_aic_analysis$treatment_id))) {
                                 ia_sqr_SE_alpha2= x$inequality_sqr_alpha2_se,
                                 #ia_sqr_SE_beta2= x$inequality_sqr_beta2_se,
                                 s_SE_delta= x$social_delta_se,
-                                s_SE_gamma= x$social_gamma_se))
+                                s_SE_gamma= x$social_gamma_se,
+                                mixed_SE_alpha =x$mixed_alpha_se,
+                                mixed_SE_beta =x$mixed_beta_se,
+                                mixed_SE_gamma =x$mixed_gamma_se))
 
 models[[length(models)+1]] <- x$models
 names_model <- append(names_model, x$treatment)
@@ -1706,7 +1736,8 @@ names(models) <- names_model
 aic_table <- aic_table %>%
   mutate(Best_model_se_ia=ifelse(Delta_SE_IA_AIC<0,"Social Expectation", "Inequality Aversion"),
          Best_model_ia_iasqr=ifelse(Delta_IA_IASQR_AIC<0,"Inequality Aversion", "Inequality sqr"),
-         Best_model_se_iasqr=ifelse(Delta_SE_IASQR_AIC<0,"Social Expectation", "Inequality sqr")) %>%
+         Best_model_se_iasqr=ifelse(Delta_SE_IASQR_AIC<0,"Social Expectation", "Inequality sqr"),
+         Best_model_se_mixed=ifelse(Delta_SE_MIXED_AIC<0,"Social Expectation", "Mixed")) %>%
   left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
   arrange(Game_type)
 
@@ -1720,10 +1751,11 @@ social_coeff <- social_coeff %>%
   mutate(i_SE_beta=ifelse(i_SE_beta>100, NA, i_SE_beta),
          ia_sqr_SE_beta=ifelse(ia_sqr_SE_beta>100, NA, ia_sqr_SE_beta),
          #ia_sqr_SE_beta2=ifelse(ia_sqr_SE_beta2>100, NA, ia_sqr_SE_beta2),
+         mixed_SE_beta=ifelse(mixed_SE_beta>100, NA, mixed_SE_beta),
          weight_SE=(n)^2) 
 
-average_coeff <- social_coeff %>% summarise(across(i_alpha:s_gamma, ~weighted.mean(., w = n, na.rm=T)))
-average_SE <- social_coeff %>% summarise(across(i_SE_alpha:s_SE_gamma, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+average_coeff <- social_coeff %>% summarise(across(i_alpha:mixed_gamma, ~weighted.mean(., w = n, na.rm=T)))
+average_SE <- social_coeff %>% summarise(across(i_SE_alpha:mixed_SE_gamma, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 
 social_coeff <- social_coeff %>%
    add_row(treatment_id="Average", average_coeff , sqrt(average_SE), Game_type="Average", n=sum(social_coeff$n), weight_SE=sum(social_coeff$weight_SE))
@@ -1779,6 +1811,22 @@ ggplot(data = aic_table, aes(Delta_SE_IASQR_AIC, fct_rev(fct_reorder(treatment_i
   geom_vline(xintercept = 0)
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+ggplot(data = aic_table, aes(Delta_SE_MIXED_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_col(aes(fill=Best_model_se_mixed)) + 
+  xlim(-max(abs(aic_table$Delta_SE_MIXED_AIC))*1.2,max(abs(aic_table$Delta_SE_MIXED_AIC))*1.2) +
+  xlab("AIC Delta") +
+  ylab("Treatment") +
+  labs(title = "Social expectation vs Mixed model")+
+  theme_light() +
+  theme(legend.position="bottom",
+        strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
+        strip.background = element_blank()) +
+  scale_fill_brewer(palette="Set1") +
+  facet_wrap(~Game_type) +
+  geom_point(shape=1) +
+  geom_vline(xintercept = 0)
+```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
@@ -1872,7 +1920,39 @@ plot_ia_sqr_alpha2 <- ggplot(social_coeff, aes(x=ia_sqr_alpha2,y=fct_rev(fct_reo
   
 ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_alpha2, plot_ia_sqr_beta, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
+# mixed model
+plot_mixed_alpha <- ggplot(social_coeff, aes(x=mixed_alpha,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=mixed_alpha-2*mixed_SE_alpha,xmax=mixed_alpha+2*mixed_SE_alpha, color=Game_type), shape=20) +
+  ylab("Treatment ID") +
+  xlab("Ahead (alpha)") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_mixed_beta <- ggplot(social_coeff, aes(x=mixed_beta,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=mixed_beta-2*mixed_SE_beta,xmax=mixed_beta+2*mixed_SE_beta, color=Game_type), shape=20) +
+  xlab("Behind (beta)") +
+  theme_light() +
+  theme(axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+
+plot_mixed_gamma <- ggplot(social_coeff, aes(x=mixed_gamma,y=fct_rev(fct_reorder(treatment_id, Game_type)))) + 
+  geom_pointrange(aes(xmin=mixed_gamma-2*mixed_SE_gamma,xmax=mixed_gamma+2*mixed_SE_gamma, color=Game_type), shape=20) +
+  xlab("Norm expectation (gamma)") +
+  theme_light() +
+  ylab("Treatment ID") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  geom_vline(xintercept = 0)
+  
+ggarrange(plot_mixed_alpha, plot_mixed_beta, plot_mixed_gamma, ncol = 2, nrow=2,common.legend=T, legend="bottom", widths = c(8,6))
+```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 list_treatment=unique(master_aic_analysis$treatment_id)
