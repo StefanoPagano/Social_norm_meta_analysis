@@ -1794,6 +1794,7 @@ ggplot(data = aic_table, aes(Delta_IA_IASQR_AIC, fct_rev(fct_reorder(treatment_i
   geom_point(shape=1) +
   geom_vline(xintercept = 0)
 ```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 ggplot(data = aic_table, aes(Delta_SE_IASQR_AIC, fct_rev(fct_reorder(treatment_id, Game_type)))) + 
   geom_col(aes(fill=Best_model_se_iasqr)) + 
@@ -1920,6 +1921,7 @@ plot_ia_sqr_alpha2 <- ggplot(social_coeff, aes(x=ia_sqr_alpha2,y=fct_rev(fct_reo
   
 ggarrange(plot_ia_sqr_alpha, plot_ia_sqr_alpha2, plot_ia_sqr_beta, ncol = 2, nrow = 2, common.legend=T, legend="bottom", widths = c(8,6))
 ```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 
 # mixed model
@@ -2022,3 +2024,31 @@ for (i in list_treatment) {
 
 do.call('grid.arrange',c(list_plot, ncol = 3, nrow = 3, common.legend=T, legend="bottom"))
 ```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# BICCHIERI ANALYSIS
+
+library(arm)
+
+pgg_t <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full.csv") %>% 
+  dplyr::select(treatment, id, round, excluded, contribution, contribute_cond, pnb, ee1:ee5, ee_avg, ne1:ne5, ne_avg) %>%
+  filter(round==1 & 
+           !(is.na(contribution)) & 
+           excluded!="Exluded" &
+           !(is.na(ee1))) %>%
+  mutate(coop = contribution/100) %>%
+  rowwise() %>%
+  mutate(ee_sd = sd(c(ee1:ee5), na.rm=T)/100,
+         ne_sd = sd(c(ne1:ne5), na.rm=T)/100,
+         delta = coop-(ne_avg/100)) 
+  
+
+summary(lmer(delta ~ ne_avg + (1|treatment), pgg_t))
+summary(lm(delta ~ ne_avg + ee_avg + pnb, data = pgg_t))
+
+pgg_t_rep <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full_replicated.csv")
+
+
+```
+
