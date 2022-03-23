@@ -24,6 +24,7 @@ library(DT)
 library(zoo)
 library(AICcmodavg)
 library(boot)
+library(arm)
 
 setwd("../")
 
@@ -96,7 +97,7 @@ master_dg <- master %>%
 
 # list of treatments in target
 list_of_paper_in_target <- master_dg %>% 
-                    select(PaperID, TreatmentCode, TreatmentName_paper, 
+                    dplyr::select(PaperID, TreatmentCode, TreatmentName_paper, 
                                Year, Game_type, Standard_game, 
                                Baseline, Group_size, Rounds, 
                                Method_elicitation, Avg_coop, Avg_NE, 
@@ -134,7 +135,7 @@ kbl(list_of_paper_in_target,
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 
 DG_avg_kw <- df_avg_kw %>% merge.data.frame(master_dg %>% 
-                                               subset.data.frame(select = c(PaperID, 
+                                               subset.data.frame(dplyr::select = c(PaperID, 
                                                                             TreatmentName_paper, 
                                                                             TreatmentCode, 
                                                                             treatment_id)), 
@@ -182,7 +183,7 @@ perc_choices <- choices_dg %>%
   summarise(n_of_sub = n(),
             endowment = mean(endowment)) %>%
   merge.data.frame(master_dg %>% 
-                     subset.data.frame(select = c(PaperID, TreatmentName_paper, 
+                     subset.data.frame(dplyr::select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
                    by = "treatment_id") %>% 
   filter(!(is.na(TreatmentName_paper)))
@@ -211,8 +212,8 @@ for (i in temp_master$treatment_id) {
     geom_bar(stat = "identity") + 
     labs(title = i, 
          subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-    xlim(min(choices_dg %>% filter(treatment_id==i) %>% select(scenarios))-1,
-         max(choices_dg %>% filter(treatment_id==i) %>% select(scenarios))+1) +
+    xlim(min(choices_dg %>% filter(treatment_id==i) %>% dplyr::select(scenarios))-1,
+         max(choices_dg %>% filter(treatment_id==i) %>% dplyr::select(scenarios))+1) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
@@ -240,7 +241,7 @@ do.call('grid.arrange',c(list_plot, ncol = 2))
 # interpolation of appropriateness with scenarios out of game
 beliefs_only_kim <- beliefs_dg %>%
   filter(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   mutate(KW_Normative_temp = KW_Normative)
 
 n_subj = length(levels(as.factor(beliefs_only_kim$subject_id)))
@@ -292,12 +293,12 @@ for (subj in levels(as.factor(beliefs_only_kim$subject_id))) {
 
 # dataset to plot consistency
 df_consistency_beliefs <- beliefs_dg %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   filter(treatment_id %in% levels(as.factor(master_dg$treatment_id))) %>%
   filter(paper_id != "2016Kim003") %>%
-  rbind.data.frame(kim003_interpolation %>% select(-KW_Normative_temp)) %>%
+  rbind.data.frame(kim003_interpolation %>% dplyr::select(-KW_Normative_temp)) %>%
   merge.data.frame(master_dg %>%
-                     subset.data.frame(select = c(treatment_id,
+                     subset.data.frame(dplyr::select = c(treatment_id,
                                                   max_sigma)),
                    by="treatment_id") 
 # %>%
@@ -661,7 +662,7 @@ master_tog <- master %>%
 
 # list of treatments in target
 list_of_paper_in_target <- master_tog %>% 
-                    select(PaperID, TreatmentCode, TreatmentName_paper, 
+                    dplyr::select(PaperID, TreatmentCode, TreatmentName_paper, 
                                Year, Game_type, Standard_game, 
                                Baseline, Group_size, Rounds, 
                                Method_elicitation, Avg_coop, Avg_NE, 
@@ -696,7 +697,7 @@ kbl(list_of_paper_in_target,
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14, fig.height=14}
 
 TOG_avg_kw <-  df_avg_kw %>% merge.data.frame(master_tog %>% 
-                                               subset.data.frame(select = c(PaperID, 
+                                               subset.data.frame(dplyr::select = c(PaperID, 
                                                                             TreatmentName_paper, 
                                                                             TreatmentCode, 
                                                                             treatment_id)), 
@@ -745,7 +746,7 @@ perc_choices <- choices_tog %>%
   summarise(n_of_sub = n(),
             endowment = mean(endowment)) %>%
   merge.data.frame(master_tog %>% 
-                     subset.data.frame(select = c(PaperID, TreatmentName_paper, 
+                     subset.data.frame(dplyr::select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
                    by = "treatment_id") %>% 
   filter(!(is.na(TreatmentName_paper)))
@@ -774,8 +775,8 @@ for (i in temp_master$treatment_id) {
     geom_bar(stat = "identity") + 
     labs(title = i, 
          subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-    xlim(min(choices_tog %>% filter(treatment_id==i) %>% select(scenarios))-1,
-         max(choices_tog %>% filter(treatment_id==i) %>% select(scenarios))+1) +
+    xlim(min(choices_tog %>% filter(treatment_id==i) %>% dplyr::select(scenarios))-1,
+         max(choices_tog %>% filter(treatment_id==i) %>% dplyr::select(scenarios))+1) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
@@ -795,9 +796,9 @@ do.call('grid.arrange',c(list_plot, ncol = 2))
 
 # dataset to plot consistency
 df_consistency_beliefs <- beliefs_tog %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   merge.data.frame(master_tog %>%
-                     subset.data.frame(select = c(treatment_id,
+                     subset.data.frame(dplyr::select = c(treatment_id,
                                                   max_sigma)),
                    by="treatment_id") 
 
@@ -1103,7 +1104,7 @@ master_don <- master %>%
 
 # list of treatments in target
 list_of_paper_in_target <- master_don %>% 
-                    select(PaperID, TreatmentCode, TreatmentName_paper, 
+                    dplyr::select(PaperID, TreatmentCode, TreatmentName_paper, 
                                Year, Game_type, Standard_game, 
                                Baseline, Group_size, Rounds, 
                                Method_elicitation, Avg_coop, Avg_NE, 
@@ -1141,7 +1142,7 @@ kbl(list_of_paper_in_target,
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", fig.align="center", fig.width = 14}
 
 DON_avg_kw <- df_avg_kw %>% merge.data.frame(master_don %>% 
-                                               subset.data.frame(select = c(PaperID, 
+                                               subset.data.frame(dplyr::select = c(PaperID, 
                                                                             TreatmentName_paper, 
                                                                             TreatmentCode, 
                                                                             treatment_id)), 
@@ -1189,7 +1190,7 @@ perc_choices <- choices_don %>%
   summarise(n_of_sub = n(),
             endowment = mean(endowment)) %>%
   merge.data.frame(master_don %>% 
-                     subset.data.frame(select = c(PaperID, TreatmentName_paper, 
+                     subset.data.frame(dplyr::select = c(PaperID, TreatmentName_paper, 
                                                   TreatmentCode, treatment_id)), 
                    by = "treatment_id") %>% 
   filter(!(is.na(TreatmentName_paper)))
@@ -1218,8 +1219,8 @@ for (i in temp_master$treatment_id) {
     geom_bar(stat = "identity") + 
     labs(title = i, 
          subtitle = temp_master_for$TreatmentName_paper[temp_master_for$treatment_id == i]) +
-    xlim(min(choices_don %>% filter(treatment_id==i) %>% select(scenarios))-10,
-         max(choices_don %>% filter(treatment_id==i) %>% select(scenarios))+10) +
+    xlim(min(choices_don %>% filter(treatment_id==i) %>% dplyr::select(scenarios))-10,
+         max(choices_don %>% filter(treatment_id==i) %>% dplyr::select(scenarios))+10) +
     ylim(0,100) +
     xlab("Choice") + 
     ylab("Subjects (%)")
@@ -1246,9 +1247,9 @@ do.call('grid.arrange',c(list_plot, ncol = 2))
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # dataset to plot consistency
 df_consistency_beliefs <- beliefs_don %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   merge.data.frame(master_don %>%
-                     subset.data.frame(select = c(treatment_id,
+                     subset.data.frame(dplyr::select = c(treatment_id,
                                                   max_sigma)),
                    by="treatment_id") 
 
@@ -1516,7 +1517,7 @@ beliefs_aic_analysis <- beliefs %>%
 
 beliefs_only_kim <- beliefs_aic_analysis %>%
   filter(paper_id == "2016Kim003" & treatment_id == "2016Kim003_7") %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   mutate(KW_Normative_temp = KW_Normative)
 
 n_subj = length(levels(as.factor(beliefs_only_kim$subject_id)))
@@ -1553,9 +1554,9 @@ for (subj in levels(as.factor(beliefs_only_kim$subject_id))) {
 
 
 beliefs_aic_analysis <- beliefs_aic_analysis %>%
-  select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
+  dplyr::select(paper_id, treatment_id, subject_id, scenarios, KW_Normative) %>%
   filter(paper_id != "2016Kim003") %>%
-  rbind.data.frame(kim003_interpolation %>% select(-KW_Normative_temp))
+  rbind.data.frame(kim003_interpolation %>% dplyr::select(-KW_Normative_temp))
                               
 mean_beliefs_aic_analysis <- beliefs_aic_analysis %>%
   group_by(treatment_id, scenarios) %>%
@@ -1738,7 +1739,7 @@ aic_table <- aic_table %>%
          Best_model_ia_iasqr=ifelse(Delta_IA_IASQR_AIC<0,"Inequality Aversion", "Inequality sqr"),
          Best_model_se_iasqr=ifelse(Delta_SE_IASQR_AIC<0,"Social Expectation", "Inequality sqr"),
          Best_model_se_mixed=ifelse(Delta_SE_MIXED_AIC<0,"Social Expectation", "Mixed")) %>%
-  left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
+  left_join(master %>% dplyr::select(treatment_id, Game_type), by = "treatment_id") %>%
   arrange(Game_type)
 
 n_subject <- choices %>%
@@ -1746,7 +1747,7 @@ n_subject <- choices %>%
   summarise(n=length(unique(subject_id)))
 
 social_coeff <- social_coeff %>%
-  left_join(master %>% select(treatment_id, Game_type), by = "treatment_id") %>%
+  left_join(master %>% dplyr::select(treatment_id, Game_type), by = "treatment_id") %>%
   left_join(n_subject, by = "treatment_id") %>%
   mutate(i_SE_beta=ifelse(i_SE_beta>100, NA, i_SE_beta),
          ia_sqr_SE_beta=ifelse(ia_sqr_SE_beta>100, NA, ia_sqr_SE_beta),
@@ -2010,7 +2011,7 @@ for (i in list_treatment) {
   
   
   # list
-  p <- ggplot(rbind.data.frame(temp_choice %>% select(treatment_id,choice, percentage, model), temp_predict_se, temp_predict_ia, temp_predict_sqr), 
+  p <- ggplot(rbind.data.frame(temp_choice %>% dplyr::select(treatment_id,choice, percentage, model), temp_predict_se, temp_predict_ia, temp_predict_sqr), 
              aes(x=choice, 
                  y=percentage, fill=model)) + 
             geom_bar(stat="identity", position = "dodge") + 
@@ -2029,8 +2030,6 @@ do.call('grid.arrange',c(list_plot, ncol = 3, nrow = 3, common.legend=T, legend=
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # BICCHIERI ANALYSIS
 
-library(arm)
-
 pgg_t <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full.csv") %>% 
   dplyr::select(treatment, id, round, excluded, contribution, contribute_cond, pnb, ee1:ee5, ee_avg, ne1:ne5, ne_avg) %>%
   filter(round==1 & 
@@ -2044,11 +2043,13 @@ pgg_t <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTz
          delta = coop-(ne_avg/100)) 
   
 
-summary(lmer(delta ~ ne_avg + (1|treatment), pgg_t))
-summary(lm(delta ~ ne_avg + ee_avg + pnb, data = pgg_t))
+ml.ne <- lmer(delta ~ 0 + rescale(ne_avg/100) + rescale(ne_sd) + (1|treatment), pgg_t)
+ml.ee <- lmer(delta ~ 0 + rescale(ee_avg/100) + rescale(ee_sd) + (1|treatment), pgg_t)
+ml.pnb <- lmer(delta ~ 0 + rescale(pnb/100) + (1|treatment), pgg_t)
+ml.all <- lmer(delta ~ 0 + rescale(ne_avg/100) + rescale(ee_avg/100) + rescale(pnb/100) + rescale(ee_sd) + rescale(ne_sd) + (1|treatment), pgg_t)
 
 pgg_t_rep <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full_replicated.csv")
 
+tab_model(ml.ne, ml.ee, ml.pnb, ml.all, dv.labels = c("NE", "EE", "PNB", "ALL"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "Model Estimates", transform=NULL)
 
 ```
-
