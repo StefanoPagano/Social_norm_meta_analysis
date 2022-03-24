@@ -1,13 +1,13 @@
 
-csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/File_DB/"
+csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/File_DB/"
 
-df_merge_game_type = read_xlsx(path = "G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+df_merge_game_type = read_xlsx(path = "/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 # Paper: 2018Her061 ----
 
 # set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2018Her061")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2018Her061")
 
 # choice file
 Her061=read_excel("meta.xlsx", sheet = "behavior")
@@ -98,7 +98,7 @@ Her061_choice <- Her061_choice %>%
 # Paper: 2019Cha026 ----
 
 # set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
 
 # choice file
 Cha026=read_excel("data.xls", sheet = "Sheet1", 
@@ -367,7 +367,7 @@ Cha026_choice_3 <- Cha026_choice_3 %>%
 # Paper: 2016Kim003 ----
 
 # set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
 
 # choice file
 Kim003_dg=read.csv("DG_Data.csv", sep="\t") %>%
@@ -606,7 +606,7 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
 
 # Paper: 2013Kru001 ----
 ### set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 df <- read_excel("behavior_bully_standard_data_2009_05_18.xlsx")
 
 ## standard ----
@@ -739,7 +739,7 @@ Kru001_bully_beliefs <- Kru001_bully_beliefs %>%
 ## aggragate data ----
 
 ### set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices
 lazear_choice <- read_excel("Lazear_combined_kru.xlsx") %>%
@@ -810,7 +810,7 @@ df <- read_excel("list_data.xlsx")
 ## baseline ----
 
 ### set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -825,12 +825,11 @@ list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
          paper_id = "2007Lis165")
 
 # long format
-Lis165_base_choices <- as.data.frame(lapply(list_base_choice, rep, 13)) %>%
+Lis165_base_choices <- as.data.frame(lapply(list_base_choice, rep, 11)) %>%
   arrange(subject_id) %>%
-  mutate(scenarios = rep(seq(-1,5,0.5),length(unique(list_base_choice$subject_id))),
+  mutate(scenarios = rep(seq(0,5,0.5),length(unique(list_base_choice$subject_id))),
          A= ifelse(Amount==scenarios, 1, 0)) %>%
-  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, Amount, endowment, coop, age, female) %>%
-  filter(scenarios != -0.5)
+  relocate(paper_id, treatment_id, subject_id, id, scenarios, A, Amount, endowment, coop, age, female)
 
 colnames(Lis165_base_choices) <- c("paper_id", "treatment_id", "subject_id", "id", "scenarios", "A", "choice", "endowment", "coop", "age", "female", "n", "take")
 
@@ -878,7 +877,7 @@ Lis165_base_beliefs <- Lis165_base_beliefs %>%
 ## Take1 ----
 
 ## set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_take1_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -943,7 +942,7 @@ Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
 
 # Paper: 2020And089 ----
 ### set wd 
-setwd("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020And089")
+setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020And089")
 
 df_choice <- read_excel("2020And089_data.xlsx") %>%
   subset.data.frame(select = c(1,4,19,20))

@@ -9,7 +9,7 @@ rm(list = ls())
 
 Social_Norms_meta <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL")
 
-csv_path_output <- "C:/Users/stefa/Documents/CNR/GitHub/Social_norm_meta_analysis/Other/Report_202107/"
+csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/Other/Report_202107/"
 # List of Games
 
 ls_game <- c("DG", "DG Tax", "UG", "PGG", "TG", "BG", "GEG", "PDG", "Donation Game", "Investment game", "ToG", "Tax Game", "CPR", "Lying DG", "Third-Party Lying DG")

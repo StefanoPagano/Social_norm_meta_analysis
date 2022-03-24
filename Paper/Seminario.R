@@ -1,4 +1,4 @@
-treatment="2019Cha026_1"
+treatment="2013Kru001_1a"
 df=utility_df_treatment_aic_analysis %>% filter(treatment_id==treatment)
 plot(df$scenarios, df$sd_app)
 
@@ -11,6 +11,10 @@ model_sd=clogit(A ~ payoff + sd_app + strata(subject_id),
 model_aug=clogit(A ~ payoff + mean_app + sd_app + strata(subject_id), 
                data=df)
 
+
+mod_mix = clogit(A ~ other_payoff_ahead + other_payoff_behind + mean_app + strata(subject_id), data=df)
+mod_ia = clogit(A ~ other_payoff_ahead + other_payoff_behind + strata(subject_id), data=df)
+mod_sqr = clogit(A ~ other_payoff_ahead + other_payoff_behind + sqr_other_payoff_ahead + strata(subject_id), data=df)
 tab_model(model_se,model_sd, model_aug, transform = NULL, show.aic = T, show.ci = F, show.se = T,dv.labels = c("Mean Appropriateness", "With Standard Deviation", "Augmented"))
 
 
@@ -25,3 +29,5 @@ ggplot(aes(x=scenarios), data=df) +
                      breaks=c('SD', 'MEAN'),
                      values=colors) + 
   theme_light()
+
+
