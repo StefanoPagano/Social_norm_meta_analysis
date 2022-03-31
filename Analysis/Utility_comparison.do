@@ -1,5 +1,13 @@
+
+* RUN ANDREA *
+/*
 cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
-import delimited C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv, clear
+import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
+*/
+
+* RUN STEFANO *
+cd "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis"
+import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", clear
 
 * DG *
 preserve 
@@ -25,17 +33,21 @@ gen sigma = endowment*s-2*payoff*s
 
 *local i = 1
 foreach l of local levels {
-	clogit a payoff rho sigma if treatment_id == "`l'", group(id) vce(cluster subject_id) collinear constraints(1)
-	est store IA`l'
+	di "treatment -> `l' "
 	
-	clogit a payoff mean_app if treatment_id == "`l'", group(id) vce(cluster subject_id)
+	/* Social expectation */
+	clogit a payoff mean_app if treatment_id == "`l'", group(id) vce(bootstrap, reps(500))
 	est store N`l'
+	
+	/* Charness Rabin 2002 */
+	clogit a payoff rho sigma if treatment_id == "`l'", group(id) vce(bootstrap, reps(500)) collinear constraints(1)
+	est store CR`l'
 	
 	*local ++i
 }
 
 foreach l of local levels {
-estimates stats IA`l' N`l'
+estimates stats N`l' CR`l'
 }
 
 

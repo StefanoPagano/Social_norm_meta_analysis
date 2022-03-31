@@ -23,12 +23,12 @@ master <- read.csv("Treatment.csv", sep=",") %>%
 #scenarios in bully version between -5 and 5. Following I create a unique scenarios between 0 and 10.
 beliefs <- read.csv("Subjects_beliefs.csv", sep=",") %>%
   filter(paper_id =="2013Kru001") %>%
-  mutate(scenarios_unique=ifelse(treatment_id=="2013Kru001_1b", scenarios+5, scenarios))
+  mutate(scenarios_unique=scenarios)
 
 choices <- read.csv("Subjects_choices.csv", sep=",") %>%
   filter(paper_id =="2013Kru001") %>%
   mutate(dummy_bully=ifelse(treatment_id=="2013Kru001_1b",1,0)) %>%
-  mutate(scenarios_unique=ifelse(treatment_id=="2013Kru001_1b", scenarios+5, scenarios))
+  mutate(scenarios_unique=scenarios)
 
 #compute avg norm
 mean_beliefs <- beliefs %>%
@@ -45,7 +45,7 @@ df <- mlogit.data(utility_df_treatment, choice = "A", shape = "long", alt.var = 
 ml.paper1 <- mlogit(A ~ 0 + payoff + mean_app, df)
 ml.paper2 <- mlogit(A ~ 0 + payoff + mean_app + mean_app:dummy_bully, df)
 
-tab_model(ml.paper1, ml.paper2 , show.aic=T, show.loglik=T, show.se=T, show.ci=F , show.est=T)
+tab_model(ml.paper1, ml.paper2 , show.aic=T, show.loglik=T, show.se=T, show.ci=F , show.est=T, transform = NULL)
 
 all_model <- predict(ml.paper1)
 
