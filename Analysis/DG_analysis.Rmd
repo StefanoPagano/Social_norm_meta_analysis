@@ -1498,7 +1498,7 @@ tab_model(list_model, dv.labels = c("2020And089_1", "2020And089_2"), show.aic = 
 
 ```{r utility_df_treatment_aic_analysis, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 master_aic_analysis <- master %>% 
-  filter(Game_type %in% c("DG")) %>%
+  filter(Game_type %in% c("Donation Game")) %>%
   subset.data.frame(subset = !(Standard_game %in% c("N")) & 
                       Choice_Method != "OnlyNorms" & 
                       StatusTreatment_Roma == "6-Complete" & 
@@ -2067,25 +2067,25 @@ tab_model(ml.all, ml.all_rep, dv.labels = c("First", "Replicated"), show.aic = T
 ```
 
 ## MODEL BY STATA
-```{r stata_output_model_DG, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+```{r stata_output_model, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 getwd()
-stata_output_model_DG <- read_excel("stata output model DG.xlsx")
+stata_output_model <- read_excel("stata output model DON.xlsx")
 
-stata_output_model_DG <- stata_output_model_DG %>%
+stata_output_model <- stata_output_model %>%
   mutate(weight_SE=(n_obs)^2) 
 
-average_coeff_stata <- stata_output_model_DG %>% summarise(across(s_delta:cr_sigma, ~weighted.mean(., w = n_obs, na.rm=T)))
-average_SE_stata <- stata_output_model_DG %>% summarise(across(s_delta_SE:cr_sigma_SE, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+average_coeff_stata <- stata_output_model %>% summarise(across(s_delta:cr_sigma, ~weighted.mean(., w = n_obs, na.rm=T)))
+average_SE_stata <- stata_output_model %>% summarise(across(s_delta_SE:cr_sigma_SE, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 
-stata_output_model_DG <- stata_output_model_DG %>%
-   add_row(treatment_id="Average", average_coeff_stata , sqrt(average_SE_stata), n_obs=sum(stata_output_model_DG$n_obs), weight_SE=sum(stata_output_model_DG$weight_SE))
+stata_output_model <- stata_output_model %>%
+   add_row(treatment_id="Average", average_coeff_stata , sqrt(average_SE_stata), n_obs=sum(stata_output_model$n_obs), weight_SE=sum(stata_output_model$weight_SE))
 ```
 
 ```{r pointrange model by stata, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 # graphic
 
 ## social expectation model
-plot_s_delta <- ggplot(stata_output_model_DG, aes(x=s_delta,y=treatment_id)) + 
+plot_s_delta <- ggplot(stata_output_model, aes(x=s_delta,y=treatment_id)) + 
   geom_pointrange(aes(xmin=s_delta-1.96*s_delta_SE,xmax=s_delta+1.96*s_delta_SE), shape=20) +
   ylab("Treatment ID") +
   xlab("Coefficient of payoff (delta)") +
@@ -2094,7 +2094,7 @@ plot_s_delta <- ggplot(stata_output_model_DG, aes(x=s_delta,y=treatment_id)) +
         panel.grid.minor = element_blank()) +
   geom_vline(xintercept = 0)
 
-plot_s_gamma <- ggplot(stata_output_model_DG, aes(x=s_gamma,y=treatment_id)) + 
+plot_s_gamma <- ggplot(stata_output_model, aes(x=s_gamma,y=treatment_id)) + 
   geom_pointrange(aes(xmin=s_gamma-1.96*s_gamma_SE,xmax=s_gamma+1.96*s_gamma_SE), shape=20) +
   xlab("Coefficient of norm expectation (gamma)") +
   theme_light() +
@@ -2107,7 +2107,7 @@ plot_s_gamma <- ggplot(stata_output_model_DG, aes(x=s_gamma,y=treatment_id)) +
 ggarrange(plot_s_delta, plot_s_gamma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
 
 # inequality aversion model
-plot_cr_rho <- ggplot(stata_output_model_DG, aes(x=cr_rho,y=treatment_id)) + 
+plot_cr_rho <- ggplot(stata_output_model, aes(x=cr_rho,y=treatment_id)) + 
   geom_pointrange(aes(xmin=cr_rho-1.96*cr_rho_SE,xmax=cr_rho+1.96*cr_rho_SE), shape=20) +
   ylab("Treatment ID") +
   xlab("Coefficient of other payoff ahead (rho)") +
@@ -2116,7 +2116,7 @@ plot_cr_rho <- ggplot(stata_output_model_DG, aes(x=cr_rho,y=treatment_id)) +
         panel.grid.minor = element_blank()) +
   geom_vline(xintercept = 0)
 
-plot_cr_sigma <- ggplot(stata_output_model_DG, aes(x=cr_sigma,y=treatment_id)) + 
+plot_cr_sigma <- ggplot(stata_output_model, aes(x=cr_sigma,y=treatment_id)) + 
   geom_pointrange(aes(xmin=cr_sigma-1.96*cr_sigma_SE,xmax=cr_sigma+1.96*cr_sigma_SE), shape=20) +
   ylab("Treatment ID") +
   xlab("Coefficient of other payoff behind (sigma)") +
@@ -2131,7 +2131,7 @@ ggarrange(plot_cr_rho, plot_cr_sigma, ncol = 2, common.legend=T, legend="bottom"
 ```
 
 ```{r aic comparison stata, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-stata_aic <- read_excel("stata aic DG.xlsx") %>%
+stata_aic <- read_excel("stata aic DON.xlsx") %>%
   mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rubin"))
 
 ggplot(data = stata_aic, aes(Delta_se_cr, treatment_id)) + 

@@ -1,0 +1,237 @@
+---
+title: "Within analysis and Between Model Comparison"
+date: "31/03/2022"
+output: html_document
+---
+
+```{r library and master file, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment="", include=FALSE}
+rm(list=ls())
+library(ggplot2)
+library(tidyverse)
+library(mlogit)
+library(sjmisc)
+library(ggrepel)
+library(readxl)
+library(sjPlot)
+library(ggpubr)
+library(foreign)
+library(survival)
+library(gridExtra)
+library(kableExtra)
+library(car)
+library(DT)
+library(zoo)
+library(AICcmodavg)
+library(boot)
+library(arm)
+
+setwd("../")
+
+# read data beliefs and choices with ALL DATA
+master <- read.csv("File_DB/Output/Treatment.csv") %>%
+  mutate(treatment_id=paste(PaperID,TreatmentCode,sep="_"))
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
+choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
+
+setwd("Paper_csv/")
+df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
+df_avg_kw <- read.csv("2018Her061_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2013Kru001_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2019Cha026_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2012Laz164_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2007Lis165_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw)
+df_avg_kw <- read.csv("2020Bas115_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) 
+df_avg_kw <- read.csv("2020And089_avg_kw.csv", sep = ",") %>% rbind.data.frame(df_avg_kw) %>%
+  mutate(treatment_id = paste(PaperID,"_",TreatmentCode,sep=""))
+```
+
+
+## Bicchieri Analysis {.tabset .tabset-pills}
+
+This analysis is performed on "Evidence from a long-term experiment that collective risks change social norms and promote cooperation". 
+All rounds are included and we performed a "Fit Linear Mixed-Effects Model". The effects are "treatment_id" and "round number".
+
+The following results show the coefficients for the experiment's first and replicated version.
+The independent variables of the model are "normative expectations", "empirical expectations" and "personal normative beliefs".
+
+I also tried to include the risk change during the experiment in this analysis. Still, the model fails to estimate variables correctly due to too many effects (treatment, round and risk). For this reason, I choose to show the model without the risk effect.
+
+```{r bicchieri analysis, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+# BICCHIERI ANALYSIS
+
+pgg_t <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full.csv") %>% 
+  dplyr::select(treatment, id, round, excluded, contribution, contribute_cond, pnb, ee1:ee5, ee_avg, ne1:ne5, ne_avg) %>%
+  filter(#round==1 &
+           !(is.na(contribution)) & 
+           excluded!="Excluded" &
+           !(is.na(ee1))) %>%
+  mutate(coop = contribution/100,
+         inf_ne = ne_avg - contribution,
+         inf_ee = ee_avg - contribution,
+         sub_treat = ifelse(round>14,1,0))
+
+ml.all <- lmer(contribution ~ 0 + ne_avg + ee_avg + pnb + (1|treatment) + (1 + ne_avg + ee_avg + pnb|round), pgg_t)
+
+pgg_t_rep <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2021Sze167/full_replicated.csv") %>%
+  dplyr::select(treatment, id, round, excluded, contribution, contribute_cond, pnb, ee1:ee5, ee_avg, ne1:ne5, ne_avg) %>%
+  filter(#round==1&
+           !(is.na(contribution)) & 
+           excluded!="Excluded" &
+           !(is.na(ee1))) %>%
+  mutate(coop = contribution/100,
+         inf_ne = ne_avg - contribution,
+         inf_ee = ee_avg - contribution,
+         sub_treat = ifelse(round>14,1,0))
+
+ml.all_rep <- lmer(contribution ~ 0 + ne_avg + ee_avg + pnb + (1|treatment) + (1 + ne_avg + ee_avg + pnb|round), pgg_t_rep)
+
+tab_model(ml.all, ml.all_rep, dv.labels = c("First", "Replicated"), show.aic = T, show.loglik = T, show.se = T, show.ci = F, title = "First and Replicated verison - all round, effects: treatment and round", transform=NULL)
+```
+
+
+## Model Comparison (between studies) {.tabset .tabset-pills}
+This section shows the results of the model comparison for between studies.
+
+For each game type, we have:
+
+ -    plot of coefficients of Social Expectation model (Krupka & Weber 2013) $U_{ik} = \delta \pi_k + \gamma N_k + \epsilon_{ik}$
+ 
+      - $\pi_k$ : payoff
+      
+      - $N_k$ : norm appropriateness
+
+ -    plot of coefficients of Inequality Aversion model (Charness & Rabin 2002) $U_{ik} = (\rho * r + \sigma * s)(W-k_i) + (1 - \rho * r - \sigma * s)k_i$
+ 
+      -   $k_i$ : payoff
+      
+      -   $W$ : endowment
+      
+      -   $\rho$ : indicates the guilt, $r=1$ if $k_i>5$
+      
+      -   $\sigma$ : indicates the envy, $s=1$ if $k_i<5$
+ 
+ -    plot of AIC comparison
+ 
+ 
+```{r function and graphics, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+model_df_generator <- function(file) {
+  df <- read_excel(file)
+
+  df <- df %>%
+    mutate(weight_SE=(n_obs)^2) 
+
+  average_coeff_stata <- df %>% summarise(across(s_delta:cr_sigma, ~weighted.mean(., w = n_obs, na.rm=T)))
+  average_SE_stata <- df %>% summarise(across(s_delta_SE:cr_sigma_SE, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+
+  df <- df %>%
+    add_row(treatment_id="Average", average_coeff_stata , sqrt(average_SE_stata), n_obs=sum(df$n_obs), weight_SE=sum(df$weight_SE))
+
+  invisible(df)
+}
+
+plot_coeff_social_generator <- function(data) {
+  plot_s_delta <- ggplot(data, aes(x=s_delta,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=s_delta-1.96*s_delta_SE,xmax=s_delta+1.96*s_delta_SE), shape=20) +
+    ylab("Treatment ID") +
+    xlab("Coefficient of payoff (delta)") +
+    theme_light() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+  
+  plot_s_gamma <- ggplot(data, aes(x=s_gamma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=s_gamma-1.96*s_gamma_SE,xmax=s_gamma+1.96*s_gamma_SE), shape=20) +
+    xlab("Coefficient of norm expectation (gamma)") +
+    theme_light() +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+    
+  plot <- ggarrange(plot_s_delta, plot_s_gamma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
+  final_plot <- annotate_figure(plot, top = text_grob("Social Expectation Model", face = "bold", size = 14))
+  
+  return(final_plot)
+}
+
+plot_coeff_charness_generator <- function(data){
+  plot_cr_rho <- ggplot(data, aes(x=cr_rho,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=cr_rho-1.96*cr_rho_SE,xmax=cr_rho+1.96*cr_rho_SE), shape=20) +
+    ylab("Treatment ID") +
+    xlab("Guilt (rho)") +
+    theme_light() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+  
+  plot_cr_sigma <- ggplot(data, aes(x=cr_sigma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=cr_sigma-1.96*cr_sigma_SE,xmax=cr_sigma+1.96*cr_sigma_SE), shape=20) +
+    ylab("Treatment ID") +
+    xlab("Envy (sigma)") +
+    theme_light() +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+    
+  plot <- ggarrange(plot_cr_rho, plot_cr_sigma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
+  final_plot <- annotate_figure(plot, top = text_grob("Inequality Aversion Model Model", face = "bold", size = 14))
+
+  return(final_plot)
+}
+
+plot_aic_generator <- function(data){
+  plot <- ggplot(data = data, aes(Delta_se_cr, treatment_id)) + 
+    geom_col(aes(fill=Best_model_se_cr)) + 
+    xlim(-max(abs(data$Delta_se_cr))*1.2,max(abs(data$Delta_se_cr))*1.2) +
+    xlab("AIC Delta") +
+    ylab("Treatment") +
+    theme_light() +
+    theme(legend.position="bottom",
+          strip.text.x = element_text(size = 12, color = "black", face = "bold.italic"),
+          strip.background = element_blank()) +
+    scale_fill_brewer(palette="Set1") + 
+    geom_point(shape=1) +
+    geom_vline(xintercept = 0)
+  
+  final_plot <- annotate_figure(plot, top = text_grob("AIC comparison - Social expectation vs Charness & Rubin", face = "bold", size = 14))
+
+  return(final_plot)
+}
+```
+
+### Dictator Game
+
+```{r dictator, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+stata_output_model <- model_df_generator("stata output model DG.xlsx")
+stata_aic <- read_excel("stata aic DG.xlsx") %>%
+  mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rabin"))
+
+plot_coeff_social_generator(stata_output_model)
+plot_coeff_charness_generator(stata_output_model)
+plot_aic_generator(stata_aic)
+```
+
+### Take or Give
+```{r tog, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+stata_output_model <- model_df_generator("stata output model ToG.xlsx")
+stata_aic <- read_excel("stata aic ToG.xlsx") %>%
+  mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rabin"))
+
+plot_coeff_social_generator(stata_output_model)
+plot_coeff_charness_generator(stata_output_model)
+plot_aic_generator(stata_aic)
+```
+
+### Donation Game
+```{r donation, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+stata_output_model <- model_df_generator("stata output model DON.xlsx")
+stata_aic <- read_excel("stata aic DON.xlsx") %>%
+  mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rabin"))
+
+plot_coeff_social_generator(stata_output_model)
+plot_coeff_charness_generator(stata_output_model)
+plot_aic_generator(stata_aic)
+```
