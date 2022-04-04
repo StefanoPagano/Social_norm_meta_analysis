@@ -100,18 +100,19 @@ For each game type, we have:
       
       - $N_k$ : norm appropriateness
 
- -    plot of coefficients of Inequality Aversion model (Charness & Rabin 2002) $U_{ik} = (\rho * r + \sigma * s)(W-k_i) + (1 - \rho * r - \sigma * s)k_i$
+ -    plot of coefficients of Social Preferencesn model (Charness & Rabin 2002) $U_{ik} = (\rho * r + \sigma * s)(W-k_i) + (1 - \rho * r - \sigma * s)k_i$
  
-      -   $k_i$ : payoff
+      -   $k_i$ : dictator's payoff
       
-      -   $W$ : endowment
+      -   $W$ : initial endowment
       
-      -   $\rho$ : indicates the guilt, $r=1$ if $k_i>5$
+      -   $r=1$ if $k_i>5$, in this case, $\rho$ indicates the concern for the others only when dictator has more than the others
       
-      -   $\sigma$ : indicates the envy, $s=1$ if $k_i<5$
+      -   $s=1$ if $k_i<5$, in this case, **$\sigma$** indicates the concern for the others only when dictator has less than the others
  
  -    plot of AIC comparison
- 
+
+
  
 ```{r function and graphics, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 model_df_generator <- function(file) {
@@ -159,7 +160,7 @@ plot_coeff_charness_generator <- function(data){
   plot_cr_rho <- ggplot(data, aes(x=cr_rho,y=treatment_id)) + 
     geom_pointrange(aes(xmin=cr_rho-1.96*cr_rho_SE,xmax=cr_rho+1.96*cr_rho_SE), shape=20) +
     ylab("Treatment ID") +
-    xlab("Guilt (rho)") +
+    xlab("Rho") +
     theme_light() +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
@@ -168,7 +169,7 @@ plot_coeff_charness_generator <- function(data){
   plot_cr_sigma <- ggplot(data, aes(x=cr_sigma,y=treatment_id)) + 
     geom_pointrange(aes(xmin=cr_sigma-1.96*cr_sigma_SE,xmax=cr_sigma+1.96*cr_sigma_SE), shape=20) +
     ylab("Treatment ID") +
-    xlab("Envy (sigma)") +
+    xlab("Sigma") +
     theme_light() +
     theme(axis.text.y=element_blank(),
           axis.title.y=element_blank(),
@@ -177,7 +178,7 @@ plot_coeff_charness_generator <- function(data){
     geom_vline(xintercept = 0)
     
   plot <- ggarrange(plot_cr_rho, plot_cr_sigma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
-  final_plot <- annotate_figure(plot, top = text_grob("Inequality Aversion Model Model", face = "bold", size = 14))
+  final_plot <- annotate_figure(plot, top = text_grob("Social Preferences Model (Charness and Rabin 2002)", face = "bold", size = 14))
 
   return(final_plot)
 }
