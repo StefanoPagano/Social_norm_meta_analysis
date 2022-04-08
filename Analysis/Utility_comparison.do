@@ -117,17 +117,17 @@ log close
 log using stata_COEFF.log, replace
 
 foreach l of local levels {
-  di "`l', `deltaS`l'', `alphaA`l'', `deltaN`l'', `gammaN`l'', `rhoBA`l'', `sigmaBA`l'', `rhoCP`l'', `sigmaCP`l'', `rhoCO`l'', `sigmaCO`l'', `rhoDA`l'', `sigmaDA`l''" 
+  di "`l' `deltaS`l'' `alphaA`l'' `deltaN`l'' `gammaN`l'' `rhoBA`l'' `sigmaBA`l'' `rhoCP`l'' `sigmaCP`l'' `rhoCO`l'' `sigmaCO`l'' `rhoDA`l'' `sigmaDA`l''" 
  }
 
 log close
  
  
   /* STAMPA TABELLA STD DEV IN FORMATO LOG */ 
-log using stata_STDDEV.log, replace
+log using stata_SE.log, replace
 
 foreach l of local levels {
-  di "`l', `se_deltaS`l'', `se_alphaA`l'', `se_deltaN`l'', `se_gammaN`l'', `se_rhoBA`l'', `se_sigmaBA`l'', `se_rhoCP`l'', `se_sigmaCP`l'', `se_rhoCO`l'', `se_sigmaCO`l'', `se_rhoDA`l'', `se_sigmaDA`l'' "
+  di "`l' `se_deltaS`l'' `se_alphaA`l'' `se_deltaN`l'' `se_gammaN`l'' `se_rhoBA`l'' `se_sigmaBA`l'' `se_rhoCP`l'' `se_sigmaCP`l'' `se_rhoCO`l'' `se_sigmaCO`l'' `se_rhoDA`l'' `se_sigmaDA`l'' "
  } 
 
 log close
@@ -138,7 +138,7 @@ log close
 log using stata_AIC.log, replace
  
 foreach l of local levels {
-  di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', `BA_AIC`l'', `CP_AIC`l'', `DA_AIC`l'', `S_AIC`l''"
+  di "`l' `N_AIC`l'' `CO_AIC`l'' `A_AIC`l'' `BA_AIC`l'' `CP_AIC`l'' `DA_AIC`l'' `S_AIC`l''"
  }
 
  

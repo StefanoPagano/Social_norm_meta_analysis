@@ -12,6 +12,7 @@ library(mlogit)
 library(sjmisc)
 library(ggrepel)
 library(readxl)
+library(readr)
 library(sjPlot)
 library(ggpubr)
 library(foreign)
@@ -240,8 +241,6 @@ plot_aic_generator(stata_aic)
 ```{r read log AIC, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
 
-library(readr)
-
 log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_AIC.log"
 df_aic <- read_log(file=log_file,
                skip=10,
@@ -249,14 +248,40 @@ df_aic <- read_log(file=log_file,
 colnames(df_aic) <- c("treatment", "N_aic", "CO_aic", "A_aic", "BA_aic", "CP_aic", "DA_aic", "S_aic")
 ```
 
-```{r read log COEFF, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-#QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
-
-library(readr)
+```{r read log COEFF and STDDEV, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
 
 log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF.log"
 df_coeff <- read_log(file=log_file,
                skip=10,
-               n_max = 7)
-colnames(df_coeff) <- c("deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+               n_max = 7,
+               col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_coeff) <- c("treatment", "deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+
+#QUESTO SCRIPT LEGGE IL FILE LOG STD ERR DA STATA
+
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_SE.log"
+df_se <- read_log(file=log_file,
+               skip=10,
+               n_max = 7,
+               col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_se) <- c("treatment", "se_deltaS", "se_alphaA", "se_deltaN", "se_gammaN", "se_rhoBA", "se_sigmaBA", "se_rhoCP", "se_sigmaCP", "se_rhoCO", "se_sigmaCO", "se_rhoDA", "se_sigmaDA")
+
+df_models <- merge.data.frame(df_coeff, df_se, by = "treatment")
+```
+
+```{r read log COEFF, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
+
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF.log"
+df_coeff <- read_log(file=log_file,
+               skip=10,
+               n_max = 7,
+               col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_coeff) <- c("treatment", "deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+
+
 ```

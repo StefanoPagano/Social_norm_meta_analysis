@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_MODELS.log
   log type:  text
- opened on:   8 Apr 2022, 13:03:10
+ opened on:   8 Apr 2022, 14:00:14
 
 . 
 . *local i = 1
@@ -630,7 +630,7 @@ note: 1 group (17 obs) dropped because of all positive or
       all negative outcomes.
 
 Iteration 0:   log pseudolikelihood = -297.27256  
-Iteration 1:   log pseudolikelihood = -297.26441  
+Iteration 1:   log pseudolikelihood = -297.26441  (not concave)
 Iteration 2:   log pseudolikelihood = -297.26441  (not concave)
 Iteration 3:   log pseudolikelihood = -297.26441  (not concave)
 Iteration 4:   log pseudolikelihood = -297.26441  (not concave)
@@ -698,7 +698,7 @@ Log pseudolikelihood = -297.26441               Pseudo R2         =    -0.5897
 -------------+----------------------------------------------------------------
       payoff |          1  (constrained)
          rho |          0  (omitted)
-       sigma |  -1.16e+10          .        .       .            .           .
+       sigma |  -59.97222          .        .       .            .           .
 ------------------------------------------------------------------------------
 Warning: convergence not achieved
 note: 1 group (17 obs) dropped because of all positive or
@@ -748,7 +748,7 @@ Iteration 8:   log pseudolikelihood = -145.00659
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =      1,122
-                                                Wald chi2(2)      =   36777.90
+                                                Wald chi2(2)      =   36777.91
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
 
@@ -778,7 +778,7 @@ Iteration 8:   log pseudolikelihood = -145.00659
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =      1,122
-                                                Wald chi2(2)      =   36777.91
+                                                Wald chi2(2)      =   36777.90
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
 
@@ -864,7 +864,7 @@ Iteration 2:   log pseudolikelihood = -72.335346
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =        418
-                                                Wald chi2(1)      =   37622.73
+                                                Wald chi2(1)      =   36980.39
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -72.335346               Pseudo R2         =     0.2062
 
@@ -877,7 +877,7 @@ Log pseudolikelihood = -72.335346               Pseudo R2         =     0.2062
 -------------+----------------------------------------------------------------
       payoff |          1  (constrained)
          rho |          0  (omitted)
-       sigma |  -15.94389   .0821995  -193.97   0.000      -16.105   -15.78278
+       sigma |   -15.8072   .0821995  -192.30   0.000     -15.9683   -15.64609
 ------------------------------------------------------------------------------
 
 Iteration 0:   log pseudolikelihood = -72.429021  
@@ -1418,5 +1418,5 @@ S2020Bas1~2a |      1,397 -304.5327  -267.3416       1    536.6831   541.9252
       name:  <unnamed>
        log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_MODELS.log
   log type:  text
- closed on:   8 Apr 2022, 13:03:14
+ closed on:   8 Apr 2022, 14:00:20
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
