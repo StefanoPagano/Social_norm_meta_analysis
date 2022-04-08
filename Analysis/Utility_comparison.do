@@ -113,7 +113,7 @@ foreach l of local levels {
  }
 
 foreach l of local levels {
-  di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', `S_AIC`l''"
+  di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', BA_AIC`l', CP_AIC`l', DA_AIC`l', `S_AIC`l''"
  }
 
  
