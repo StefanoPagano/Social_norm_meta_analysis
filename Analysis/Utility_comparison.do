@@ -1,16 +1,15 @@
 set more off
 * RUN ANDREA *
-
+/*
 cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
 import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
 log using "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\stata.log", replace
+*/
 
 * RUN STEFANO *
-/*cd "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis"
+cd "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis"
 import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", clear
 
-log using /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata.log
-*/
 * DG *
 preserve 
 drop if game_type != "DG"
@@ -37,6 +36,8 @@ gen s = payoff < endowment/2
 gen rho = endowment*r-2*payoff*r
 gen sigma = endowment*s-2*payoff*s
 gen alpha = endowment - 2*payoff
+
+log using stata_MODELS.log, replace
 
 *local i = 1
 foreach l of local levels {
@@ -108,16 +109,42 @@ local DA_AIC`l' = temp[6,5]
 local S_AIC`l' = temp[7,5]
 }
 
-foreach l of local levels {
-  di "`l', `deltaS`l'', `alphaA`l'', `deltaN`l'', `gammaN`l'', `rhoBA`l'', `sigmaBA`l'', `rhoCP`l'', `sigmaCP`l'', `rhoCO`l'', `sigmaCO`l'', `rhoDA`l'', `sigmaDA`l'', `se_deltaS`l'', `se_alphaA`l'', `se_deltaN`l'', `se_gammaN`l'', `se_rhoBA`l'', `se_sigmaBA`l'', `se_rhoCP`l'', `se_sigmaCP`l'', `se_rhoCO`l'', `se_sigmaCO`l'', `se_rhoDA`l'', `se_sigmaDA`l'' "
- }
+log close
+
+
+/* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
+
+log using stata_COEFF.log, replace
 
 foreach l of local levels {
-  di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', BA_AIC`l', CP_AIC`l', DA_AIC`l', `S_AIC`l''"
+  di "`l', `deltaS`l'', `alphaA`l'', `deltaN`l'', `gammaN`l'', `rhoBA`l'', `sigmaBA`l'', `rhoCP`l'', `sigmaCP`l'', `rhoCO`l'', `sigmaCO`l'', `rhoDA`l'', `sigmaDA`l''" 
+ }
+
+log close
+ 
+ 
+  /* STAMPA TABELLA STD DEV IN FORMATO LOG */ 
+log using stata_STDDEV.log, replace
+
+foreach l of local levels {
+  di "`l', `se_deltaS`l'', `se_alphaA`l'', `se_deltaN`l'', `se_gammaN`l'', `se_rhoBA`l'', `se_sigmaBA`l'', `se_rhoCP`l'', `se_sigmaCP`l'', `se_rhoCO`l'', `se_sigmaCO`l'', `se_rhoDA`l'', `se_sigmaDA`l'' "
+ } 
+
+log close
+
+
+/* STAMPA TABELLA AIC IN FORMATO LOG */ 
+
+log using stata_AIC.log, replace
+ 
+foreach l of local levels {
+  di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', `BA_AIC`l'', `CP_AIC`l'', `DA_AIC`l'', `S_AIC`l''"
  }
 
  
  log close
+ 
+ 
 * Norm model *
 /*
 foreach l of local levels {

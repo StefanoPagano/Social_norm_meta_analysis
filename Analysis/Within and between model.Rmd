@@ -236,3 +236,27 @@ plot_coeff_social_generator(stata_output_model)
 plot_coeff_charness_generator(stata_output_model)
 plot_aic_generator(stata_aic)
 ```
+
+```{r read log AIC, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
+
+library(readr)
+
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_AIC.log"
+df_aic <- read_log(file=log_file,
+               skip=10,
+               n_max = 7)
+colnames(df_aic) <- c("treatment", "N_aic", "CO_aic", "A_aic", "BA_aic", "CP_aic", "DA_aic", "S_aic")
+```
+
+```{r read log COEFF, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
+#QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
+
+library(readr)
+
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF.log"
+df_coeff <- read_log(file=log_file,
+               skip=10,
+               n_max = 7)
+colnames(df_coeff) <- c("deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+```
