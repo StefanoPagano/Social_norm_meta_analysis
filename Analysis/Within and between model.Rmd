@@ -33,6 +33,7 @@ master <- read.csv("File_DB/Output/Treatment.csv") %>%
   mutate(treatment_id=paste(PaperID,TreatmentCode,sep="_"))
 beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",")
 choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",")
+observation <- read.csv("Analysis/Observation.csv", sep=";")
 
 setwd("Paper_csv/")
 df_avg_kw <- read.csv("2016Kim003_avg_kw.csv", sep = ",") 
@@ -238,50 +239,71 @@ plot_coeff_charness_generator(stata_output_model)
 plot_aic_generator(stata_aic)
 ```
 
+## STATA LOG FILE READING 
 ```{r read log AIC, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
+## MODIFICARE SUFFISSO "_DG" CON "_ToG" O "_DON"
+## MODIFICARE n_max = x, x È UGUALE AL NUMERO DI TRATTAMENTI
 
-log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_AIC.log"
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_AIC_ToG.log"
 df_aic <- read_log(file=log_file,
                skip=10,
-               n_max = 7)
-colnames(df_aic) <- c("treatment", "N_aic", "CO_aic", "A_aic", "BA_aic", "CP_aic", "DA_aic", "S_aic")
+               n_max = 2)
+colnames(df_aic) <- c("treatment_id", "N_aic", "CO_aic", "A_aic", "BA_aic", "CP_aic", "DA_aic", "S_aic")
+
+avg_aic <- df_aic %>% 
+  summarise(across(N_aic:S_aic, ~mean(., na.rm=T)))
+
+df_aic <- df_aic %>%
+    add_row(treatment_id="Average", avg_aic)
+
+write.csv(df_aic, "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/AIC_ToG.csv", row.names = F)
 ```
 
 ```{r read log COEFF and STDDEV, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 #QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
+## MODIFICARE SUFFISSO "_DG" CON "_ToG" O "_DON"
+## MODIFICARE n_max = x, x è UGUALE AL NUMERO DI TRATTAMENTI
 
-log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF.log"
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF_ToG.log"
 df_coeff <- read_log(file=log_file,
                skip=10,
-               n_max = 7,
+               n_max = 2,
                col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
 
-colnames(df_coeff) <- c("treatment", "deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+colnames(df_coeff) <- c("treatment_id", "deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+
+df_coeff <- df_coeff %>%
+  merge.data.frame(observation, by = "treatment_id")
+
+avg_coeff <- df_coeff %>% 
+  summarise(across(deltaS:sigmaDA, ~weighted.mean(., w = n_obs, na.rm=T)))
+
+df_coeff <- df_coeff %>%
+    add_row(treatment_id="Average", avg_coeff, n_obs=sum(df_coeff$n_obs))
 
 #QUESTO SCRIPT LEGGE IL FILE LOG STD ERR DA STATA
 
-log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_SE.log"
+log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_SE_ToG.log"
 df_se <- read_log(file=log_file,
                skip=10,
-               n_max = 7,
+               n_max = 2,
                col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
 
-colnames(df_se) <- c("treatment", "se_deltaS", "se_alphaA", "se_deltaN", "se_gammaN", "se_rhoBA", "se_sigmaBA", "se_rhoCP", "se_sigmaCP", "se_rhoCO", "se_sigmaCO", "se_rhoDA", "se_sigmaDA")
+colnames(df_se) <- c("treatment_id", "se_deltaS", "se_alphaA", "se_deltaN", "se_gammaN", "se_rhoBA", "se_sigmaBA", "se_rhoCP", "se_sigmaCP", "se_rhoCO", "se_sigmaCO", "se_rhoDA", "se_sigmaDA")
 
-df_models <- merge.data.frame(df_coeff, df_se, by = "treatment")
-```
+df_se <- df_se %>%
+  merge.data.frame(observation, by = "treatment_id") %>%
+  mutate(weight_SE=n_obs^2)
 
-```{r read log COEFF, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
-#QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
+avg_se <- df_se %>% 
+  summarise(across(se_deltaS:se_sigmaDA, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 
-log_file = "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_COEFF.log"
-df_coeff <- read_log(file=log_file,
-               skip=10,
-               n_max = 7,
-               col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+df_se <- df_se %>%
+    add_row(treatment_id="Average", sqrt(avg_se), n_obs=sum(df_se$n_obs), weight_SE=sum(df_se$weight_SE))
 
-colnames(df_coeff) <- c("treatment", "deltaS", "alphaA", "deltaN", "gammaN", "rhoBA", "sigmaBA", "rhoCP", "sigmaCP", "rhoCO", "sigmaCO", "rhoDA", "sigmaDA")
+df_models <- merge.data.frame(df_coeff, df_se, by = "treatment_id")
 
+write.csv(df_models, "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/MODEL_ToG.csv", row.names = F)
 
 ```

@@ -15,7 +15,7 @@ require(readxl)
 
 rm(list=ls())
 
-authors_net <- read_excel("G:/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
+authors_net <- read_excel("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>%
   subset.data.frame(subset = Method_elicitation =="KW" | 
                       Method_elicitation =="Bicchieri" | 
                       Method_elicitation =="Both") %>%

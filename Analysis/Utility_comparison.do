@@ -18,7 +18,7 @@ drop if game_type != "DG"
 * set constraint for IA *
 constraint 1 payoff = 1
 constraint 2 rho = 0
-constraint 3 sigma <= rho <=0
+constraint 3 sigma <= rho <= 0
 constraint 4 sigma = 0
 constraint 5 sigma < 0 < rho < 1
 gen sqr_other_payoff_ahead = other_payoff_ahead^2
@@ -37,7 +37,7 @@ gen rho = endowment*r-2*payoff*r
 gen sigma = endowment*s-2*payoff*s
 gen alpha = endowment - 2*payoff
 
-log using stata_MODELS.log, replace
+log using stata_MODELS_DG.log, replace
 
 *local i = 1
 foreach l of local levels {
@@ -88,7 +88,7 @@ foreach l of local levels {
 	local se_sigmaCO`l' = _se[sigma]
 
 	/* Difference averse */
-	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
+	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1 5)
 	est store DA`l'
 	local rhoDA`l' = _b[rho]
 	local sigmaDA`l' = _b[sigma]
@@ -114,7 +114,7 @@ log close
 
 /* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
 
-log using stata_COEFF.log, replace
+log using stata_COEFF_ONG.log, replace
 
 foreach l of local levels {
   di "`l' `deltaS`l'' `alphaA`l'' `deltaN`l'' `gammaN`l'' `rhoBA`l'' `sigmaBA`l'' `rhoCP`l'' `sigmaCP`l'' `rhoCO`l'' `sigmaCO`l'' `rhoDA`l'' `sigmaDA`l''" 
@@ -124,7 +124,7 @@ log close
  
  
   /* STAMPA TABELLA STD DEV IN FORMATO LOG */ 
-log using stata_SE.log, replace
+log using stata_SE_ONG.log, replace
 
 foreach l of local levels {
   di "`l' `se_deltaS`l'' `se_alphaA`l'' `se_deltaN`l'' `se_gammaN`l'' `se_rhoBA`l'' `se_sigmaBA`l'' `se_rhoCP`l'' `se_sigmaCP`l'' `se_rhoCO`l'' `se_sigmaCO`l'' `se_rhoDA`l'' `se_sigmaDA`l'' "
@@ -135,7 +135,7 @@ log close
 
 /* STAMPA TABELLA AIC IN FORMATO LOG */ 
 
-log using stata_AIC.log, replace
+log using stata_AIC_ONG.log, replace
  
 foreach l of local levels {
   di "`l' `N_AIC`l'' `CO_AIC`l'' `A_AIC`l'' `BA_AIC`l'' `CP_AIC`l'' `DA_AIC`l'' `S_AIC`l''"

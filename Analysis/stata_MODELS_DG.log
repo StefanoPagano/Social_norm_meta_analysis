@@ -1,51 +1,8 @@
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_Stefano3.log
+       log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_MODELS_DG.log
   log type:  text
- opened on:   8 Apr 2022, 12:03:55
-
-. 
-. * DG *
-. preserve 
-
-. drop if game_type != "DG"
-(4,644 observations deleted)
-
-. 
-. * Fehr and schmidt model *
-. * set constraint for IA *
-. constraint 1 payoff = 1
-
-. constraint 2 rho = 0
-
-. constraint 3 sigma <= rho <=0
-
-. constraint 4 sigma = 0
-
-. constraint 5 sigma < 0 < rho < 1
-
-. gen sqr_other_payoff_ahead = other_payoff_ahead^2
-
-. * run loop *
-. levelsof treatment_id, local(levels)
-`"2007Lis165_1a"' `"2012Laz164_3"' `"2013Kru001_1a"' `"2016Kim003_7"' `"2018Her061_9"' `"2019Cha026_1"' `"2020Bas115_2a"'
-
-. /*
-> foreach l of local levels {
->         clogit a payoff other_payoff_ahead other_payoff_behind if treatment_id == "`l'", group(id) vce(cluster subject_id) collinear constraints(1)
-> }
->  */
-. 
-. * Charness Rabin 2002 *
-. gen r = payoff > endowment/2
-
-. gen s = payoff < endowment/2
-
-. gen rho = endowment*r-2*payoff*r
-
-. gen sigma = endowment*s-2*payoff*s
-
-. gen alpha = endowment - 2*payoff
+ opened on:  14 Apr 2022, 15:09:13
 
 . 
 . *local i = 1
@@ -97,7 +54,7 @@
  34.         local se_sigmaCO`l' = _se[sigma]
  35. 
 .         /* Difference averse */
-.         clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
+.         clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1 5)
  36.         est store DA`l'
  37.         local rhoDA`l' = _b[rho]
  38.         local sigmaDA`l' = _b[sigma]
@@ -242,6 +199,7 @@ Log pseudolikelihood = -49.960552               Pseudo R2         =     0.1319
          rho |   .3446559    .158767     2.17   0.030     .0334784    .6558335
        sigma |  -.0456426   .4081354    -0.11   0.911    -.8455732     .754288
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -50.072071  
 Iteration 1:   log pseudolikelihood = -49.960967  
@@ -407,6 +365,7 @@ Log pseudolikelihood = -255.79292               Pseudo R2         =     0.2098
          rho |   .4599158   .0311049    14.79   0.000     .3989514    .5208802
        sigma |  -.2754208   .2521002    -1.09   0.275    -.7695282    .2186866
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -338.95662  
 Iteration 1:   log pseudolikelihood = -284.37313  
@@ -573,6 +532,7 @@ Log pseudolikelihood = -104.72558               Pseudo R2         =     0.1601
          rho |   .4143214   .0490052     8.45   0.000      .318273    .5103699
        sigma |   .1593335   .1500723     1.06   0.288    -.1348029    .4534699
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -115.24563  
 Iteration 1:   log pseudolikelihood = -108.47278  
@@ -673,63 +633,14 @@ note: 1 group (17 obs) dropped because of all positive or
       all negative outcomes.
 
 Iteration 0:   log pseudolikelihood = -297.27256  
-Iteration 1:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 2:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 3:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 4:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 5:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 6:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 7:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 8:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 9:   log pseudolikelihood = -297.26441  (not concave)
-Iteration 10:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 11:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 12:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 13:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 14:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 15:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 16:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 17:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 18:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 19:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 20:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 21:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 22:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 23:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 24:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 25:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 26:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 27:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 28:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 29:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 30:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 31:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 32:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 33:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 34:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 35:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 36:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 37:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 38:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 39:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 40:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 41:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 42:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 43:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 44:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 45:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 46:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 47:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 48:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 49:  log pseudolikelihood = -297.26441  (not concave)
-Iteration 50:  log pseudolikelihood = -297.26441  (not concave)
-convergence not achieved
+Iteration 1:   log pseudolikelihood = -297.26441  
+Iteration 2:   log pseudolikelihood = -297.26441  (backed up)
 
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =      1,122
-                                                Wald chi2(0)      =          .
-                                                Prob > chi2       =          .
+                                                Wald chi2(1)      =   59358.17
+                                                Prob > chi2       =     0.0000
 Log pseudolikelihood = -297.26441               Pseudo R2         =    -0.5897
 
  ( 1)  [a]payoff = 1
@@ -741,9 +652,8 @@ Log pseudolikelihood = -297.26441               Pseudo R2         =    -0.5897
 -------------+----------------------------------------------------------------
       payoff |          1  (constrained)
          rho |          0  (omitted)
-       sigma |  -30.22222          .        .       .            .           .
+       sigma |  -15.10962   .0620174  -243.64   0.000    -15.23117   -14.98807
 ------------------------------------------------------------------------------
-Warning: convergence not achieved
 note: 1 group (17 obs) dropped because of all positive or
       all negative outcomes.
 
@@ -791,7 +701,7 @@ Iteration 8:   log pseudolikelihood = -145.00659
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =      1,122
-                                                Wald chi2(2)      =   36777.91
+                                                Wald chi2(2)      =   36777.90
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
 
@@ -807,6 +717,7 @@ Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
 ------------------------------------------------------------------------------
 note: 1 group (17 obs) dropped because of all positive or
       all negative outcomes.
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -297.27256  
 Iteration 1:   log pseudolikelihood = -269.02623  
@@ -821,7 +732,7 @@ Iteration 8:   log pseudolikelihood = -145.00659
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =      1,122
-                                                Wald chi2(2)      =   36777.91
+                                                Wald chi2(2)      =   36777.90
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
 
@@ -907,7 +818,7 @@ Iteration 2:   log pseudolikelihood = -72.335346
 Conditional (fixed-effects) logistic regression
 
                                                 Number of obs     =        418
-                                                Wald chi2(1)      =   40693.48
+                                                Wald chi2(1)      =   37838.08
                                                 Prob > chi2       =     0.0000
 Log pseudolikelihood = -72.335346               Pseudo R2         =     0.2062
 
@@ -920,7 +831,7 @@ Log pseudolikelihood = -72.335346               Pseudo R2         =     0.2062
 -------------+----------------------------------------------------------------
       payoff |          1  (constrained)
          rho |          0  (omitted)
-       sigma |   -16.5818   .0821995  -201.73   0.000     -16.7429   -16.42069
+       sigma |  -15.98946   .0821995  -194.52   0.000    -16.15056   -15.82835
 ------------------------------------------------------------------------------
 
 Iteration 0:   log pseudolikelihood = -72.429021  
@@ -977,6 +888,7 @@ Log pseudolikelihood = -60.550867               Pseudo R2         =     0.3355
          rho |    .302895    .068951     4.39   0.000     .1677536    .4380364
        sigma |  -7.212998   .2583651   -27.92   0.000    -7.719385   -6.706612
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -72.429021  
 Iteration 1:   log pseudolikelihood = -70.133169  
@@ -1147,6 +1059,7 @@ Log pseudolikelihood = -122.10396               Pseudo R2         =     0.0907
          rho |   .5111574   .0568895     8.99   0.000      .399656    .6226589
        sigma |   .2167423   .1142427     1.90   0.058    -.0071693    .4406539
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -143.21364  
 Iteration 1:   log pseudolikelihood = -128.89025  
@@ -1312,6 +1225,7 @@ Log pseudolikelihood = -242.38377               Pseudo R2         =     0.2041
          rho |   .5019028   .0332316    15.10   0.000     .4367701    .5670355
        sigma |  -.3271641   .3170253    -1.03   0.302    -.9485223     .294194
 ------------------------------------------------------------------------------
+(note: constraint number 5 caused error r(111))
 
 Iteration 0:   log pseudolikelihood = -350.69574  
 Iteration 1:   log pseudolikelihood = -245.64009  
@@ -1404,7 +1318,7 @@ Akaike's information criterion and Bayesian information criterion
 N2016Kim00~7 |      1,122 -186.9921   -142.653       2     289.306   299.3517
 CO2016Kim0~7 |      1,122 -186.9921  -145.0066       2    294.0132   304.0589
 A2016Kim00~7 |      1,122 -186.9921  -163.8428       1    329.6855   334.7084
-BA2016Kim0~7 |      1,122 -186.9921  -297.2644       0    594.5288   594.5288
+BA2016Kim0~7 |      1,122 -186.9921  -297.2644       1    596.5288   601.5517
 CP2016Kim0~7 |      1,122 -186.9921  -148.9719       1    299.9439   304.9667
 DA2016Kim0~7 |      1,122 -186.9921  -145.0066       2    294.0132   304.0589
 S2016Kim00~7 |      1,122 -186.9921  -163.8428       1    329.6855   334.7084
@@ -1457,42 +1371,9 @@ S2020Bas1~2a |      1,397 -304.5327  -267.3416       1    536.6831   541.9252
                Note: N=Obs used in calculating BIC; see [R] BIC note.
 
 . 
-. foreach l of local levels {
-  2.   di "`l', `deltaS`l'', `alphaA`l'', `deltaN`l'', `gammaN`l'', `rhoBA`l'', `sigmaBA`l'', `rhoCP`l'', `sigmaCP`l'', `rhoCO`l'', `sigmaCO`l'', `rhoDA`l'', `sigmaDA`l'', `se_deltaS`l'', `se_alphaA`l'', `se_deltaN`l'', `se_gammaN`l'', `se
-> _rhoBA`l'', `se_sigmaBA`l'', `se_rhoCP`l'', `se_sigmaCP`l'', `se_rhoCO`l'', `se_sigmaCO`l'', `se_rhoDA`l'', `se_sigmaDA`l'' "
-  3.  }
-2007Lis165_1a, .5295782397284103, .2352108801316874, 1.414957188297462, 2.163337889408855, 0, .325914302983862, .3355837260645941, 0, .3446559383216894, -.0456425984841528, .3446559383216893, -.0456425984841526, .1593181579765406, .0796590
-> 789891124, .8019476030725444, 1.450169998504047, 0, .2691950005380631, .1293573498391157, 0, .1587669734926388, .4081353680795397, .1587669734926389, .4081353680795398 
-2012Laz164_3, .304798674841622, .3476006625558237, 1.091248051769934, 3.198479713308743, 0, .4513287830614249, .4437905806162543, 0, .4599157744084472, -.2754208069424555, .4599157744084472, -.275420806942456, .0298965067818223, .014948253
-> 3928464, .1700048680091404, .5321697453248813, 0, .1016314359788288, .0278518378000836, 0, .0311048693699063, .2521002299812447, .0311048693699063, .2521002299812451 
-2013Kru001_1a, .2960811765819147, .3519594140913646, .6161621437809256, 1.507821856019696, 0, .6352241802080577, .4319483815719307, 0, .4143214473782339, .1593334611038097, .4143214473782339, .1593334611038095, .0519764598385642, .02598822
-> 95809655, .1897403451130591, .683089796575424, 0, .0786825490351172, .0443270367723785, 0, .0490051900848092, .150072346555359, .0490051900848092, .150072346555359 
-2016Kim003_7, .192200820214869, .4038996002005302, .9523451398017502, 4.349249670134296, 0, -30.22222221072516, .4862612951410645, 0, .5034094145088182, -13.83502410034544, .5034094145088182, -13.83502298146914, .0255419580204063, .0127709
-> 779050751, .1535822234715159, .7617326368603879, 0, 0, .026806847810766, 0, .0289027143576434, .1300383191741913, .0289027143576434, .1300383191741914 
-2018Her061_9, .5146504916758483, .2426747956743713, 1.867003936878366, 4.914613924169386, 0, -16.58179570768583, .2824549973227813, 0, .3028950259774097, -7.212998275830872, .3028950259774099, -7.212998276337404, .0942118377987153, .047105
-> 9069693236, .5218846149433661, 1.660210332818549, 0, .0821994936526784, .0646667407083909, 0, .0689509533081616, .2583651441723581, .0689509533081615, .258365144172358 
-2019Cha026_1, .1741684472038387, .4129157769485061, .7640150924817833, 3.957976940567971, 0, .7282732972742558, .5450476637405262, 0, .5111574455202516, .2167423413455523, .5111574455202516, .2167423413455522, .0455103074547229, .022755153
-> 6793252, .2632824034876214, 1.200839408541962, 0, .0568964314689033, .0505714419821135, 0, .0568895387265758, .1142427070673209, .0568895387265758, .1142427070673209 
-2020Bas115_2a, .2667157137432811, .3666421730400541, 1.17120975327729, 3.535699172976316, 0, .4601055992488545, .4821224348850549, 0, .5019028298061778, -.3271641377824878, .5019028298061778, -.3271641377824878, .0285159059485802, .0142579
-> 507699268, .3192639958453916, .9275088974514152, 0, .1215030518561189, .0290661726151239, 0, .0332315889199433, .3170252995273201, .0332315889199433, .3170252995273201 
-
-. 
-. foreach l of local levels {
-  2.   di "`l', `N_AIC`l'', `CO_AIC`l'', `A_AIC`l'', BA_AIC`l', CP_AIC`l', DA_AIC`l', `S_AIC`l''"
-  3.  }
-2007Lis165_1a, 99.03437787173107, 103.9211039249493, 103.2098828388177, BA_AIC2007Lis165_1a, CP_AIC2007Lis165_1a, DA_AIC2007Lis165_1a, 103.2098828388177
-2012Laz164_3, 487.922983952709, 515.5858362201357, 551.3950093301257, BA_AIC2012Laz164_3, CP_AIC2012Laz164_3, DA_AIC2012Laz164_3, 551.3950093301257
-2013Kru001_1a, 210.0205163905173, 213.4511627741065, 215.3100858204098, BA_AIC2013Kru001_1a, CP_AIC2013Kru001_1a, DA_AIC2013Kru001_1a, 215.3100858204097
-2016Kim003_7, 289.3059869809443, 294.0131890131383, 329.6855184639197, BA_AIC2016Kim003_7, CP_AIC2016Kim003_7, DA_AIC2016Kim003_7, 329.6855184639193
-2018Her061_9, 119.2282524935626, 125.1017344495699, 127.5508623889356, BA_AIC2018Her061_9, CP_AIC2018Her061_9, DA_AIC2018Her061_9, 127.5508623889334
-2019Cha026_1, 221.7381596967327, 248.2079165526138, 255.0093527689942, BA_AIC2019Cha026_1, CP_AIC2019Cha026_1, DA_AIC2019Cha026_1, 255.0093527689942
-2020Bas115_2a, 457.0978151830238, 488.7675414498433, 536.6831246251147, BA_AIC2020Bas115_2a, CP_AIC2020Bas115_2a, DA_AIC2020Bas115_2a, 536.6831246251116
-
-. 
-.  
-.  log close
+. log close
       name:  <unnamed>
-       log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_Stefano3.log
+       log:  /Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/stata_MODELS_DG.log
   log type:  text
- closed on:   8 Apr 2022, 12:04:01
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  14 Apr 2022, 15:09:17
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
