@@ -57,7 +57,7 @@ clear all
 
 import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", encoding(ISO-8859-1)
 
-keep if treatment_id=="2016Kim003_7"
+keep if treatment_id=="2020Bas115_2a"
 drop if subject_id=="2016Kim003_7_2222"
 
 sort id scenarios
@@ -83,7 +83,7 @@ mleval `boh2' = `b', eq(2) scalar
 mleval `xb' = `b', eq(3)
 
 quietly{
-by id : gen double `somma' = exp(`xb' + (`boh')*$rho + (`boh2')*$sigma)
+by id : gen double `somma' = exp(`xb' + invlogit(`boh')*$rho - exp(`boh2')*$sigma)
 by id : egen double `den' = sum((`somma'))
 gen double `p' = (`somma')/`den'
 mlsum `lnL' = $ML_y1*log(`p') if $ML_y1==1
@@ -96,4 +96,5 @@ global sigma sigma
 ml model d0 myconditional_logit3 (boh: ) (boh2: ) (Eq1: a = payoff , nocons), collinear constraint(1)
 ml maximize, iter(10)
 
-clogit a payoff rho sigma, iter(50) group(id) collinear constraint(1)
+nlcom -exp([boh2]_cons)
+/*clogit a payoff rho sigma, iter(50) group(id) collinear constraint(1)*/
