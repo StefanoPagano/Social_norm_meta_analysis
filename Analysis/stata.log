@@ -1,0 +1,327 @@
+---------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\stata.log
+  log type:  text
+ opened on:  29 Apr 2022, 15:11:16
+
+. 
+. 
+. * DG *
+. preserve 
+
+. drop if game_type != "DG"
+(4,644 observations deleted)
+
+. 
+. * Fehr and schmidt model *
+. * set constraint for IA *
+. constraint 1 payoff = 1
+
+. constraint 2 rho = 0
+
+. constraint 3 sigma <= rho <= 0
+
+. constraint 4 sigma = 0
+
+. constraint 5 sigma < 0 < rho < 1
+
+. gen sqr_other_payoff_ahead = other_payoff_ahead^2
+
+. * run loop *
+. levelsof treatment_id, local(levels)
+`"2007Lis165_1a"' `"2012Laz164_3"' `"2013Kru001_1a"' `"2016Kim003_7"' `"2018Her061_9"' `"2019Cha026_1"' `"2020Bas115_2a"'
+
+. /*
+> foreach l of local levels {
+>         clogit a payoff other_payoff_ahead other_payoff_behind if treatment_id == "`l'", group(id) vce(cluster subject_id) collinear 
+> constraints(1)
+> }
+>  */
+. 
+. * Charness Rabin 2002 *
+. gen r = payoff > endowment/2
+
+. gen s = payoff < endowment/2
+
+. gen rho = endowment*r-2*payoff*r
+
+. gen sigma = endowment*s-2*payoff*s
+
+. gen alpha = endowment - 2*payoff
+
+. 
+. log using stata_MODELS_DG.log, replace
+log file already open
+r(604);
+
+end of do-file
+
+r(604);
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. set more off
+
+. * RUN ANDREA *
+. cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis
+
+. import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
+(17 vars, 10,535 obs)
+
+. 
+. 
+. * DG *
+. preserve 
+
+. drop if game_type != "DG"
+(4,644 observations deleted)
+
+. 
+. * Fehr and schmidt model *
+. * set constraint for IA *
+. constraint 1 payoff = 1
+
+. constraint 2 rho = 0
+
+. constraint 3 sigma <= rho <= 0
+
+. constraint 4 sigma = 0
+
+. constraint 5 sigma < 0 < rho < 1
+
+. gen sqr_other_payoff_ahead = other_payoff_ahead^2
+
+. * run loop *
+. levelsof treatment_id, local(levels)
+`"2007Lis165_1a"' `"2012Laz164_3"' `"2013Kru001_1a"' `"2016Kim003_7"' `"2018Her061_9"' `"2019Cha026_1"' `"2020Bas115_2a"'
+
+. /*
+> foreach l of local levels {
+>         clogit a payoff other_payoff_ahead other_payoff_behind if treatment_id == "`l'", group(id) vce(cluster subject_id) collinear 
+> constraints(1)
+> }
+>  */
+. 
+. * Charness Rabin 2002 *
+. gen r = payoff > endowment/2
+
+. gen s = payoff < endowment/2
+
+. gen rho = endowment*r-2*payoff*r
+
+. gen sigma = endowment*s-2*payoff*s
+
+. gen alpha = endowment - 2*payoff
+
+. 
+. 
+. *local i = 1
+. foreach l of local levels {
+  2.         di "treatment -> `l' "
+  3.         
+.                         
+.         /* Competitive */
+.         clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1)
+  4.         est store CO`l'
+  5.         local rhoCO`l' = _b[rho]
+  6.         local sigmaCO`l' = _b[sigma]
+  7.         local se_rhoCO`l' = _se[rho]
+  8.         local se_sigmaCO`l' = _se[sigma]
+  9. 
+. }
+treatment -> 2007Lis165_1a 
+
+Iteration 0:   log pseudolikelihood = -50.072071  
+Iteration 1:   log pseudolikelihood = -49.960967  
+Iteration 2:   log pseudolikelihood = -49.960552  
+Iteration 3:   log pseudolikelihood = -49.960552  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =        264
+                                                Wald chi2(2)      =       6.64
+                                                Prob > chi2       =     0.0361
+Log pseudolikelihood = -49.960552               Pseudo R2         =     0.1319
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .3446559    .158767     2.17   0.030     .0334784    .6558335
+       sigma |  -.0456426   .4081354    -0.11   0.911    -.8455732     .754288
+------------------------------------------------------------------------------
+treatment -> 2012Laz164_3 
+
+Iteration 0:   log pseudolikelihood = -338.95662  
+Iteration 1:   log pseudolikelihood = -284.37313  
+Iteration 2:   log pseudolikelihood = -257.49544  
+Iteration 3:   log pseudolikelihood =   -255.793  
+Iteration 4:   log pseudolikelihood = -255.79292  
+Iteration 5:   log pseudolikelihood = -255.79292  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      1,485
+                                                Wald chi2(2)      =     240.46
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -255.79292               Pseudo R2         =     0.2098
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4599158   .0311049    14.79   0.000     .3989514    .5208802
+       sigma |  -.2754208   .2521002    -1.09   0.275    -.7695282    .2186866
+------------------------------------------------------------------------------
+treatment -> 2013Kru001_1a 
+
+Iteration 0:   log pseudolikelihood = -115.24563  
+Iteration 1:   log pseudolikelihood = -108.47278  
+Iteration 2:   log pseudolikelihood = -105.04009  
+Iteration 3:   log pseudolikelihood = -104.72832  
+Iteration 4:   log pseudolikelihood = -104.72558  
+Iteration 5:   log pseudolikelihood = -104.72558  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =        572
+                                                Wald chi2(2)      =     108.67
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -104.72558               Pseudo R2         =     0.1601
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4143214   .0490052     8.45   0.000      .318273    .5103699
+       sigma |   .1593335   .1500723     1.06   0.288    -.1348029    .4534699
+------------------------------------------------------------------------------
+treatment -> 2016Kim003_7 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -297.27256  
+Iteration 1:   log pseudolikelihood = -269.02623  
+Iteration 2:   log pseudolikelihood = -202.15027  
+Iteration 3:   log pseudolikelihood = -187.21661  
+Iteration 4:   log pseudolikelihood = -163.24263  
+Iteration 5:   log pseudolikelihood = -146.05497  
+Iteration 6:   log pseudolikelihood = -145.00683  
+Iteration 7:   log pseudolikelihood = -145.00659  
+Iteration 8:   log pseudolikelihood = -145.00659  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      1,122
+                                                Wald chi2(2)      =   36777.91
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -145.00659               Pseudo R2         =     0.2245
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .5034094   .0289027    17.42   0.000     .4467611    .5600577
+       sigma |  -13.83502   .1300383  -106.39   0.000    -14.08989   -13.58015
+------------------------------------------------------------------------------
+treatment -> 2018Her061_9 
+
+Iteration 0:   log pseudolikelihood = -72.429021  
+Iteration 1:   log pseudolikelihood = -70.133169  
+Iteration 2:   log pseudolikelihood = -60.609264  
+Iteration 3:   log pseudolikelihood = -60.564324  
+Iteration 4:   log pseudolikelihood =  -60.55396  
+Iteration 5:   log pseudolikelihood = -60.551583  
+Iteration 6:   log pseudolikelihood = -60.551007  
+Iteration 7:   log pseudolikelihood =  -60.55089  
+Iteration 8:   log pseudolikelihood = -60.550869  
+Iteration 9:   log pseudolikelihood = -60.550867  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =        418
+                                                Wald chi2(2)      =    5593.39
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -60.550867               Pseudo R2         =     0.3355
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |    .302895    .068951     4.39   0.000     .1677536    .4380364
+       sigma |  -7.212998   .2583651   -27.92   0.000    -7.719385   -6.706612
+------------------------------------------------------------------------------
+treatment -> 2019Cha026_1 
+
+Iteration 0:   log pseudolikelihood = -143.21364  
+Iteration 1:   log pseudolikelihood = -128.89025  
+Iteration 2:   log pseudolikelihood = -122.13259  
+Iteration 3:   log pseudolikelihood = -122.10398  
+Iteration 4:   log pseudolikelihood = -122.10396  
+Iteration 5:   log pseudolikelihood = -122.10396  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =        616
+                                                Wald chi2(2)      =     155.29
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -122.10396               Pseudo R2         =     0.0907
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .5111574   .0568895     8.99   0.000      .399656    .6226589
+       sigma |   .2167423   .1142427     1.90   0.058    -.0071693    .4406539
+------------------------------------------------------------------------------
+treatment -> 2020Bas115_2a 
+
+Iteration 0:   log pseudolikelihood = -350.69574  
+Iteration 1:   log pseudolikelihood = -245.64009  
+Iteration 2:   log pseudolikelihood = -242.61766  
+Iteration 3:   log pseudolikelihood =  -242.3856  
+Iteration 4:   log pseudolikelihood = -242.38377  
+Iteration 5:   log pseudolikelihood = -242.38377  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      1,397
+                                                Wald chi2(2)      =     258.50
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -242.38377               Pseudo R2         =     0.2041
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .5019028   .0332316    15.10   0.000     .4367701    .5670355
+       sigma |  -.3271641   .3170253    -1.03   0.302    -.9485223     .294194
+------------------------------------------------------------------------------
+
+. 
+. 
+end of do-file
+
+. exit, clear

@@ -1,4 +1,10 @@
-/*TEST ANDREA*/
+** this program allows to put non-linear constraints to clogit function **
+
+** first part allows to estimate KW model by adding a restriction to gamma (g>0)
+
+** second part allows to estimate CR model with several restrictions:
+          - 
+/*Basic clogit*/
 cap prog drop myconditional_logit3
 program myconditional_logit3
 args todo b lnL
@@ -24,22 +30,22 @@ ml maximize, iter(5)
 set more off
 clear all
 
-import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", encoding(ISO-8859-1)
+import delimited "data_utility.csv", encoding(ISO-8859-1)
 
 keep if treatment_id=="2013Kru001_1a"
 
 sort id scenarios
 
-cap prog drop myconditional_logit3
-program myconditional_logit3
+cap prog drop KW_gamma_positive
+program KW_gamma_positive
 args todo b lnL
 version 14
-tempname boh
+tempname gamma
 tempvar  den xb p last somma
-mleval `boh' = `b', eq(1) scalar
+mleval `gamma' = `b', eq(1) scalar
 mleval `xb' = `b', eq(2)
 quietly{
-by id : gen double `somma' = exp(`xb' + (`boh')*$norm)
+by id : gen double `somma' = exp(`xb' + (`gamma')*$norm)
 by id : egen double `den' = sum((`somma'))
 gen double `p' = (`somma')/`den'
 mlsum `lnL' = $ML_y1*log(`p') if $ML_y1==1
@@ -48,16 +54,16 @@ if (`todo'==0 | `lnL' > =.) exit
 }
 end
 global norm mean_app
-ml model d0 myconditional_logit3 (norme: ) (Eq1: a = payoff , nocons)
+ml model d0 KW_gamma_positive (norme: ) (Eq1: a = payoff , nocons)
 ml maximize, iter(10)
 
 /*OUR VARIABLES - CHARNESS*/
 set more off
 clear all
 
-import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", encoding(ISO-8859-1)
+import delimited "data_utility.csv", encoding(ISO-8859-1)
 
-keep if treatment_id=="2020Bas115_2a"
+keep if treatment_id=="2007Lis165_1a"
 drop if subject_id=="2016Kim003_7_2222"
 
 sort id scenarios
@@ -71,19 +77,18 @@ gen alpha = endowment - 2*payoff
 
 constraint 1 payoff = 1
 
-cap prog drop myconditional_logit3
-program myconditional_logit3
+cap prog drop difference_averse
+program difference_averse
 args todo b lnL
 version 14
-tempname boh
-tempname boh2
+tempname R S
 tempvar  den xb p last somma
-mleval `boh' = `b', eq(1) scalar
-mleval `boh2' = `b', eq(2) scalar
+mleval `R' = `b', eq(1) scalar
+mleval `S' = `b', eq(2) scalar
 mleval `xb' = `b', eq(3)
 
 quietly{
-by id : gen double `somma' = exp(`xb' + invlogit(`boh')*$rho - exp(`boh2')*$sigma)
+by id : gen double `somma' = exp(`xb' + invlogit(`R')*$rho - exp(`S')*$sigma)
 by id : egen double `den' = sum((`somma'))
 gen double `p' = (`somma')/`den'
 mlsum `lnL' = $ML_y1*log(`p') if $ML_y1==1
@@ -93,8 +98,34 @@ if (`todo'==0 | `lnL' > =.) exit
 end
 global rho rho
 global sigma sigma
-ml model d0 myconditional_logit3 (boh: ) (boh2: ) (Eq1: a = payoff , nocons), collinear constraint(1)
+ml model d0 difference_averse (R: ) (S: ) (Eq1: a = payoff , nocons), collinear constraint(1)
 ml maximize, iter(10)
 
-nlcom -exp([boh2]_cons)
+
+cap prog drop competitive
+program competitive
+args todo b lnL
+version 14
+tempname R S
+tempvar  den xb p last somma
+mleval `R' = `b', eq(1) scalar
+mleval `S' = `b', eq(2) scalar
+*mleval `diff' = `R' - `S'
+mleval `xb' = `b', eq(3)
+
+quietly{
+by id : gen double `somma' = exp(`xb' +(exp(`S') - exp(`R'-`S'))*$rho -exp(`S')*$sigma)
+by id : egen double `den' = sum((`somma'))
+gen double `p' = (`somma')/`den'
+mlsum `lnL' = $ML_y1*log(`p') if $ML_y1==1
+if (`todo'==0 | `lnL' > =.) exit
+
+}
+end
+global rho rho
+global sigma sigma
+ml model d0 competitive (R: ) (S: ) (Eq1: a = payoff , nocons), collinear constraint(1)
+ml maximize, iter(30)
+
+nlcom -exp([R]_cons)
 /*clogit a payoff rho sigma, iter(50) group(id) collinear constraint(1)*/
