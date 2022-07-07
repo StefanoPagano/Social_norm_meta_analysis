@@ -100,7 +100,7 @@ sort id scenarios
 global rho rho
 global sigma sigma
 ml model d0 competitive (R: ) (S: ) (Eq1: a = payoff , nocons), collinear constraint(1)
-ml maximize, iter(50)
+ml maximize, iter(30)
 *global norm mean_app
 *ml model d0 difference_averse (norme: ) (Eq1: a = payoff , nocons)
 *ml maximize, iter(10)
