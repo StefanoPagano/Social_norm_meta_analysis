@@ -123,8 +123,9 @@ model_df_generator <- function(file) {
   df <- df %>%
     mutate(weight_SE=(n_obs)^2) 
 
-  average_coeff_stata <- df %>% summarise(across(s_delta:cr_sigma, ~weighted.mean(., w = n_obs, na.rm=T)))
-  average_SE_stata <- df %>% summarise(across(s_delta_SE:cr_sigma_SE, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+  average_coeff_stata <- df %>% summarise(across(S_delta:FU_gamma, ~weighted.mean(., w = n_obs, na.rm=T)))
+  average_SE_stata <- df %>% summarise(across(se_S_delta:se_FU_gamma, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+  #average_SE_stata <- df %>% summarise(across(s_delta_SE:cr_sigma_SE, ~weighted.mean(.^2, w = n_obs, na.rm=T)))
 
   df <- df %>%
     add_row(treatment_id="Average", average_coeff_stata , sqrt(average_SE_stata), n_obs=sum(df$n_obs), weight_SE=sum(df$weight_SE))
@@ -133,18 +134,32 @@ model_df_generator <- function(file) {
 }
 
 plot_coeff_social_generator <- function(data) {
-  plot_s_delta <- ggplot(data, aes(x=s_delta,y=treatment_id)) + 
-    geom_pointrange(aes(xmin=s_delta-1.96*s_delta_SE,xmax=s_delta+1.96*s_delta_SE), shape=20) +
+  
+  # selfish model
+
+    plot_s_delta <- ggplot(data, aes(x=S_delta,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=S_delta-1.96*se_S_delta,xmax=S_delta+1.96*se_S_delta), shape=20) +
     ylab("Treatment ID") +
-    xlab("Coefficient of payoff (delta)") +
+    xlab("S model - Coefficient of payoff (delta)") +
     theme_light() +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     geom_vline(xintercept = 0)
   
-  plot_s_gamma <- ggplot(data, aes(x=s_gamma,y=treatment_id)) + 
-    geom_pointrange(aes(xmin=s_gamma-1.96*s_gamma_SE,xmax=s_gamma+1.96*s_gamma_SE), shape=20) +
-    xlab("Coefficient of norm expectation (gamma)") +
+  # Social norm model (SN)
+
+  plot_sn_delta <- ggplot(data, aes(x=SN_delta,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=SN_delta-1.96*se_SN_delta,xmax=SN_delta+1.96*se_SN_delta), shape=20) +
+    ylab("Treatment ID") +
+    xlab(expression(delta)) +
+    theme_light() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+
+  plot_sn_gamma <- ggplot(data, aes(x=SN_gamma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=SN_gamma-1.96*se_SN_gamma,xmax=SN_gamma+1.96*se_SN_gamma), shape=20) +
+    xlab(expression(gamma)) +
     theme_light() +
     theme(axis.text.y=element_blank(),
           axis.title.y=element_blank(),
@@ -152,12 +167,75 @@ plot_coeff_social_generator <- function(data) {
           panel.grid.minor = element_blank()) +
     geom_vline(xintercept = 0)
     
-  plot <- ggarrange(plot_s_delta, plot_s_gamma, ncol = 2, common.legend=T, legend="bottom", widths = c(8,6))
-  final_plot <- annotate_figure(plot, top = text_grob("Social Expectation Model", face = "bold", size = 14))
-  
-  return(final_plot)
-}
+  # Social preferences models
 
+  plot_da_rho <- ggplot(data, aes(x=DA_rho,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=DA_rho-1.96*se_DA_rho,xmax=DA_rho+1.96*se_DA_rho), shape=20) +
+    ylab("Treatment ID") +
+    xlab(expression(rho)) +
+    theme_light() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+
+  plot_da_sigma <- ggplot(data, aes(x=DA_sigma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=DA_sigma-1.96*se_DA_sigma,xmax=DA_sigma+1.96*se_DA_sigma), shape=20) +
+    xlab(expression(sigma)) +
+    theme_light() +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+    
+  # Full model (social preferences and social norms)
+
+  plot_fu_rho <- ggplot(data, aes(x=FU_rho,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=FU_rho-1.96*se_FU_rho,xmax=FU_rho+1.96*se_FU_rho), shape=20) +
+    ylab("Treatment ID") +
+    xlab(expression(rho)) +
+    theme_light() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+
+  plot_fu_sigma <- ggplot(data, aes(x=FU_sigma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=FU_sigma-1.96*se_FU_sigma,xmax=FU_sigma+1.96*se_FU_sigma), shape=20) +
+    xlab(expression(sigma)) +
+    theme_light() +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+  
+  plot_fu_gamma <- ggplot(data, aes(x=FU_gamma,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=FU_gamma-1.96*se_FU_gamma,xmax=FU_gamma+1.96*se_FU_gamma), shape=20) +
+    xlab(expression(gamma)) +
+    theme_light() +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+    
+  plot_sn <- ggarrange(plot_sn_delta, plot_sn_gamma, common.legend=T, legend="bottom", widths = c(8,6))
+  plot_sn <- annotate_figure(plot_sn, top = text_grob("Social Norm model", face = "bold", size = 14))
+  plot_da <- ggarrange(plot_da_rho, plot_da_sigma, common.legend=T, legend="bottom", widths = c(8,6))
+  plot_da <- annotate_figure(plot_da, top = text_grob("Social Preferences model", face = "bold", size = 14))
+  plot_fu <- ggarrange(plot_fu_rho, plot_fu_sigma, plot_fu_gamma, nrow = 1, common.legend=T, legend="bottom", widths = c(9,6,6))
+  plot_fu <- annotate_figure(plot_fu, top = text_grob("Full model", face = "bold", size = 14))
+  #final_plot <- ggarrange(plot_sn, plot_da, plot_fu, ncol = 1)
+  ggsave(filename = "model_social_norm.png", plot = plot_sn)
+  ggsave(filename = "model_social_preferences.png", plot=plot_da)
+  ggsave(filename = "model_full.png", plot=plot_fu)
+  
+  return(list(plot_sn, plot_da, plot_fu))
+}
+```
+
+
+```{r function and graphics, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 plot_coeff_charness_generator <- function(data){
   plot_cr_rho <- ggplot(data, aes(x=cr_rho,y=treatment_id)) + 
     geom_pointrange(aes(xmin=cr_rho-1.96*cr_rho_SE,xmax=cr_rho+1.96*cr_rho_SE), shape=20) +
@@ -209,12 +287,12 @@ plot_aic_generator <- function(data){
 
 ```{r dictator, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, comment=""}
 stata_output_model <- model_df_generator("stata output model DG.xlsx")
-stata_aic <- read_excel("stata aic DG.xlsx") %>%
-  mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rabin"))
+#stata_aic <- read_excel("stata aic DG.xlsx") %>%
+#  mutate(Best_model_se_cr=ifelse(Delta_se_cr<0,"Social Expectation", "Charness & Rabin"))
 
 plot_coeff_social_generator(stata_output_model)
-plot_coeff_charness_generator(stata_output_model)
-plot_aic_generator(stata_aic)
+#plot_coeff_charness_generator(stata_output_model)
+#plot_aic_generator(stata_aic)
 ```
 
 ### Take or Give

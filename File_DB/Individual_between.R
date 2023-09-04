@@ -98,7 +98,7 @@ Her061_choice <- Her061_choice %>%
 # Paper: 2019Cha026 ----
 
 # set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2019Cha026")
+setwd("/Mon Drive/Meta-analysis beliefs/Dati paper/2019Cha026")
 
 # choice file
 Cha026=read_excel("data.xls", sheet = "Sheet1", 
