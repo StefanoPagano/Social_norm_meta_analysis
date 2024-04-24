@@ -1,0 +1,28 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{A}&\multicolumn{1}{c}{A}&\multicolumn{1}{c}{A}&\multicolumn{1}{c}{A}\\
+\hline
+A                   &                     &                     &                     &                     \\
+payoff              &     -0.0147\sym{***}&           1         &     -0.0975\sym{***}&           1         \\
+                    &   (0.00302)         &         (.)         &    (0.0232)         &         (.)         \\
+[1em]
+rho                 &                     &       0.477\sym{***}&                     &       0.333\sym{***}\\
+                    &                     &   (0.00207)         &                     &    (0.0322)         \\
+[1em]
+sigma               &                     &       0.534\sym{***}&                     &       0.470\sym{***}\\
+                    &                     &   (0.00395)         &                     &   (0.00452)         \\
+[1em]
+mean\_app            &                     &                     &      -3.454\sym{***}&       8.331\sym{***}\\
+                    &                     &                     &     (0.861)         &     (1.594)         \\
+\hline
+Observations        &        2244         &        2244         &        2244         &        2244         \\
+\textit{AIC}        &      1319.2         &      1246.0         &      1288.8         &      1216.9         \\
+\textit{BIC}        &      1324.9         &      1251.8         &      1294.5         &      1222.6         \\
+\hline\hline
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

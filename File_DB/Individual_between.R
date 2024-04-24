@@ -1,13 +1,13 @@
 
-csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/File_DB/"
+csv_path_output <- "~/GitHub/Social_norm_meta_analysis/File_DB"
 
-df_merge_game_type = read_xlsx(path = "/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+df_merge_game_type = read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 # Paper: 2018Her061 ----
 
 # set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2018Her061")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2018Her061")
 
 # choice file
 Her061=read_excel("meta.xlsx", sheet = "behavior")
@@ -367,7 +367,7 @@ Cha026_choice_3 <- Cha026_choice_3 %>%
 # Paper: 2016Kim003 ----
 
 # set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2016Kim003")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2016Kim003")
 
 # choice file
 Kim003_dg=read.csv("DG_Data.csv", sep="\t") %>%
@@ -464,7 +464,7 @@ Kim003_beliefs_dg <- Kim003_db_norms_dg %>%
          Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs))
 
-# 
+# interpolation ?
 # Kim003_KW_score_dg_add <- data.frame(scenarios = seq(1,15,2), KW_Normative = NA)
 # Kim003_KW_score_dg_add$KW_Normative[1] = mean(c(Kim003_KW_score_dg$KW_Normative[1],Kim003_KW_score_dg$KW_Normative[2]))
 # Kim003_KW_score_dg_add$KW_Normative[2] = mean(c(Kim003_KW_score_dg$KW_Normative[2],Kim003_KW_score_dg$KW_Normative[3]))

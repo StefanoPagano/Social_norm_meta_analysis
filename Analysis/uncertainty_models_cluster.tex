@@ -1,0 +1,31 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{3}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+                    &\multicolumn{1}{c}{A}&\multicolumn{1}{c}{A}&\multicolumn{1}{c}{A}\\
+\hline
+A                   &                     &                     &                     \\
+payoff              &       0.688\sym{***}&       0.584\sym{***}&           1         \\
+                    &     (0.118)         &     (0.105)         &         (.)         \\
+[1em]
+mean\_app            &       2.110\sym{***}&       1.582\sym{***}&       1.503\sym{**} \\
+                    &     (0.301)         &     (0.370)         &     (0.489)         \\
+[1em]
+sd\_app              &                     &      -3.206\sym{***}&      -2.788         \\
+                    &                     &     (0.971)         &     (1.485)         \\
+[1em]
+rho                 &                     &                     &       0.227\sym{*}  \\
+                    &                     &                     &    (0.0899)         \\
+[1em]
+sigma               &                     &                     &       0.150         \\
+                    &                     &                     &     (0.195)         \\
+\hline
+Observations        &        5874         &        5874         &        5874         \\
+\textit{AIC}        &      1974.1         &      1959.7         &      1961.0         \\
+\textit{BIC}        &      1987.4         &      1979.7         &      1987.7         \\
+\hline\hline
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

@@ -1,0 +1,1949 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\uncertain_stata_AIC_NU.log
+  log type:  text
+ opened on:  26 Sep 2023, 07:09:12
+
+.  
+. foreach l of local levels {
+  2.   di "`l'" "`NU_AIC`l''"
+  3.  }
+2007Lis165_1a99.22787742514575
+2012Laz164_3488.6370140230743
+2013Kru001_1a212.0190533885154
+2016Kim003_7288.6306137281586
+2018Her061_9111.1548379510197
+2019Cha026_1217.424961404821
+2020Bas115_2a456.0502395696125
+
+. 
+. eststo clear
+
+. eststo :clogit a payoff mean_app, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     186.34
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(rob) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1034.1288  
+Iteration 1:   log pseudolikelihood = -981.55854  
+Iteration 2:   log pseudolikelihood = -976.86936  
+Iteration 3:   log pseudolikelihood = -976.83527  
+Iteration 4:   log pseudolikelihood = -976.83526  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =     135.89
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.83526               Pseudo R2         =     0.2012
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .5840637   .0625849     9.33   0.000     .4613995    .7067278
+    mean_app |   1.581632   .2378876     6.65   0.000     1.115381    2.047883
+      sd_app |  -3.206224   .8263609    -3.88   0.000    -4.825862   -1.586586
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2241.7019  
+Iteration 1:   log pseudolikelihood = -2065.6811  (backed up)
+Iteration 2:   log pseudolikelihood = -1929.7042  
+Iteration 3:   log pseudolikelihood = -1117.6941  
+Iteration 4:   log pseudolikelihood = -1016.4396  
+Iteration 5:   log pseudolikelihood = -977.69977  
+Iteration 6:   log pseudolikelihood = -976.49607  
+Iteration 7:   log pseudolikelihood = -976.49603  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(4)      =    1463.35
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.49603               Pseudo R2         =     0.2015
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2265129   .0392025     5.78   0.000     .1496774    .3033484
+       sigma |   .1496639   .1118747     1.34   0.181    -.0696065    .3689343
+    mean_app |   1.502708   .2507616     5.99   0.000     1.011225    1.994192
+      sd_app |  -2.788024    .985442    -2.83   0.005    -4.719455   -.8565934
+------------------------------------------------------------------------------
+(est3 stored)
+
+. esttab using uncertainty_models.tex, label replace aic bic se 
+(output written to uncertainty_models.tex)
+
+. 
+. eststo clear
+
+. eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =      49.30
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .1177469     5.84   0.000     .4569176    .9184771
+    mean_app |   2.110329   .3005634     7.02   0.000     1.521236    2.699423
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1034.1288  
+Iteration 1:   log pseudolikelihood = -981.55854  
+Iteration 2:   log pseudolikelihood = -976.86936  
+Iteration 3:   log pseudolikelihood = -976.83527  
+Iteration 4:   log pseudolikelihood = -976.83526  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =      66.40
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.83526               Pseudo R2         =     0.2012
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .5840637   .1045265     5.59   0.000     .3791954    .7889319
+    mean_app |   1.581632   .3699387     4.28   0.000     .8565656    2.306699
+      sd_app |  -3.206224   .9712965    -3.30   0.001     -5.10993   -1.302518
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2241.7019  
+Iteration 1:   log pseudolikelihood = -2065.6811  (backed up)
+Iteration 2:   log pseudolikelihood = -1929.7042  
+Iteration 3:   log pseudolikelihood = -1117.6941  
+Iteration 4:   log pseudolikelihood = -1016.4396  
+Iteration 5:   log pseudolikelihood = -977.69977  
+Iteration 6:   log pseudolikelihood = -976.49607  
+Iteration 7:   log pseudolikelihood = -976.49603  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(4)      =     301.22
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.49603               Pseudo R2         =     0.2015
+
+ ( 1)  [a]payoff = 1
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2265129   .0898715     2.52   0.012      .050368    .4026578
+       sigma |   .1496639   .1948037     0.77   0.442    -.2321444    .5314722
+    mean_app |   1.502708   .4892435     3.07   0.002     .5438086    2.461608
+      sd_app |  -2.788024   1.484729    -1.88   0.060     -5.69804    .1219921
+------------------------------------------------------------------------------
+(est3 stored)
+
+. esttab using uncertainty_models_cluster.tex, label replace aic bic se 
+(output written to uncertainty_models_cluster.tex)
+
+. 
+. *eststo clear
+. *eststo :clogit a payoff mean_app, group(id) vce(bootstrap, strata(treatment_id))
+. *eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
+. *eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(bootstrap, strata(treatment_id)) collinear constraint(1)
+. *esttab using uncertainty_models.tex, label replace aic bic se 
+. 
+. *eststo :clogit a payoff mean_app, group(id) iter(50) collinear constraint(1)
+. *eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+. *suest est5 est6, vce(cluster treatment_id)
+. *test [est6_a]mean_app= [est5_a]mean_app
+. 
+. *restore
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff mean_app, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     186.34
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(rob) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1034.1288  
+Iteration 1:   log pseudolikelihood = -981.55854  
+Iteration 2:   log pseudolikelihood = -976.86936  
+Iteration 3:   log pseudolikelihood = -976.83527  
+Iteration 4:   log pseudolikelihood = -976.83526  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =     135.89
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.83526               Pseudo R2         =     0.2012
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .5840637   .0625849     9.33   0.000     .4613995    .7067278
+    mean_app |   1.581632   .2378876     6.65   0.000     1.115381    2.047883
+      sd_app |  -3.206224   .8263609    -3.88   0.000    -4.825862   -1.586586
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2241.7019  
+Iteration 1:   log pseudolikelihood = -2065.6811  (backed up)
+Iteration 2:   log pseudolikelihood = -1929.7042  
+Iteration 3:   log pseudolikelihood = -1117.6941  
+Iteration 4:   log pseudolikelihood = -1016.4396  
+Iteration 5:   log pseudolikelihood = -977.69977  
+Iteration 6:   log pseudolikelihood = -976.49607  
+Iteration 7:   log pseudolikelihood = -976.49603  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(4)      =    1463.35
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.49603               Pseudo R2         =     0.2015
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2265129   .0392025     5.78   0.000     .1496774    .3033484
+       sigma |   .1496639   .1118747     1.34   0.181    -.0696065    .3689343
+    mean_app |   1.502708   .2507616     5.99   0.000     1.011225    1.994192
+      sd_app |  -2.788024    .985442    -2.83   0.005    -4.719455   -.8565934
+------------------------------------------------------------------------------
+(est3 stored)
+
+. 
+end of do-file
+
+.           twoway plot mean_app sd_app
+plot is not a twoway plot type
+r(198);
+
+.           twoway scatter mean_app sd_app
+
+. reg mean_app sd_app
+
+      Source |       SS           df       MS      Number of obs   =     5,891
+-------------+----------------------------------   F(1, 5889)      =     49.84
+       Model |  11.8348963         1  11.8348963   Prob > F        =    0.0000
+    Residual |  1398.36138     5,889  .237453113   R-squared       =    0.0084
+-------------+----------------------------------   Adj R-squared   =    0.0082
+       Total |  1410.19628     5,890  .239422119   Root MSE        =    .48729
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .2585059   .0366165     7.06   0.000     .1867241    .3302877
+       _cons |   -.097556   .0208635    -4.68   0.000     -.138456    -.056656
+------------------------------------------------------------------------------
+
+. reg mean_app sd_app if a == 1
+
+      Source |       SS           df       MS      Number of obs   =       498
+-------------+----------------------------------   F(1, 496)       =     92.32
+       Model |  33.6313247         1  33.6313247   Prob > F        =    0.0000
+    Residual |  180.689729       496  .364293808   R-squared       =    0.1569
+-------------+----------------------------------   Adj R-squared   =    0.1552
+       Total |  214.321053       497  .431229484   Root MSE        =    .60357
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |  -2.695007   .2804877    -9.61   0.000    -3.246098   -2.143917
+       _cons |   1.027808   .1230708     8.35   0.000     .7860033    1.269612
+------------------------------------------------------------------------------
+
+.           twoway scatter mean_app sd_app if a == 1
+
+. preserve
+
+. collapse mean_app (mean) sd_app (mean) , by(treatment_id )
+varlist required
+r(100);
+
+. collapse (mean) mean_app (mean) sd_app , by(treatment_id )
+
+. edit
+
+. restore
+
+. collapse (mean) mean_app (mean) sd_app , by(treatment_id scenarios )
+
+. edit
+
+.           twoway scatter mean_app sd_app
+
+. edit
+
+. reg mean_app sd_app
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(1, 81)        =      0.78
+       Model |  .190600153         1  .190600153   Prob > F        =    0.3783
+    Residual |  19.6691933        81  .242829547   R-squared       =    0.0096
+-------------+----------------------------------   Adj R-squared   =   -0.0026
+       Total |  19.8597935        82  .242192604   Root MSE        =    .49278
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .2812939   .3175042     0.89   0.378    -.3504398    .9130276
+       _cons |  -.0802014   .1824127    -0.44   0.661    -.4431456    .2827427
+------------------------------------------------------------------------------
+
+. pwcorr mean_app sd_app
+
+             | mean_app   sd_app
+-------------+------------------
+    mean_app |   1.0000 
+      sd_app |   0.0980   1.0000 
+
+. pwcorr mean_app sd_app, star(0.05)
+
+             | mean_app   sd_app
+-------------+------------------
+    mean_app |   1.0000 
+      sd_app |   0.0980   1.0000 
+
+. 
+. 
+. 
+. 
+. reg mean_app sd_app, noconst
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(1, 82)        =      2.49
+       Model |  .599882758         1  .599882758   Prob > F        =    0.1181
+    Residual |  19.7161347        82  .240440667   R-squared       =    0.0295
+-------------+----------------------------------   Adj R-squared   =    0.0177
+       Total |  20.3160174        83  .244771294   Root MSE        =    .49035
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |    .147975   .0936827     1.58   0.118    -.0383896    .3343397
+------------------------------------------------------------------------------
+
+. spearman mean_app sd_app, star(0.05)
+
+ Number of obs =      83
+Spearman's rho =       0.0301
+
+Test of Ho: mean_app and sd_app are independent
+    Prob > |t| =       0.7872
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. preserve
+
+. collapse (mean) mean_app (mean) sd_app, by(treatment_id scenarios)
+
+. pwcorr mean_app sd_app
+
+             | mean_app   sd_app
+-------------+------------------
+    mean_app |   1.0000 
+      sd_app |   0.0980   1.0000 
+
+. restore
+
+. 
+end of do-file
+
+. edit
+
+. twoway scatter mean_app sd_app, noconst
+option noconst not allowed
+r(198);
+
+. twoway scatter mean_app sd_app
+
+. reg mean_app sd_app
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(1, 81)        =      0.78
+       Model |  .190600153         1  .190600153   Prob > F        =    0.3783
+    Residual |  19.6691933        81  .242829547   R-squared       =    0.0096
+-------------+----------------------------------   Adj R-squared   =   -0.0026
+       Total |  19.8597935        82  .242192604   Root MSE        =    .49278
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .2812939   .3175042     0.89   0.378    -.3504398    .9130276
+       _cons |  -.0802014   .1824127    -0.44   0.661    -.4431456    .2827427
+------------------------------------------------------------------------------
+
+. reg mean_app sd_app if mean_app > 0
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(1, 49)        =     15.96
+       Model |  .620236568         1  .620236568   Prob > F        =    0.0002
+    Residual |  1.90407272        49  .038858627   R-squared       =    0.2457
+-------------+----------------------------------   Adj R-squared   =    0.2303
+       Total |  2.52430929        50  .050486186   Root MSE        =    .19713
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   -.586758    .146867    -4.00   0.000    -.8818982   -.2916178
+       _cons |   .7525252   .0896753     8.39   0.000      .572316    .9327345
+------------------------------------------------------------------------------
+
+. reg mean_app sd_app if mean_app < 0
+
+      Source |       SS           df       MS      Number of obs   =        32
+-------------+----------------------------------   F(1, 30)        =      2.66
+       Model |  .184449753         1  .184449753   Prob > F        =    0.1135
+    Residual |  2.08223371        30   .06940779   R-squared       =    0.0814
+-------------+----------------------------------   Adj R-squared   =    0.0508
+       Total |  2.26668347        31  .073118822   Root MSE        =    .26345
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .6267098   .3844427     1.63   0.114    -.1584268    1.411846
+       _cons |  -.7754135   .1967618    -3.94   0.000    -1.177255   -.3735723
+------------------------------------------------------------------------------
+
+. reg mean_app sd_app if mean_app > 0
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(1, 49)        =     15.96
+       Model |  .620236568         1  .620236568   Prob > F        =    0.0002
+    Residual |  1.90407272        49  .038858627   R-squared       =    0.2457
+-------------+----------------------------------   Adj R-squared   =    0.2303
+       Total |  2.52430929        50  .050486186   Root MSE        =    .19713
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   -.586758    .146867    -4.00   0.000    -.8818982   -.2916178
+       _cons |   .7525252   .0896753     8.39   0.000      .572316    .9327345
+------------------------------------------------------------------------------
+
+. twoway scatter mean_app sd_app if mean_app >= 0
+
+. twoway scatter mean_app sd_app if mean_app < 0
+
+. reg mean_app sd_app if mean_app < 0
+
+      Source |       SS           df       MS      Number of obs   =        32
+-------------+----------------------------------   F(1, 30)        =      2.66
+       Model |  .184449753         1  .184449753   Prob > F        =    0.1135
+    Residual |  2.08223371        30   .06940779   R-squared       =    0.0814
+-------------+----------------------------------   Adj R-squared   =    0.0508
+       Total |  2.26668347        31  .073118822   Root MSE        =    .26345
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .6267098   .3844427     1.63   0.114    -.1584268    1.411846
+       _cons |  -.7754135   .1967618    -3.94   0.000    -1.177255   -.3735723
+------------------------------------------------------------------------------
+
+. reg mean_app sd_app##mean_app
+sd_app:  factor variables may not contain noninteger values
+r(452);
+
+. reg mean_app c.sd_app##c.mean_app
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(3, 79)        =         .
+       Model |  19.8597935         3  6.61993116   Prob > F        =         .
+    Residual |           0        79           0   R-squared       =    1.0000
+-------------+----------------------------------   Adj R-squared   =    1.0000
+       Total |  19.8597935        82  .242192604   Root MSE        =         0
+
+-------------------------------------------------------------------------------------
+           mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+             sd_app |  -1.30e-15          .        .       .            .           .
+           mean_app |          1          .        .       .            .           .
+                    |
+c.sd_app#c.mean_app |   5.60e-15          .        .       .            .           .
+                    |
+              _cons |   6.38e-16          .        .       .            .           .
+-------------------------------------------------------------------------------------
+
+. reg c.sd_app##c.mean_app
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(2, 80)        =     23.11
+       Model |  .882091555         2  .441045777   Prob > F        =    0.0000
+    Residual |  1.52671882        80  .019083985   R-squared       =    0.3662
+-------------+----------------------------------   Adj R-squared   =    0.3503
+       Total |  2.40881037        82  .029375736   Root MSE        =    .13814
+
+-------------------------------------------------------------------------------------
+             sd_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+           mean_app |  -.6959479   .1131487    -6.15   0.000     -.921121   -.4707748
+                    |
+c.sd_app#c.mean_app |   1.561227   .2327077     6.71   0.000     1.098124     2.02433
+                    |
+              _cons |    .524025   .0156872    33.40   0.000     .4928065    .5552435
+-------------------------------------------------------------------------------------
+
+. gen d=0
+
+. replace d = 1 if mean_app >=0
+(51 real changes made)
+
+. reg mean_app sd_app##d
+sd_app:  factor variables may not contain noninteger values
+r(452);
+
+. reg mean_app c.sd_app##d
+
+      Source |       SS           df       MS      Number of obs   =        83
+-------------+----------------------------------   F(3, 79)        =    104.86
+       Model |  15.8734871         3  5.29116235   Prob > F        =    0.0000
+    Residual |  3.98630644        79  .050459575   R-squared       =    0.7993
+-------------+----------------------------------   Adj R-squared   =    0.7917
+       Total |  19.8597935        82  .242192604   Root MSE        =    .22463
+
+------------------------------------------------------------------------------
+    mean_app |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      sd_app |   .6267098   .3277927     1.91   0.060    -.0257452    1.279165
+         1.d |   1.527939   .1964394     7.78   0.000     1.136936    1.918942
+             |
+  d#c.sd_app |
+          1  |  -1.213468   .3680455    -3.30   0.001    -1.946044   -.4808916
+             |
+       _cons |  -.7754135   .1677678    -4.62   0.000    -1.109347   -.4414802
+------------------------------------------------------------------------------
+
+. twoway scatter mean_app sd_app
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. set more off
+
+. * RUN ANDREA *
+. clear all
+
+. cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis
+
+. import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
+(17 vars, 10,535 obs)
+
+. 
+. * DG *
+. drop if game_type != "DG"
+(4,644 observations deleted)
+
+. 
+. * set constraint for social preferences models *
+. constraint 1 payoff = 1
+
+. constraint 2 rho = 0
+
+. constraint 3 sigma = rho
+
+. constraint 4 sigma = 0
+
+. 
+. levelsof treatment_id, local(levels)
+`"2007Lis165_1a"' `"2012Laz164_3"' `"2013Kru001_1a"' `"2016Kim003_7"' `"2018Her061_9"' `"2019Cha026_1"' `"2020Bas115_2a"'
+
+. 
+. * Charness Rabin 2002 *
+. gen r = payoff > endowment/2
+
+. gen s = payoff < endowment/2
+
+. gen rho = endowment*r-2*payoff*r
+
+. gen sigma = endowment*s-2*payoff*s
+
+. gen alpha = endowment - 2*payoff
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1080.0257  
+Iteration 1:   log pseudolikelihood = -1064.1285  
+Iteration 2:   log pseudolikelihood = -1064.1284  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(1)      =     305.23
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1064.1284               Pseudo R2         =     0.1298
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .2664154   .0152492    17.47   0.000     .2365275    .2963033
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo model2 :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1854.1973  
+Iteration 1:   log pseudolikelihood = -1697.0535  (backed up)
+Iteration 2:   log pseudolikelihood = -1145.5035  
+Iteration 3:   log pseudolikelihood = -1015.3202  
+Iteration 4:   log pseudolikelihood = -1003.7951  
+Iteration 5:   log pseudolikelihood = -1003.7762  
+Iteration 6:   log pseudolikelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1075.61
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1003.7762               Pseudo R2         =     0.1792
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+------------------------------------------------------------------------------
+
+. eststo :clogit a payoff mean_app, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     186.34
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+(est3 stored)
+
+. eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2089.2409  
+Iteration 1:   log pseudolikelihood = -1865.9761  (backed up)
+Iteration 2:   log pseudolikelihood =  -1116.014  
+Iteration 3:   log pseudolikelihood = -982.02112  
+Iteration 4:   log pseudolikelihood = -980.82185  
+Iteration 5:   log pseudolikelihood = -980.80835  
+Iteration 6:   log pseudolikelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1332.66
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -980.80835               Pseudo R2         =     0.1980
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. suest model2 model4, vce(rob)
+model2 was estimated with a nonstandard vce (robust)
+r(322);
+
+end of do-file
+
+r(322);
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. suest model2 model4
+model2 was estimated with a nonstandard vce (robust)
+r(322);
+
+end of do-file
+
+r(322);
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1854.1973  
+Iteration 1:   log likelihood = -1697.0535  (backed up)
+Iteration 2:   log likelihood = -1145.5035  
+Iteration 3:   log likelihood = -1015.3202  
+Iteration 4:   log likelihood = -1003.7951  
+Iteration 5:   log likelihood = -1003.7762  
+Iteration 6:   log likelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1506.45
+Log likelihood = -1003.7762                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0125104    37.29   0.000     .4420417    .4910817
+       sigma |  -.0699281   .0600466    -1.16   0.244    -.1876174    .0477612
+------------------------------------------------------------------------------
+
+. eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -2089.2409  
+Iteration 1:   log likelihood = -1865.9761  (backed up)
+Iteration 2:   log likelihood =  -1116.014  
+Iteration 3:   log likelihood = -982.02112  
+Iteration 4:   log likelihood = -980.82185  
+Iteration 5:   log likelihood = -980.80835  
+Iteration 6:   log likelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1749.75
+Log likelihood = -980.80835                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0360141     6.48   0.000     .1627674    .3039402
+       sigma |   .0096039   .0621456     0.15   0.877    -.1121993     .131407
+    mean_app |   1.659216   .2383065     6.96   0.000     1.192144    2.126288
+------------------------------------------------------------------------------
+
+. suest model2 model4
+
+Simultaneous results for model2, model4
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model2_a]rho
+
+ ( 1) = 0
+       Constraint 1 dropped
+
+           chi2(  0) =       .
+         Prob > chi2 =         .
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1483.0467  
+Iteration 1:   log likelihood = -1260.1997  
+Iteration 2:   log likelihood = -1030.8028  
+Iteration 3:   log likelihood = -1004.1152  
+Iteration 4:   log likelihood = -1003.6612  
+Iteration 5:   log likelihood = -1003.6611  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(1)      =    1785.66
+Log likelihood = -1003.6611                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+    mean_app |   3.124227   .0739338    42.26   0.000      2.97932    3.269135
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. suest model2 model4 model3
+
+Simultaneous results for model2, model4, model3
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+-------------+----------------------------------------------------------------
+model3_a     |
+      payoff |          1          .        .       .            .           .
+    mean_app |   3.124227   .0850701    36.73   0.000     2.957493    3.290962
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model3_a]mean_app= [model4_a]mean_app
+
+ ( 1)  - [model4_a]mean_app + [model3_a]mean_app = 0
+
+           chi2(  1) =   36.43
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1080.0257  
+Iteration 1:   log pseudolikelihood = -1064.1285  
+Iteration 2:   log pseudolikelihood = -1064.1284  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(1)      =     305.23
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1064.1284               Pseudo R2         =     0.1298
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .2664154   .0152492    17.47   0.000     .2365275    .2963033
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1854.1973  
+Iteration 1:   log pseudolikelihood = -1697.0535  (backed up)
+Iteration 2:   log pseudolikelihood = -1145.5035  
+Iteration 3:   log pseudolikelihood = -1015.3202  
+Iteration 4:   log pseudolikelihood = -1003.7951  
+Iteration 5:   log pseudolikelihood = -1003.7762  
+Iteration 6:   log pseudolikelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1075.61
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1003.7762               Pseudo R2         =     0.1792
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff mean_app, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     186.34
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+(est3 stored)
+
+. eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2089.2409  
+Iteration 1:   log pseudolikelihood = -1865.9761  (backed up)
+Iteration 2:   log pseudolikelihood =  -1116.014  
+Iteration 3:   log pseudolikelihood = -982.02112  
+Iteration 4:   log pseudolikelihood = -980.82185  
+Iteration 5:   log pseudolikelihood = -980.80835  
+Iteration 6:   log pseudolikelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1332.66
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -980.80835               Pseudo R2         =     0.1980
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+(est4 stored)
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1854.1973  
+Iteration 1:   log likelihood = -1697.0535  (backed up)
+Iteration 2:   log likelihood = -1145.5035  
+Iteration 3:   log likelihood = -1015.3202  
+Iteration 4:   log likelihood = -1003.7951  
+Iteration 5:   log likelihood = -1003.7762  
+Iteration 6:   log likelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1506.45
+Log likelihood = -1003.7762                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0125104    37.29   0.000     .4420417    .4910817
+       sigma |  -.0699281   .0600466    -1.16   0.244    -.1876174    .0477612
+------------------------------------------------------------------------------
+
+. eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1063.9625  
+Iteration 1:   log likelihood =  -991.5064  
+Iteration 2:   log likelihood = -985.07718  
+Iteration 3:   log likelihood = -985.03891  
+Iteration 4:   log likelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                LR chi2(2)        =     475.69
+                                                Prob > chi2       =     0.0000
+Log likelihood = -985.03891                     Pseudo R2         =     0.1945
+
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0470159    14.63   0.000     .5955478    .7798469
+    mean_app |   2.110329    .175541    12.02   0.000     1.766275    2.454383
+------------------------------------------------------------------------------
+
+. eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -2089.2409  
+Iteration 1:   log likelihood = -1865.9761  (backed up)
+Iteration 2:   log likelihood =  -1116.014  
+Iteration 3:   log likelihood = -982.02112  
+Iteration 4:   log likelihood = -980.82185  
+Iteration 5:   log likelihood = -980.80835  
+Iteration 6:   log likelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1749.75
+Log likelihood = -980.80835                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0360141     6.48   0.000     .1627674    .3039402
+       sigma |   .0096039   .0621456     0.15   0.877    -.1121993     .131407
+    mean_app |   1.659216   .2383065     6.96   0.000     1.192144    2.126288
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. suest model2 model4 model3
+
+Simultaneous results for model2, model4, model3
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+-------------+----------------------------------------------------------------
+model3_a     |
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model2_a]rho
+
+ ( 1) = 0
+       Constraint 1 dropped
+
+           chi2(  0) =       .
+         Prob > chi2 =         .
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model3_a]mean_app= [model4_a]mean_app
+
+ ( 1)  - [model4_a]mean_app + [model3_a]mean_app = 0
+
+           chi2(  1) =    5.85
+         Prob > chi2 =    0.0156
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model2_a]rho
+
+ ( 1) = 0
+       Constraint 1 dropped
+
+           chi2(  0) =       .
+         Prob > chi2 =         .
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. suest model2 model4 
+
+Simultaneous results for model2, model4
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model2_a]rho
+
+ ( 1) = 0
+       Constraint 1 dropped
+
+           chi2(  0) =       .
+         Prob > chi2 =         .
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. set more off
+
+. * RUN ANDREA *
+. clear all
+
+. cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis
+
+. import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
+(17 vars, 10,535 obs)
+
+. 
+. * DG *
+. drop if game_type != "DG"
+(4,644 observations deleted)
+
+. 
+. * set constraint for social preferences models *
+. constraint 1 payoff = 1
+
+. constraint 2 rho = 0
+
+. constraint 3 sigma = rho
+
+. constraint 4 sigma = 0
+
+. 
+. levelsof treatment_id, local(levels)
+`"2007Lis165_1a"' `"2012Laz164_3"' `"2013Kru001_1a"' `"2016Kim003_7"' `"2018Her061_9"' `"2019Cha026_1"' `"2020Bas115_2a"'
+
+. 
+. * Charness Rabin 2002 *
+. gen r = payoff > endowment/2
+
+. gen s = payoff < endowment/2
+
+. gen rho = endowment*r-2*payoff*r
+
+. gen sigma = endowment*s-2*payoff*s
+
+. gen alpha = endowment - 2*payoff
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1080.0257  
+Iteration 1:   log pseudolikelihood = -1064.1285  
+Iteration 2:   log pseudolikelihood = -1064.1284  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(1)      =     305.23
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1064.1284               Pseudo R2         =     0.1298
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .2664154   .0152492    17.47   0.000     .2365275    .2963033
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1854.1973  
+Iteration 1:   log pseudolikelihood = -1697.0535  (backed up)
+Iteration 2:   log pseudolikelihood = -1145.5035  
+Iteration 3:   log pseudolikelihood = -1015.3202  
+Iteration 4:   log pseudolikelihood = -1003.7951  
+Iteration 5:   log pseudolikelihood = -1003.7762  
+Iteration 6:   log pseudolikelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1075.61
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1003.7762               Pseudo R2         =     0.1792
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff mean_app, group(id) vce(rob)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     186.34
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+------------------------------------------------------------------------------
+(est3 stored)
+
+. eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2089.2409  
+Iteration 1:   log pseudolikelihood = -1865.9761  (backed up)
+Iteration 2:   log pseudolikelihood =  -1116.014  
+Iteration 3:   log pseudolikelihood = -982.02112  
+Iteration 4:   log pseudolikelihood = -980.82185  
+Iteration 5:   log pseudolikelihood = -980.80835  
+Iteration 6:   log pseudolikelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1332.66
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -980.80835               Pseudo R2         =     0.1980
+
+ ( 1)  [a]payoff = 1
+                                     (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+(est4 stored)
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1854.1973  
+Iteration 1:   log likelihood = -1697.0535  (backed up)
+Iteration 2:   log likelihood = -1145.5035  
+Iteration 3:   log likelihood = -1015.3202  
+Iteration 4:   log likelihood = -1003.7951  
+Iteration 5:   log likelihood = -1003.7762  
+Iteration 6:   log likelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1506.45
+Log likelihood = -1003.7762                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0125104    37.29   0.000     .4420417    .4910817
+       sigma |  -.0699281   .0600466    -1.16   0.244    -.1876174    .0477612
+------------------------------------------------------------------------------
+
+. eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1063.9625  
+Iteration 1:   log likelihood =  -991.5064  
+Iteration 2:   log likelihood = -985.07718  
+Iteration 3:   log likelihood = -985.03891  
+Iteration 4:   log likelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                LR chi2(2)        =     475.69
+                                                Prob > chi2       =     0.0000
+Log likelihood = -985.03891                     Pseudo R2         =     0.1945
+
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0470159    14.63   0.000     .5955478    .7798469
+    mean_app |   2.110329    .175541    12.02   0.000     1.766275    2.454383
+------------------------------------------------------------------------------
+
+. eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -2089.2409  
+Iteration 1:   log likelihood = -1865.9761  (backed up)
+Iteration 2:   log likelihood =  -1116.014  
+Iteration 3:   log likelihood = -982.02112  
+Iteration 4:   log likelihood = -980.82185  
+Iteration 5:   log likelihood = -980.80835  
+Iteration 6:   log likelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1749.75
+Log likelihood = -980.80835                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0360141     6.48   0.000     .1627674    .3039402
+       sigma |   .0096039   .0621456     0.15   0.877    -.1121993     .131407
+    mean_app |   1.659216   .2383065     6.96   0.000     1.192144    2.126288
+------------------------------------------------------------------------------
+
+. suest model2 model4 
+
+Simultaneous results for model2, model4
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model2_a]rho
+
+ ( 1) = 0
+       Constraint 1 dropped
+
+           chi2(  0) =       .
+         Prob > chi2 =         .
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model2_a]rho= [model4_a]rho
+
+ ( 1)  [model2_a]rho - [model4_a]rho = 0
+
+           chi2(  1) =   43.03
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1854.1973  
+Iteration 1:   log likelihood = -1697.0535  (backed up)
+Iteration 2:   log likelihood = -1145.5035  
+Iteration 3:   log likelihood = -1015.3202  
+Iteration 4:   log likelihood = -1003.7951  
+Iteration 5:   log likelihood = -1003.7762  
+Iteration 6:   log likelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =    1506.45
+Log likelihood = -1003.7762                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0125104    37.29   0.000     .4420417    .4910817
+       sigma |  -.0699281   .0600466    -1.16   0.244    -.1876174    .0477612
+------------------------------------------------------------------------------
+
+. eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -1063.9625  
+Iteration 1:   log likelihood =  -991.5064  
+Iteration 2:   log likelihood = -985.07718  
+Iteration 3:   log likelihood = -985.03891  
+Iteration 4:   log likelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                LR chi2(2)        =     475.69
+                                                Prob > chi2       =     0.0000
+Log likelihood = -985.03891                     Pseudo R2         =     0.1945
+
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .0470159    14.63   0.000     .5955478    .7798469
+    mean_app |   2.110329    .175541    12.02   0.000     1.766275    2.454383
+------------------------------------------------------------------------------
+
+. eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log likelihood = -2089.2409  
+Iteration 1:   log likelihood = -1865.9761  (backed up)
+Iteration 2:   log likelihood =  -1116.014  
+Iteration 3:   log likelihood = -982.02112  
+Iteration 4:   log likelihood = -980.82185  
+Iteration 5:   log likelihood = -980.80835  
+Iteration 6:   log likelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =    1749.75
+Log likelihood = -980.80835                     Prob > chi2       =     0.0000
+
+ ( 1)  [a]payoff = 1
+------------------------------------------------------------------------------
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0360141     6.48   0.000     .1627674    .3039402
+       sigma |   .0096039   .0621456     0.15   0.877    -.1121993     .131407
+    mean_app |   1.659216   .2383065     6.96   0.000     1.192144    2.126288
+------------------------------------------------------------------------------
+
+. suest model2 model3 model4 
+
+Simultaneous results for model2, model3, model4
+
+                                                Number of obs     =      5,874
+
+                                   (Std. Err. adjusted for 498 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+model2_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .4665617   .0156626    29.79   0.000     .4358636    .4972599
+       sigma |  -.0699281   .0906029    -0.77   0.440    -.2475064    .1076502
+-------------+----------------------------------------------------------------
+model3_a     |
+      payoff |   .6876973   .0509737    13.49   0.000     .5877907     .787604
+    mean_app |   2.110329   .1908106    11.06   0.000     1.736347    2.484311
+-------------+----------------------------------------------------------------
+model4_a     |
+      payoff |          1          .        .       .            .           .
+         rho |   .2333538   .0388631     6.00   0.000     .1571835     .309524
+       sigma |   .0096039   .0940443     0.10   0.919    -.1747196    .1939273
+    mean_app |   1.659216   .2466791     6.73   0.000     1.175734    2.142698
+------------------------------------------------------------------------------
+
+. test [model2_a]rho= [model4_a]rho
+
+ ( 1)  [model2_a]rho - [model4_a]rho = 0
+
+           chi2(  1) =   43.03
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. test [model3_a]mean_app= [model4_a]mean_app
+
+ ( 1)  [model3_a]mean_app - [model4_a]mean_app = 0
+
+           chi2(  1) =    5.85
+         Prob > chi2 =    0.0156
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff, group(id) vce(cluster treatment_id)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1080.0257  
+Iteration 1:   log pseudolikelihood = -1064.1285  
+Iteration 2:   log pseudolikelihood = -1064.1284  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(1)      =      84.75
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1064.1284               Pseudo R2         =     0.1298
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .2664154   .0289387     9.21   0.000     .2096966    .3231341
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1) 
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1854.1973  
+Iteration 1:   log pseudolikelihood = -1697.0535  (backed up)
+Iteration 2:   log pseudolikelihood = -1145.5035  
+Iteration 3:   log pseudolikelihood = -1015.3202  
+Iteration 4:   log pseudolikelihood = -1003.7951  
+Iteration 5:   log pseudolikelihood = -1003.7762  
+Iteration 6:   log pseudolikelihood = -1003.7762  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =     703.54
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -1003.7762               Pseudo R2         =     0.1792
+
+ ( 1)  [a]payoff = 1
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .4665617   .0180046    25.91   0.000     .4312734    .5018501
+       sigma |  -.0699281   .1328204    -0.53   0.599    -.3302513    .1903951
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =      49.30
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .1177469     5.84   0.000     .4569176    .9184771
+    mean_app |   2.110329   .3005634     7.02   0.000     1.521236    2.699423
+------------------------------------------------------------------------------
+(est3 stored)
+
+. eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2089.2409  
+Iteration 1:   log pseudolikelihood = -1865.9761  (backed up)
+Iteration 2:   log pseudolikelihood =  -1116.014  
+Iteration 3:   log pseudolikelihood = -982.02112  
+Iteration 4:   log pseudolikelihood = -980.82185  
+Iteration 5:   log pseudolikelihood = -980.80835  
+Iteration 6:   log pseudolikelihood = -980.80835  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =     354.43
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -980.80835               Pseudo R2         =     0.1980
+
+ ( 1)  [a]payoff = 1
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2333538   .0945763     2.47   0.014     .0479876    .4187199
+       sigma |   .0096039    .140814     0.07   0.946    -.2663865    .2855943
+    mean_app |   1.659216   .5217398     3.18   0.001     .6366244    2.681807
+------------------------------------------------------------------------------
+(est4 stored)
+
+. esttab using overall_models_cluster.tex, label replace aic bic se 
+(note: file overall_models_cluster.tex not found)
+(output written to overall_models_cluster.tex)
+
+. 
+end of do-file
+
+. do "C:\Users\aguido\AppData\Local\Temp\STD00000000.tmp"
+
+. eststo clear
+
+. eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1063.9625  
+Iteration 1:   log pseudolikelihood =  -991.5064  
+Iteration 2:   log pseudolikelihood = -985.07718  
+Iteration 3:   log pseudolikelihood = -985.03891  
+Iteration 4:   log pseudolikelihood = -985.03891  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(2)      =      49.30
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -985.03891               Pseudo R2         =     0.1945
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .6876973   .1177469     5.84   0.000     .4569176    .9184771
+    mean_app |   2.110329   .3005634     7.02   0.000     1.521236    2.699423
+------------------------------------------------------------------------------
+(est1 stored)
+
+. eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -1034.1288  
+Iteration 1:   log pseudolikelihood = -981.55854  
+Iteration 2:   log pseudolikelihood = -976.86936  
+Iteration 3:   log pseudolikelihood = -976.83527  
+Iteration 4:   log pseudolikelihood = -976.83526  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(3)      =      66.40
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.83526               Pseudo R2         =     0.2012
+
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |   .5840637   .1045265     5.59   0.000     .3791954    .7889319
+    mean_app |   1.581632   .3699387     4.28   0.000     .8565656    2.306699
+      sd_app |  -3.206224   .9712965    -3.30   0.001     -5.10993   -1.302518
+------------------------------------------------------------------------------
+(est2 stored)
+
+. eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+note: 1 group (17 obs) dropped because of all positive or
+      all negative outcomes.
+
+Iteration 0:   log pseudolikelihood = -2241.7019  
+Iteration 1:   log pseudolikelihood = -2065.6811  (backed up)
+Iteration 2:   log pseudolikelihood = -1929.7042  
+Iteration 3:   log pseudolikelihood = -1117.6941  
+Iteration 4:   log pseudolikelihood = -1016.4396  
+Iteration 5:   log pseudolikelihood = -977.69977  
+Iteration 6:   log pseudolikelihood = -976.49607  
+Iteration 7:   log pseudolikelihood = -976.49603  
+
+Conditional (fixed-effects) logistic regression
+
+                                                Number of obs     =      5,874
+                                                Wald chi2(4)      =     301.22
+                                                Prob > chi2       =     0.0000
+Log pseudolikelihood = -976.49603               Pseudo R2         =     0.2015
+
+ ( 1)  [a]payoff = 1
+                           (Std. Err. adjusted for 7 clusters in treatment_id)
+------------------------------------------------------------------------------
+             |               Robust
+           a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      payoff |          1  (constrained)
+         rho |   .2265129   .0898715     2.52   0.012      .050368    .4026578
+       sigma |   .1496639   .1948037     0.77   0.442    -.2321444    .5314722
+    mean_app |   1.502708   .4892435     3.07   0.002     .5438086    2.461608
+      sd_app |  -2.788024   1.484729    -1.88   0.060     -5.69804    .1219921
+------------------------------------------------------------------------------
+(est3 stored)
+
+. esttab using uncertainty_models_cluster.tex, label replace aic bic se 
+(output written to uncertainty_models_cluster.tex)
+
+. 
+end of do-file
+
+. exit, clear

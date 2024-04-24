@@ -1,21 +1,57 @@
 set more off
-* RUN ANDREA *
 clear all
 cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
 import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
-*log using "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\stata.log", replace
-
-/*
-* RUN STEFANO *
-cd "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis"
-import delimited "/Users/Stefano/Documents/GitHub/Social_norm_meta_analysis/Analysis/data_utility.csv", clear
-*/
 
 * DG *
-*preserve 
 drop if game_type != "DG"
-*drop if game_type != "ToG"
-* set constraint for IA *
+
+** Descriptive statistics **
+/*preserve
+drop if a!=1
+gen coop = scenarios/endowment
+set scheme lean1
+hist coop, percent xtitle("% Endowment")
+graph export hist_coop.pdf, replace
+tab treatment_id, sum(coop)
+restore
+
+preserve
+gen coop = scenarios/endowment
+set scheme lean1
+collapse (mean) mean_app, by(coop)
+twoway line mean_app coop , xtitle("% Endowment") ytitle("Average Appropriateness") yline(0)
+graph export hist_mean_app.pdf, replace
+restore
+*/
+preserve
+tempfile temp
+gen coop = scenarios/endowment
+set scheme lean1
+collapse (mean) mean_app, by(coop)
+gen db = 2
+save `temp' 
+restore
+
+* generate db variable for graph *
+gen db = 1
+* generate cooperation variable *
+gen coop = scenarios/endowment
+
+append using `temp'
+twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
+(line mean_app coop if db==2, xtitle("% Endowment") ytitle("Average Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(2))), legend( pos(12) label (1 "Choices") label (2 "Mean Appropriateness") rows(1))
+graph export hist_coop_mean_app.pdf, replace
+
+** Utility estimation **
+clear all
+cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
+
+* DG *
+drop if game_type != "DG"
+
+* set constraint for social preferences models *
 constraint 1 payoff = 1
 constraint 2 rho = 0
 constraint 3 sigma = rho
@@ -30,9 +66,8 @@ gen rho = endowment*r-2*payoff*r
 gen sigma = endowment*s-2*payoff*s
 gen alpha = endowment - 2*payoff
 
-log using stata_MODELS_DG.log, replace
-
-*local i = 1
+*log using stata_MODELS_DG.log, replace
+/*
 foreach l of local levels {
 	di "treatment -> `l' "
 	
@@ -42,12 +77,6 @@ foreach l of local levels {
 	local deltaS`l' = _b[payoff]
 	local se_deltaS`l' = _se[payoff]
 	
-	/* Altruism
-	clogit a payoff alpha if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
-	est store A`l'
-	local alphaA`l' = _b[alpha]
-	local se_alphaA`l' = _se[alpha]*/
-
 	/* N - Social expectation - Norm */
 	clogit a payoff mean_app if treatment_id == "`l'", group(id) vce(rob)
 	est store N`l'
@@ -152,13 +181,171 @@ log close
 */ 
 * overall model *
 eststo clear
+eststo :clogit a payoff, group(id) vce(rob)
+eststo :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
+eststo :clogit a payoff mean_app, group(id) vce(rob)
+eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
+esttab using overall_models.tex, label replace aic bic se
+
+eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
+eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+suest model2 model3 model4 
+test [model2_a]rho= [model4_a]rho
+test [model3_a]mean_app= [model4_a]mean_app
+
+eststo clear
 eststo :clogit a payoff, group(id) vce(cluster treatment_id)
 eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1) 
 eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
 eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
-esttab using overall_models.tex, label replace aic bic se 
+esttab using overall_models_cluster.tex, label replace aic bic se 
+*/
+
+** Norm uncertainty models **
+
+foreach l of local levels {
+	di "treatment -> `l' "
+
+	/* NU - social norms and uncertainty */
+	clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	est store NU`l'
+	local deltaNU`l' = _b[payoff]
+	local gammaNU`l' = _b[mean_app]
+	local etaNU`l' = _b[sd_app]
+	local se_gammaNU`l' = _se[mean_app]
+	local se_etaNU`l' = _se[sd_app]
+
+	qui tab id if e(sample)
+	local nobs_NU`l' = r(r)
+}
+
+foreach l of local levels {
+	estimates stats NU`l'
+	matrix temp = r(S)
+	local NU_AIC`l' = temp[1,5]
+}
+
+/* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
+
+log using uncertain_stata_COEFF_NU.log, replace
+
+foreach l of local levels {
+  di "`l' `deltaNU`l'' `gammaNU`l''" "`etaNU`l''"
+ }
+
+log close
+ 
+ 
+  /* STAMPA TABELLA STD DEV IN FORMATO LOG */
+log using uncertain_stata_SE_NU.log, replace
+
+foreach l of local levels {
+  di "`l' `se_deltaNU`l'' `se_gammaNU`l''" "`se_etaNU`l''"
+ } 
+
+log close
+
+
+/* STAMPA TABELLA AIC IN FORMATO LOG */ 
+
+log using uncertain_stata_AIC_NU.log, replace
+ 
+foreach l of local levels {
+  di "`l'" "`NU_AIC`l''"
+ }
+
+eststo clear
+eststo :clogit a payoff mean_app, group(id) vce(rob)
+eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(rob) collinear
+eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
+esttab using uncertainty_models.tex, label replace aic bic se 
+
+eststo clear
+eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
+eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+esttab using uncertainty_models_cluster.tex, label replace aic bic se 
+
+preserve
+collapse (mean) mean_app (mean) sd_app, by(treatment_id scenarios)
+pwcorr mean_app sd_app
+restore
+
+*eststo clear
+*eststo :clogit a payoff mean_app, group(id) vce(bootstrap, strata(treatment_id))
+*eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
+*eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(bootstrap, strata(treatment_id)) collinear constraint(1)
+*esttab using uncertainty_models.tex, label replace aic bic se 
 
 *eststo :clogit a payoff mean_app, group(id) iter(50) collinear constraint(1)
 *eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
 *suest est5 est6, vce(cluster treatment_id)
 *test [est6_a]mean_app= [est5_a]mean_app
+
+*restore
+
+quietly{
+********* NOT SURE TO INCLUDE THIS **************
+preserve
+* ToG game *
+drop if game_type != "ToG"
+
+replace endowment = 5 if treatment_id == "2013Kru001_1b"
+replace scenarios = scenarios - 5 if treatment_id == "2013Kru001_1b" | treatment_id == "2019Cha026_3"
+replace choice = choice - 5 if treatment_id == "2013Kru001_1b" | treatment_id == "2019Cha026_3"
+replace payoff = payoff + 5 if treatment_id == "2019Cha026_3"
+
+* set constraint for social preferences models *
+constraint 1 payoff = 1
+constraint 2 rho = 0
+constraint 3 sigma = rho
+constraint 4 sigma = 0
+
+levelsof treatment_id, local(levels)
+
+* Charness Rabin 2002 *
+gen r = payoff > endowment
+gen s = payoff < endowment
+gen rho = endowment*r-2*payoff*r
+gen sigma = endowment*s-2*payoff*s
+gen alpha = endowment - 2*payoff
+
+* overall model *
+eststo clear
+eststo :clogit a payoff, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1) 
+eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+esttab using take_or_give_overall_models.tex, label replace aic bic se 
+
+restore
+
+preserve
+* Donation game *
+drop if game_type != "Donation Game"
+
+* set constraint for social preferences models *
+constraint 1 payoff = 1
+constraint 2 rho = 0
+constraint 3 sigma = rho
+constraint 4 sigma = 0
+
+levelsof treatment_id, local(levels)
+
+* Charness Rabin 2002 *
+gen r = payoff > endowment/2
+gen s = payoff < endowment/2
+gen rho = endowment*r-2*payoff*r
+gen sigma = endowment*s-2*payoff*s
+gen alpha = endowment - 2*payoff
+
+* overall model *
+eststo clear
+eststo :clogit a payoff, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1) 
+eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+esttab using take_or_give_overall_models.tex, label replace aic bic se 
+}
+restore

@@ -1,0 +1,57 @@
+---
+title: "stata_resampling"
+author: "Andrea Guido"
+date: "05/09/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+library(Statamarkdown)
+library(dplyr)
+```
+
+```{r}
+setwd(dir = "../")
+papers_included<-c("2007Lis165_1a","2007Lis165_1b","2012Laz164_3","2013Kru001_1a","2013Kru001_1b",
+                   #"2016Kim003_7",
+                   "2018Her061_9","2019Cha026_1","2019Cha026_3","2020And089_1","2020And089_2","2020Bas115_2a")
+master <- read.csv("File_DB/Output/Treatment.csv") %>%
+  mutate(treatment_id=paste(PaperID,TreatmentCode,sep="_"))
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
+choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
+
+# create table of beliefs aggregated by paper for all papers (between-subjects and within-subjects)
+beliefs_aggregated <- beliefs %>% group_by(treatment_id) %>% slice_sample(n=100) %>% group_by(treatment_id, scenarios) %>% summarise(mean_app = mean(KW_Normative, na.rm=T), sd_app = sd(KW_Normative, na.rm = T)) 
+
+# create comprehensive table with choices and beliefs
+temp <- choices %>% merge.data.frame(beliefs_aggregated, by = c("treatment_id", "scenarios"), all.x = T)
+
+
+final_data <- temp %>% filter(treatment_id %in% papers_included)
+write.csv(final_data, file = "data_utility.csv")
+```
+
+```{stata}
+import delimited "data_utility.csv", clear
+drop if game_type != "DG"
+gen payoff = endowment - scenarios
+egen id = group(subject_id)
+
+constraint 1 payoff = 1
+constraint 2 rho = 0
+constraint 3 sigma = rho
+constraint 4 sigma = 0
+
+levelsof treatment_id, local(levels)
+
+gen r = payoff > endowment/2
+gen s = payoff < endowment/2
+gen rho = endowment*r-2*payoff*r
+gen sigma = endowment*s-2*payoff*s
+gen alpha = endowment - 2*payoff
+
+eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
+
+```
+
