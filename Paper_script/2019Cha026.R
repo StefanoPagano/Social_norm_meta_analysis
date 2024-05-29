@@ -3,7 +3,7 @@ library(dplyr)
 # set wd 
 setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2019Cha026")
 
-csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/Paper_csv/"
+csv_path_output <- "~/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 master_df=read_excel("data.xls", sheet = "Sheet1", 
               col_types = c("numeric", "numeric", "numeric", 

@@ -98,7 +98,7 @@ Her061_choice <- Her061_choice %>%
 # Paper: 2019Cha026 ----
 
 # set wd 
-setwd("/Mon Drive/Meta-analysis beliefs/Dati paper/2019Cha026")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2019Cha026")
 
 # choice file
 Cha026=read_excel("data.xls", sheet = "Sheet1", 
@@ -606,7 +606,7 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
 
 # Paper: 2013Kru001 ----
 ### set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
 df <- read_excel("behavior_bully_standard_data_2009_05_18.xlsx")
 
 ## standard ----
@@ -739,7 +739,7 @@ Kru001_bully_beliefs <- Kru001_bully_beliefs %>%
 ## aggragate data ----
 
 ### set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices
 lazear_choice <- read_excel("Lazear_combined_kru.xlsx") %>%
@@ -810,7 +810,7 @@ df <- read_excel("list_data.xlsx")
 ## baseline ----
 
 ### set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -877,7 +877,7 @@ Lis165_base_beliefs <- Lis165_base_beliefs %>%
 ## Take1 ----
 
 ## set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_take1_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -942,7 +942,7 @@ Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
 
 # Paper: 2020And089 ----
 ### set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020And089")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2020And089")
 
 df_choice <- read_excel("2020And089_data.xlsx") %>%
   subset.data.frame(select = c(1,4,19,20))

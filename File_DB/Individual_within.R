@@ -1,7 +1,7 @@
 
-csv_path_output <- "~/Documents/GitHub/Social_norm_meta_analysis/File_DB/"
+csv_path_output <- "~/GitHub/Social_norm_meta_analysis/File_DB/"
 
-df_merge_game_type = read_xlsx(path = "/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+df_merge_game_type = read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 #### CHOICES DB ----
@@ -10,7 +10,7 @@ df_merge_game_type = read_xlsx(path = "/Volumes/GoogleDrive/.shortcut-targets-by
 #### Paper: 2020Bas115 ----
 
 # set wd 
-setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2020Bas115")
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2020Bas115")
 
 # choice file
 Bas115=read.csv("Basic_Verrina_2021.csv", sep=",")
@@ -260,7 +260,7 @@ Bas115_choice <- Bas115_choice %>%
 # #### Paper: 2017Del037 ----
 # 
 # # set wd 
-# setwd("/Volumes/GoogleDrive/.shortcut-targets-by-id/1IoJDOQWCFiL1qTzSja6byrAlCelNSTsT/Meta-analysis beliefs/Dati paper/2017Del037")
+# setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2017Del037")
 # 
 # # choice file
 # Del037=read.csv("DATA_full.csv", sep=",") %>%
