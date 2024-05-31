@@ -1085,4 +1085,6 @@ rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
                              "and089_pvt_choices",
                              "and089_pvt_beliefs",
                              "and089_pub_choices",
-                             "and089_pub_beliefs"))])
+                             "and089_pub_beliefs",
+                             "Eck169_choices",
+                             "Eck169_beliefs"))])

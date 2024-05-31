@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log
+  log type:  text
+ opened on:  31 May 2024, 16:02:18
+
+.  
+. foreach l of local levels {
+  2.   di "`l'" "`NU_AIC`l''"
+  3.  }
+2007Lis165_1a100.8036539943901
+2012Laz164_3490.5985760456615
+2013Kru001_1a213.7685490972752
+2016Kim003_7290.0064681549793
+2018Her061_9113.0946067925611
+2019Cha026_1192.2441191903486
+2020Bas115_2a458.0150700964078
+2023Eck169_1a1169.48941577652
+2023Eck169_1b1303.343733034873
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log
+  log type:  text
+ closed on:  31 May 2024, 16:02:18
+-------------------------------------------------------------------------------------------------------------------------------------------------------------

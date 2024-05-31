@@ -9,8 +9,7 @@ clear all
 
 ** Import data
 cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
-import delimited "data_utility.csv", clear
-append using krupka_final, force
+import delimited "new_data_utility.csv", clear
 
 * DG *
 drop if game_type != "DG"
@@ -50,13 +49,15 @@ gen coop = scenarios/endowment
 append using `temp'
 twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
 (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(2))), legend( pos(12) label (1 "Choices") label (2 "Mean Appropriateness") rows(1))
-graph export "Output/Figures/hist_coop_mean_app.pdf", replace
+graph export "Utility estimation\Output\Figures\hist_coop_mean_app.pdf", replace
 
 twoway (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(1))) ///
 (line sd_app coop if db==2, yaxis(2) ytitle("Norm Uncertainty", axis(2))), ///
 legend( pos(12) label (1 "Mean Appropriateness") label (2 "Norm Uncertainty") rows(1))
-graph export norm_uncertainty.pdf, replace
+graph export "Utility estimation\Output\Figures\norm_uncertainty.pdf", replace
 
+* Table 1
+tab 
 ***************************
 ***************************
 ** 2. Utility estimation **
@@ -65,8 +66,7 @@ graph export norm_uncertainty.pdf, replace
 
 clear all
 cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
-import delimited "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\data_utility.csv", clear
-append using krupka_final, force
+import delimited "new_data_utility.csv", clear
 
 * DG *
 drop if game_type != "DG"
@@ -92,8 +92,8 @@ gen alpha = endowment - 2*payoff
 *******************************
 *******************************
 
-* log using stata_MODELS_DG.log, replace
-/*
+log using "Utility estimation\Output\Logs\stata_MODELS_DG.log", replace
+
 foreach l of local levels {
 	di "treatment -> `l' "
 	
@@ -111,21 +111,21 @@ foreach l of local levels {
 	local se_deltaN`l' = _se[payoff]
 	local se_gammaN`l' = _se[mean_app]
 	
-	/* BA - Behindness averse */
-	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 2)
-	est store BA`l'
-	local rhoBA`l' = _b[rho]
-	local sigmaBA`l' = _b[sigma]
-	local se_rhoBA`l' = _se[rho]
-	local se_sigmaBA`l' = _se[sigma]
+*	/* BA - Behindness averse */
+*	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 2)
+*	est store BA`l'
+*	local rhoBA`l' = _b[rho]
+*	local sigmaBA`l' = _b[sigma]
+*	local se_rhoBA`l' = _se[rho]
+*	local se_sigmaBA`l' = _se[sigma]
 	
-	/* CP - Charity prone */
-	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 4)
-	est store CP`l'
-	local rhoCP`l' = _b[rho]
-	local sigmaCP`l' = _b[sigma]
-	local se_rhoCP`l' = _se[rho]
-	local se_sigmaCP`l' = _se[sigma]
+*	/* CP - Charity prone */
+*	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 4)
+*	est store CP`l'
+*	local rhoCP`l' = _b[rho]
+*	local sigmaCP`l' = _b[sigma]
+*	local se_rhoCP`l' = _se[rho]
+*	local se_sigmaCP`l' = _se[sigma]
 	
 	/* DA - Difference averse */
 	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
@@ -151,36 +151,34 @@ foreach l of local levels {
 }
 
 foreach l of local levels {
-estimates stats N`l' BA`l' CP`l' DA`l' S`l' FU`l'
+estimates stats N`l' DA`l' S`l' FU`l'
 matrix temp = r(S)
 local N_AIC`l' = temp[1,5]
-local BA_AIC`l' = temp[2,5]
-local CP_AIC`l' = temp[3,5]
-local DA_AIC`l' = temp[4,5]
-local S_AIC`l' = temp[5,5]
-local FU_AIC`l' = temp[6,5]
+local DA_AIC`l' = temp[2,5]
+local S_AIC`l' = temp[3,5]
+local FU_AIC`l' = temp[4,5]
 }
 
 log close
 
 
-/*
+
 /* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
 
-log using stata_COEFF_ONG.log, replace
+log using "Utility estimation\Output\Logs\stata_COEFF_ONG.log", replace
 
 foreach l of local levels {
-  di "`l' `deltaS`l'' `deltaN`l'' `gammaN`l'' `sigmaBA`l'' `rhoCP`l'' `rhoDA`l'' `sigmaDA`l'' `rhoFU`l'' `sigmaFU`l'' `gammaFU`l''" 
+  di "`l' `deltaS`l'' `deltaN`l'' `gammaN`l'' `rhoDA`l'' `sigmaDA`l'' `rhoFU`l'' `sigmaFU`l'' `gammaFU`l''" 
  }
 
 log close
  
  
   /* STAMPA TABELLA STD DEV IN FORMATO LOG */
-log using stata_SE_ONG.log, replace
+log using "Utility estimation\Output\Logs\stata_SE_ONG.log", replace
 
 foreach l of local levels {
-  di "`l' `se_deltaS`l'' `se_deltaN`l'' `se_gammaN`l'' `se_sigmaBA`l'' `se_rhoCP`l'' `se_rhoDA`l'' `se_sigmaDA`l'' `se_rhoFU`l'' `se_sigmaFU`l'' `se_gammaFU`l''"
+  di "`l' `se_deltaS`l'' `se_deltaN`l'' `se_gammaN`l'' `se_rhoDA`l'' `se_sigmaDA`l'' `se_rhoFU`l'' `se_sigmaFU`l'' `se_gammaFU`l''"
  } 
 
 log close
@@ -188,45 +186,22 @@ log close
 
 /* STAMPA TABELLA AIC IN FORMATO LOG */ 
 
-log using stata_AIC_ONG.log, replace
+log using "Utility estimation\Output\Logs\stata_AIC_ONG.log", replace
  
 foreach l of local levels {
-  di "`l' `S_AIC`l'' `N_AIC`l'' `BA_AIC`l'' `CP_AIC`l'' `DA_AIC`l'' `FU_AIC`l''"
+  di "`l' `S_AIC`l'' `N_AIC`l'' `DA_AIC`l'' `FU_AIC`l''"
  }
 
  
 log close
 
-log using stata_Nobs.log, replace
+log using "Utility estimation\Output\Logs\stata_Nobs.log", replace
  
 foreach l of local levels {
   di "`l' `nobs_FU`l''"
  }
 
 log close
-*/ 
-* overall model *
-eststo clear
-eststo :clogit a payoff, group(id) vce(rob)
-eststo :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
-eststo :clogit a payoff mean_app, group(id) vce(rob)
-eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
-esttab using overall_models.tex, label replace aic bic se
-
-eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
-eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
-eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
-suest model2 model3 model4 
-test [model2_a]rho= [model4_a]rho
-test [model3_a]mean_app= [model4_a]mean_app
-
-eststo clear
-eststo :clogit a payoff, group(id) vce(cluster treatment_id)
-eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1) 
-eststo :clogit a payoff mean_app, group(id) vce(cluster treatment_id)
-eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
-esttab using overall_models_cluster.tex, label replace aic bic se 
-*/
 
 ** Norm uncertainty models **
 
@@ -234,6 +209,15 @@ foreach l of local levels {
 	di "treatment -> `l' "
 
 	/* NU - social norms and uncertainty */
+	clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	est store NU`l'
+	local basedeltaNU`l' = _b[payoff]
+	local basegammaNU`l' = _b[mean_app]
+	local baseetaNU`l' = _b[sd_app]
+	local se_basegammaNU`l' = _se[mean_app]
+	local se_baseetaNU`l' = _se[sd_app]
+	
+	/* NU - social norms and uncertainty w/ interaction */
 	clogit a payoff c.mean_app##c.sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
 	est store NU`l'
 	local deltaNU`l' = _b[payoff]
@@ -242,7 +226,8 @@ foreach l of local levels {
 	local se_gammaNU`l' = _se[mean_app]
 	local se_etaNU`l' = _se[sd_app]
 	local sucaNU`l' = _b[c.mean_app#c.sd_app]
-
+	local se_sucaNU`l' = _se[c.mean_app#c.sd_app]
+	
 	qui tab id if e(sample)
 	local nobs_NU`l' = r(r)
 }
@@ -255,20 +240,20 @@ foreach l of local levels {
 
 /* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
 
-log using uncertain_stata_COEFF_NU.log, replace
+log using "Utility estimation\Output\Logs\uncertain_stata_COEFF_NU.log", replace
 
 foreach l of local levels {
-  di "`l' `deltaNU`l'' `gammaNU`l'' `etaNU`l'' `sucaNU`l''"
+  di "`l' `basegammaNU`l'' `baseetaNU`l'' `gammaNU`l'' `etaNU`l'' `sucaNU`l''"
  }
 
 log close
  
  
   /* STAMPA TABELLA STD DEV IN FORMATO LOG */
-log using uncertain_stata_SE_NU.log, replace
+log using "Utility estimation\Output\Logs\uncertain_stata_SE_NU.log", replace
 
 foreach l of local levels {
-  di "`l' `se_deltaNU`l'' `se_gammaNU`l''" "`se_etaNU`l''"
+  di "`l' `se_basegammaNU`l'' `se_baseetaNU`l'' `se_gammaNU`l'' `se_etaNU`l'' `se_sucaNU`l''"
  } 
 
 log close
@@ -276,7 +261,7 @@ log close
 
 /* STAMPA TABELLA AIC IN FORMATO LOG */ 
 
-log using uncertain_stata_AIC_NU.log, replace
+log using "Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log", replace
  
 foreach l of local levels {
   di "`l'" "`NU_AIC`l''"
@@ -290,20 +275,44 @@ log close
 ** 2.2 Models for representative agent **
 *****************************************
 *****************************************
+* overall model *
+eststo clear
+eststo :clogit a payoff, group(id) vce(rob)
+eststo :clogit a payoff rho sigma, group(id) iter(50) vce(rob) collinear constraint(1) 
+eststo :clogit a payoff mean_app, group(id) vce(rob)
+eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(rob) collinear constraint(1)
+esttab using "Utility estimation\Output\Tables\overall_models.tex", label replace aic bic se
 
+eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constraint(1) 
+eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
+eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
+suest model2 model3 model4 
+test [model2_a]rho= [model4_a]rho
+test [model3_a]mean_app= [model4_a]mean_app
+
+/*
+eststo clear
+eststo :clogit a payoff, group(id) vce(cluster treatment_id)
+eststo :clogit a payoff rho sigma, group(id) iter(50) vce(cluster paper_id) collinear constraint(1) 
+eststo :clogit a payoff mean_app, group(id) vce(cluster paper_id)
+eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster paper_id) collinear constraint(1)
+esttab using "Utility estimation\Output\Tables\overall_models_cluster.tex", label replace aic bic se 
+*/
+
+* models with norm uncertainty *
 eststo clear
 eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(rob) collinear
 eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
 eststo :clogit a payoff c.mean_app##c.sd_app, group(id) iter(50) vce(rob) collinear
 eststo :clogit a payoff rho sigma c.mean_app##c.sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
-esttab using uncertainty_models.tex, label replace aic bic se 
+esttab using "Utility estimation\Output\Tables\uncertainty_models.tex", label replace aic bic se 
 
 eststo clear
 eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
 eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
 eststo :clogit a payoff c.mean_app##c.sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
 eststo :clogit a payoff rho sigma c.mean_app##c.sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
-esttab using uncertainty_models_cluster.tex, label replace aic bic se 
+esttab using "Utility estimation\Output\Tables\uncertainty_models_cluster.tex", label replace aic bic se 
 
 preserve
 collapse (mean) mean_app (mean) sd_app, by(treatment_id scenarios)

@@ -380,3 +380,65 @@ Bas115_choice <- Bas115_choice %>%
 #   pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_Normative") %>%
 #   mutate(scenarios = as.numeric(dplyr::recode(scenarios, `KW1` = 6, `KW2` = 5, `KW3` = 4, `KW4` = 3, `KW5` = 2, `KW6` = 1, `KW7` = 0))) %>%
 #   subset.data.frame(select = -c(ID, Treatment, Dictator))
+
+#### Paper: 2023Eck169 -------
+# DG
+# set wd
+setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2023Eck169/")
+
+kru_df <- haven::read_dta("data_stata.dta") %>% 
+  filter((dict_game=="class" & dict_order==2)|(dict_game=="freshmen"&dict_order==1))%>%
+  select(dict_game,id,amount_sent,dict_order,choice,mean_norm_give,sd_norm_give) %>%
+  mutate(endowment=20,PaperID="2023Eck169") %>% rename(scenarios=amount_sent)
+
+# choice
+temp_choice <- kru_df %>% filter(choice==1) %>% select(id,scenarios) %>% rename(choice=scenarios)
+#Eck169_choices <- data.frame(p = NA, subject_id = NA, treatment_id = NA, paper_id = NA, scenarios = NA, choice = NA, endowment = NA, A = NA, female = NA, age = NA)
+
+Eck169_choices <- kru_df %>% rename(A=choice) %>%
+  mutate(p=row_number(),
+         treatmentcode=ifelse(dict_game=="class","1a","1b"),
+         subject_id = paste("2023Eck169", treatmentcode, id, sep = "_"),
+         treatment_id = paste("2023Eck169", treatmentcode, sep = "_"), 
+         paper_id = "2023Eck169",
+         endowment=20,
+         female=NA,
+         age=NA) %>% merge.data.frame(temp_choice,  by="id") %>% merge.data.frame(df_merge_game_type[,c("treatment_id", "Game_type")]) %>% 
+  mutate(Design="Within") %>%
+  select(p,subject_id,treatment_id,paper_id,Game_type,scenarios,choice,A,endowment,female,age,Design)
+
+# beliefs
+
+temp_beliefs <- haven::read_dta("data_stata.dta") %>% 
+  filter((dict_game=="class" & dict_order==2)|(dict_game=="freshmen"&dict_order==1)) %>%
+  select(dict_game,id,amount_sent,norm_give)
+
+Eck169_beliefs <- temp_beliefs %>% rename(KW_Normative=norm_give,scenarios=amount_sent) %>%
+  mutate(
+    treatmentcode=ifelse(dict_game=="class","1a","1b"),
+    subject_id = paste("2023Eck169", treatmentcode, id, sep = "_"),
+    treatment_id = paste("2023Eck169", treatmentcode, sep = "_"), 
+    paper_id = "2023Eck169",
+    endowment=20,
+    Game_type="DG",
+    KW_Personal=NA,
+    Bicchieri_Empirical=NA,
+    Bicchieri_Normative=NA,
+    Bicchieri_Personal=NA,
+    female=NA,
+    age=NA,
+    Design="Within"
+  ) %>%
+  select(treatment_id,subject_id,paper_id,scenarios,KW_Normative,Game_type,KW_Personal,Bicchieri_Empirical,Bicchieri_Normative,Bicchieri_Personal,female,age,Design)
+
+#kru_df %>% select(dict_game, id, choice, scenarios) %>%
+# filter tratment class, only when played first
+#kru_class <- kru_df %>% filter(dict_game=="class" & dict_order==2) %>% mutate(treatmentcode="1a") %>% rename(a=choice)
+#kru_freshmen <- kru_df %>% filter(dict_game=="freshmen" & dict_order==1) %>% mutate(treatmentcode="1b") %>% rename(a=choice)
+
+# meta-information dataset
+#meta_dataset <- read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2022Tve168", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) #%>% mutate(TreatmentCode = as.numeric(TreatmentCode))
+
+# produce final datasets
+#finaldf <- kru_class %>% rbind.data.frame(kru_freshmen) %>%
+#  merge.data.frame(kru_choices[,-c(3)], by = c("dict_game", "id")) %>%

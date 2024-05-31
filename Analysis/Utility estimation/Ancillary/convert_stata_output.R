@@ -1,0 +1,112 @@
+## STATA LOG FILE READING 
+
+#QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA
+## MODIFICARE SUFFISSO "_DG" CON "_ToG" O "_DON"
+## MODIFICARE n_max = x, x È UGUALE AL NUMERO DI TRATTAMENTI
+
+log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/stata_AIC_ONG.log"
+df_aic <- read_log(file=log_file,
+                   skip=10,
+                   n_max = 9)
+colnames(df_aic) <- c("treatment_id", "Selfish_aic", "Norm_aic", "DA_aic", "FU_aic")
+
+avg_aic <- df_aic %>% 
+  summarise(across(Selfish_aic:FU_aic, ~mean(., na.rm=T)))
+
+df_aic <- df_aic %>%
+  add_row(treatment_id="Average", avg_aic)
+
+write.csv(df_aic, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/AIC_DG.csv", row.names = F)
+
+#QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
+## MODIFICARE n_max = x, x è UGUALE AL NUMERO DI TRATTAMENTI
+
+log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/stata_COEFF_ONG.log"
+df_coeff <- read_log(file=log_file,
+                     skip=10,
+                     n_max = 9,
+                     col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_coeff) <- c("treatment_id", "deltaS", "deltaN", "gammaN", "rhoDA", "sigmaDA", "rhoFU", "sigmaFU", "gammaFU")
+
+observation <- read.csv("new_data_utility.csv") %>% distinct(treatment_id,subject_id,Game_type) %>% group_by(treatment_id,Game_type) %>% tally()
+
+df_coeff <- df_coeff %>%
+  merge.data.frame(observation, by = "treatment_id")
+
+avg_coeff <- df_coeff %>% 
+  summarise(across(deltaS:gammaFU, ~weighted.mean(., w = n, na.rm=T)))
+
+df_coeff <- df_coeff %>%
+  add_row(treatment_id="Average", avg_coeff, n=sum(df_coeff$n), Game_type="DG")
+
+#QUESTO SCRIPT LEGGE IL FILE LOG STD ERR DA STATA
+
+log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/stata_SE_ONG.log"
+df_se <- read_log(file=log_file,
+                  skip=10,
+                  n_max = 9,
+                  col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_se) <- c("treatment_id", "se_deltaS", "se_deltaN", "se_gammaN", "se_rhoDA", "se_sigmaDA", "se_rhoFU", "se_sigmaFU", "se_gammaFU")
+
+df_se <- df_se %>%
+  merge.data.frame(observation, by = "treatment_id") %>%
+  mutate(weight_SE=n^2)
+
+avg_se <- df_se %>% 
+  summarise(across(se_deltaS:se_gammaFU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+
+df_se <- df_se %>%
+  add_row(treatment_id="Average", sqrt(avg_se), n=sum(df_se$n), weight_SE=sum(df_se$weight_SE))
+
+df_models <- merge.data.frame(df_coeff, df_se, by = "treatment_id")
+
+write.csv(df_models, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/MODEL_DG.csv", row.names = F)
+
+# MODELLI CON NORM UNCERTAINTY
+#QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
+## MODIFICARE n_max = x, x è UGUALE AL NUMERO DI TRATTAMENTI
+
+log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/uncertain_stata_COEFF_NU.log"
+df_coeff <- read_log(file=log_file,
+                     skip=10,
+                     n_max = 9,
+                     col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_coeff) <- c("treatment_id", "basegammaNU", "baseetaNU", "gammaNU", "etaNU", "sucaNU")
+
+observation <- read.csv("new_data_utility.csv") %>% distinct(treatment_id,subject_id,Game_type) %>% group_by(treatment_id,Game_type) %>% tally()
+
+df_coeff <- df_coeff %>%
+  merge.data.frame(observation, by = "treatment_id")
+
+avg_coeff <- df_coeff %>% 
+  summarise(across(basegammaNU:sucaNU, ~weighted.mean(., w = n, na.rm=T)))
+
+df_coeff <- df_coeff %>%
+  add_row(treatment_id="Average", avg_coeff, n=sum(df_coeff$n), Game_type="DG")
+
+#QUESTO SCRIPT LEGGE IL FILE LOG STD ERR DA STATA
+
+log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/uncertain_stata_SE_NU.log"
+df_se <- read_log(file=log_file,
+                  skip=10,
+                  n_max = 9,
+                  col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
+
+colnames(df_se) <- c("treatment_id", "se_basegammaNU", "se_baseetaNU", "se_gammaNU", "se_etaNU", "se_sucaNU")
+
+df_se <- df_se %>%
+  merge.data.frame(observation, by = "treatment_id") %>%
+  mutate(weight_SE=n^2)
+
+avg_se <- df_se %>% 
+  summarise(across(se_basegammaNU:se_sucaNU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+
+df_se <- df_se %>%
+  add_row(treatment_id="Average", sqrt(avg_se), n=sum(df_se$n), weight_SE=sum(df_se$weight_SE))
+
+df_models <- merge.data.frame(df_coeff, df_se, by = "treatment_id")
+
+write.csv(df_models, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/uncertainty_MODEL_DG.csv", row.names = F)
