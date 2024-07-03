@@ -57,7 +57,7 @@ legend( pos(12) label (1 "Mean Appropriateness") label (2 "Norm Uncertainty") ro
 graph export "Utility estimation\Output\Figures\norm_uncertainty.pdf", replace
 
 * Table 1
-tab 
+tab treatment_id if a==1
 ***************************
 ***************************
 ** 2. Utility estimation **
