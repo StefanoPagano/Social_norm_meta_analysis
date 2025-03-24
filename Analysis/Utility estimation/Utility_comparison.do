@@ -8,7 +8,7 @@ clear all
 *******************************
 
 ** Import data
-cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
 import delimited "new_data_utility.csv", clear
 
 * DG *
@@ -65,7 +65,7 @@ tab treatment_id if a==1
 ***************************
 
 clear all
-cd "C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
+cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
 import delimited "new_data_utility.csv", clear
 
 * DG *
@@ -111,22 +111,6 @@ foreach l of local levels {
 	local se_deltaN`l' = _se[payoff]
 	local se_gammaN`l' = _se[mean_app]
 	
-*	/* BA - Behindness averse */
-*	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 2)
-*	est store BA`l'
-*	local rhoBA`l' = _b[rho]
-*	local sigmaBA`l' = _b[sigma]
-*	local se_rhoBA`l' = _se[rho]
-*	local se_sigmaBA`l' = _se[sigma]
-	
-*	/* CP - Charity prone */
-*	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 4)
-*	est store CP`l'
-*	local rhoCP`l' = _b[rho]
-*	local sigmaCP`l' = _b[sigma]
-*	local se_rhoCP`l' = _se[rho]
-*	local se_sigmaCP`l' = _se[sigma]
-	
 	/* DA - Difference averse */
 	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
 	est store DA`l'
@@ -160,7 +144,6 @@ local FU_AIC`l' = temp[4,5]
 }
 
 log close
-
 
 
 /* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
@@ -264,7 +247,7 @@ log close
 log using "Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log", replace
  
 foreach l of local levels {
-  di "`l'" "`NU_AIC`l''"
+  di "`l' `NU_AIC`l''"
  }
 
 log close
@@ -287,8 +270,10 @@ eststo model2 :clogit a payoff rho sigma, group(id) iter(50) collinear constrain
 eststo model3 :clogit a payoff mean_app, group(id) iter(50) collinear
 eststo model4 :clogit a payoff rho sigma mean_app, group(id) iter(50) collinear constraint(1)
 suest model2 model3 model4 
+** comparing coefficients **
+// measure how much of the weight previously attributed to rho and sigma is captured by delta
 test [model2_a]rho= [model4_a]rho
-test [model3_a]mean_app= [model4_a]mean_app
+test [model2_a]sigma= [model4_a]sigma
 
 /*
 eststo clear
@@ -332,6 +317,7 @@ restore
 
 *restore
 
+/*
 quietly{
 ********* NOT SURE TO INCLUDE THIS **************
 preserve
@@ -396,3 +382,4 @@ eststo :clogit a payoff rho sigma mean_app, group(id) iter(50) vce(cluster treat
 esttab using take_or_give_overall_models.tex, label replace aic bic se 
 }
 restore
+*/

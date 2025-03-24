@@ -1,8 +1,8 @@
--------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_MODELS_DG.log
+       log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_MODELS_DG.log
   log type:  text
- opened on:  31 May 2024, 16:02:06
+ opened on:  17 Mar 2025, 16:35:10
 
 . 
 . foreach l of local levels {
@@ -22,22 +22,6 @@
  11.         local se_deltaN`l' = _se[payoff]
  12.         local se_gammaN`l' = _se[mean_app]
  13.         
-. *       /* BA - Behindness averse */
-. *       clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 2)
-. *       est store BA`l'
-. *       local rhoBA`l' = _b[rho]
-. *       local sigmaBA`l' = _b[sigma]
-. *       local se_rhoBA`l' = _se[rho]
-. *       local se_sigmaBA`l' = _se[sigma]
-.         
-. *       /* CP - Charity prone */
-. *       clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraints(1 4)
-. *       est store CP`l'
-. *       local rhoCP`l' = _b[rho]
-. *       local sigmaCP`l' = _b[sigma]
-. *       local se_rhoCP`l' = _se[rho]
-. *       local se_sigmaCP`l' = _se[sigma]
-.         
 .         /* DA - Difference averse */
 .         clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
  14.         est store DA`l'
@@ -565,7 +549,7 @@ Log pseudolikelihood = -126.50468               Pseudo R2         =     0.0579
              |               Robust
            a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-      payoff |   .1741684   .0455103     3.83   0.000     .0849699     .263367
+      payoff |   .1741685   .0455103     3.83   0.000     .0849699     .263367
 ------------------------------------------------------------------------------
 
 Iteration 0:   log pseudolikelihood = -109.31495  
@@ -827,8 +811,8 @@ Log pseudolikelihood = -605.17345               Pseudo R2         =     0.2931
            a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
       payoff |          1  (constrained)
-         rho |   .0329531   .0463908     0.71   0.477    -.0579713    .1238774
-       sigma |   .4820722   .0546551     8.82   0.000     .3749503    .5891942
+         rho |    .032953   .0463908     0.71   0.477    -.0579713    .1238774
+       sigma |   .4820723   .0546551     8.82   0.000     .3749503    .5891942
     mean_app |   7.333485    .657469    11.15   0.000     6.044869      8.6221
 ------------------------------------------------------------------------------
 treatment -> 2023Eck169_1b 
@@ -850,7 +834,7 @@ Log pseudolikelihood = -784.58297               Pseudo R2         =     0.0731
              |               Robust
            a |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-      payoff |   .0990264   .0091727    10.80   0.000     .0810483    .1170045
+      payoff |   .0990264   .0091727    10.80   0.000     .0810484    .1170045
 ------------------------------------------------------------------------------
 
 Iteration 0:   log pseudolikelihood = -708.73666  
@@ -1051,7 +1035,7 @@ FU2023Eck~1b |      3,883  -846.457  -645.5932       3    1297.186    1315.98
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\aguido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_MODELS_DG.log
+       log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_MODELS_DG.log
   log type:  text
- closed on:  31 May 2024, 16:02:14
--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  17 Mar 2025, 16:35:24
+------------------------------------------------------------------------------------------------------------------------------------------------------------

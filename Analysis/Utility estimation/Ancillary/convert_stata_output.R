@@ -3,7 +3,7 @@
 library(tidyverse)
 # 1. QUESTO SCRIPT LEGGE IL FILE LOG AIC DA STATA ---------------
 ## MODIFICARE SUFFISSO "_DG" CON "_ToG" O "_DON"
-## MODIFICARE n_max = x, x È UGUALE AL NUMERO DI TRATTAMENTI
+## MODIFICARE n_max = x, x ? UGUALE AL NUMERO DI TRATTAMENTI
 
 log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/stata_AIC_ONG.log"
 df_aic <- read_log(file=log_file,
@@ -20,7 +20,7 @@ df_aic <- df_aic %>%
 write.csv(df_aic, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/AIC_DG.csv", row.names = F)
 
 # 2. QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA -------------
-## MODIFICARE n_max = x, x è UGUALE AL NUMERO DI TRATTAMENTI
+## MODIFICARE n_max = x, x ? UGUALE AL NUMERO DI TRATTAMENTI
 
 log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/stata_COEFF_ONG.log"
 df_coeff <- read_log(file=log_file,
@@ -51,11 +51,12 @@ df_se <- read_log(file=log_file,
 
 colnames(df_se) <- c("treatment_id", "se_deltaS", "se_deltaN", "se_gammaN", "se_rhoDA", "se_sigmaDA", "se_rhoFU", "se_sigmaFU", "se_gammaFU")
 
-df_se <- df_se %>%
-  merge.data.frame(observation, by = "treatment_id") %>%
-  mutate(weight_SE=n^2)
-
 # Uncomment this if want to use obs. weights
+
+#df_se <- df_se %>%
+#  merge.data.frame(observation, by = "treatment_id") %>%
+#  mutate(weight_SE=n^2)
+
 #avg_se <- df_se %>% 
 #  summarise(across(se_deltaS:se_gammaFU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 #df_se <- df_se %>%
@@ -63,7 +64,7 @@ df_se <- df_se %>%
 
 # XXX CHECK ANDREA #################
 # avg coefficient with inverse variance
-num <- colSums(df_coeff[,2:9]/df_se[,2:9]^2)
+num <- colSums(df_coeff[,2:9]*(1/df_se[,2:9]^2))
 den <- colSums(1/df_se[,2:9]^2)
 ration <- data.frame(t(num/den))
 
@@ -75,7 +76,7 @@ se_average <- data.frame(t(sqrt(1/den)))
 colnames(se_average) <- colnames(df_se)[2:9]
 
 df_se <- df_se %>%
-  add_row(treatment_id="Average", se_average, n=sum(df_se$n), weight_SE=sum(df_se$weight_SE))
+  add_row(treatment_id="Average", se_average)#, n=sum(df_se$n) Uncomment when using obs as weights, weight_SE=sum(df_se$weight_SE))
 
 ##################
 
@@ -86,12 +87,11 @@ average_ci_u <- df_coeff[10,2:9] + 1.96*df_se[10,2:9]
 average_ci_l <- df_coeff[10,2:9] - 1.96*df_se[10,2:9]
 
 rbind.data.frame(average_ci_l, df_coeff[10,2:9], average_ci_u)
-
 write.csv(df_models, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/MODEL_DG.csv", row.names = F)
 
 # 3. MODELLI CON NORM UNCERTAINTY ----------------
 #QUESTO SCRIPT LEGGE IL FILE LOG COEFF DA STATA
-## MODIFICARE n_max = x, x è UGUALE AL NUMERO DI TRATTAMENTI
+## MODIFICARE n_max = x, x ? UGUALE AL NUMERO DI TRATTAMENTI
 
 log_file = "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/uncertain_stata_COEFF_NU.log"
 df_coeff <- read_log(file=log_file,
@@ -122,9 +122,9 @@ df_se <- read_log(file=log_file,
 
 colnames(df_se) <- c("treatment_id", "se_basegammaNU", "se_baseetaNU", "se_gammaNU", "se_etaNU", "se_sucaNU")
 
-df_se <- df_se %>%
-  merge.data.frame(observation, by = "treatment_id") %>%
-  mutate(weight_SE=n^2)
+#df_se <- df_se %>%
+#  merge.data.frame(observation, by = "treatment_id") %>%
+#  mutate(weight_SE=n^2)
 
 # Uncomment this if want to use obs. weights
 #avg_se <- df_se %>% 
@@ -146,7 +146,7 @@ se_average <- data.frame(t(sqrt(1/den)))
 colnames(se_average) <- colnames(df_se)[2:6]
 
 df_se <- df_se %>%
-  add_row(treatment_id="Average", se_average, n=sum(df_se$n), weight_SE=sum(df_se$weight_SE))
+  add_row(treatment_id="Average", se_average)#, n=sum(df_se$n) Uncomment if using obs as weights, weight_SE=sum(df_se$weight_SE))
 
 ##################
 

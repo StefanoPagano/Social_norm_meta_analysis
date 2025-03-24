@@ -81,7 +81,7 @@ plot_coeff_social_generator <- function(data) {
           axis.title.y=element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
-    geom_vline(xintercept = 0) + xlim(c(-1,1))
+    geom_vline(xintercept = 0) #xlim(c(-1,1))
   
   # Full model (social preferences and social norms)
   
