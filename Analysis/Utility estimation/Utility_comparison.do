@@ -304,6 +304,43 @@ collapse (mean) mean_app (mean) sd_app, by(treatment_id scenarios)
 pwcorr mean_app sd_app
 restore
 
+** Linear Regressions on donations
+** Comments: when analyzing behavior using simple regressions
+preserve	
+keep if a == 1
+gen perc_e = scenarios / endowment
+gen high = 0
+replace high = 1 if perc_e>0.5
+
+tobit perc_e mean_app, vce(cluster treatment_id ) ul(1) ll(0)
+
+tobit perc_e mean_app sd_app, vce(cluster treatment_id ) ul(1) ll(0)
+tobit perc_e mean_app sd_app if perc_e <=0.5, vce(cluster treatment_id ) ul(1) ll(0)
+tobit perc_e mean_app sd_app if perc_e >0.5, vce(cluster treatment_id ) ul(1) ll(0)
+
+tobit perc_e c.mean_app##c.sd_app, vce(cluster treatment_id ) ul(1) ll(0)
+
+tobit perc_e c.mean_app##c.sd_app if perc_e <=0.5, vce(cluster treatment_id ) ll(0) ul(0.5)
+tobit perc_e c.mean_app##c.sd_app if perc_e >0.5, vce(cluster treatment_id ) ll(0.5) ul(1)
+
+metobit perc_e mean_app if perc_e <=0.5 ||treatment_id:
+metobit perc_e mean_app sd_app if perc_e <=0.5 ||treatment_id:
+metobit perc_e c.mean_app##c.sd_app if perc_e <=0.5 ||treatment_id:, ul(0.5) ll(0)
+
+
+gen zero=0
+replace zero = 1 if perc_e == 0
+logit zero mean_app, vce(cluster treatment_id)
+logit zero mean_app sd_app, vce(cluster treatment_id)
+logit zero c.mean_app##c.sd_app, vce(cluster treatment_id)
+
+gen half=0
+replace half = 1 if perc_e > 0
+logit half mean_app, vce(cluster treatment_id)
+logit half mean_app sd_app, vce(cluster treatment_id)
+logit half c.mean_app##c.sd_app, vce(cluster treatment_id)
+
+restore
 *eststo clear
 *eststo :clogit a payoff mean_app, group(id) vce(bootstrap, strata(treatment_id))
 *eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear

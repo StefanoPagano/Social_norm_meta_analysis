@@ -2,26 +2,26 @@
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log
   log type:  text
- opened on:  17 Mar 2025, 16:35:31
+ opened on:  10 Jun 2025, 20:27:01
 
 .  
 . foreach l of local levels {
-  2.   di "`l'" "`NU_AIC`l''"
+  2.   di "`l' `NU_AIC`l''"
   3.  }
-2007Lis165_1a100.80365399439
-2012Laz164_3490.598576045662
-2013Kru001_1a213.7685490972754
-2016Kim003_7290.0064681549791
-2018Her061_9113.0946067925611
-2019Cha026_1192.2441191903486
-2020Bas115_2a458.0150700964082
-2023Eck169_1a1169.489415776518
-2023Eck169_1b1303.343733034872
+2007Lis165_1a 100.8036539943901
+2012Laz164_3 490.5985760456617
+2013Kru001_1a 213.7685490972751
+2016Kim003_7 290.0064681549793
+2018Her061_9 113.0946067925611
+2019Cha026_1 192.2441191903485
+2020Bas115_2a 458.0150700964083
+2023Eck169_1a 1169.489415776522
+2023Eck169_1b 1303.343733034873
 
 . 
 . log close
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log
   log type:  text
- closed on:  17 Mar 2025, 16:35:31
+ closed on:  10 Jun 2025, 20:27:01
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

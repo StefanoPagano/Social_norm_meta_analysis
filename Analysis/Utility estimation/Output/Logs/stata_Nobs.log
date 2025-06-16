@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_Nobs.log
   log type:  text
- opened on:  17 Mar 2025, 16:35:24
+ opened on:  10 Jun 2025, 20:26:53
 
 .  
 . foreach l of local levels {
@@ -23,5 +23,5 @@
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_Nobs.log
   log type:  text
- closed on:  17 Mar 2025, 16:35:24
+ closed on:  10 Jun 2025, 20:26:53
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
