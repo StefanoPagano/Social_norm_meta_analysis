@@ -8,8 +8,8 @@ clear all
 *******************************
 
 ** Import data
-cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
-import delimited "new_data_utility.csv", clear
+cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation"
+import delimited "Data\new_data_utility.csv", clear
 
 * DG *
 drop if game_type != "DG"
@@ -35,8 +35,11 @@ restore
 preserve
 tempfile temp
 gen coop = scenarios/endowment
+summ sd_app
+local sd_max = r(max)
+gen sd_app_norm = 2*(sd_app/`sd_max') - 1
 set scheme lean1
-collapse (mean) mean_app sd_app, by(coop)
+collapse (mean) mean_app sd_app_norm, by(coop)
 gen db = 2
 save `temp' 
 restore
@@ -48,7 +51,10 @@ gen coop = scenarios/endowment
 
 append using `temp'
 twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
-(line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(2))), legend( pos(12) label (1 "Choices") label (2 "Mean Appropriateness") rows(1))
+(line mean_app coop if db==2, yaxis(1)) ///
+(line sd_app_norm coop if db==2, yaxis(1)), ///
+xtitle("% Endowment") ///
+ytitle("Mean Appropriateness / Norm Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Mean Appropriateness") label( 3 "Norm Uncertainty") rows(1))
 graph export "Utility estimation\Output\Figures\hist_coop_mean_app.pdf", replace
 
 twoway (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(1))) ///
@@ -192,24 +198,36 @@ foreach l of local levels {
 	di "treatment -> `l' "
 
 	/* NU - social norms and uncertainty */
-	clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	*clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	clogit a payoff mean_app sd_app rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
 	est store NU`l'
 	local basedeltaNU`l' = _b[payoff]
 	local basegammaNU`l' = _b[mean_app]
 	local baseetaNU`l' = _b[sd_app]
+	local se_basedeltaNU`l' = _se[payoff]
 	local se_basegammaNU`l' = _se[mean_app]
 	local se_baseetaNU`l' = _se[sd_app]
+	local se_baserhoNU`l' = _se[rho]
+	local se_basesigmaNU`l' = _se[sigma]
+	local baserhoNU`l' = _b[rho]
+	local basesigmaNU`l' = _b[sigma]
 	
 	/* NU - social norms and uncertainty w/ interaction */
-	clogit a payoff c.mean_app##c.sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	*clogit a payoff c.mean_app##c.sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	clogit a payoff c.mean_app##c.sd_app rho sigma if treatment_id == "`l'", group(id) iter(100) vce(rob) collinear constraint(1)
 	est store NU`l'
 	local deltaNU`l' = _b[payoff]
 	local gammaNU`l' = _b[mean_app]
 	local etaNU`l' = _b[sd_app]
+	local nuNU`l' = _b[c.mean_app#c.sd_app]
+	local se_deltaNU`l' = _se[payoff]
 	local se_gammaNU`l' = _se[mean_app]
 	local se_etaNU`l' = _se[sd_app]
-	local sucaNU`l' = _b[c.mean_app#c.sd_app]
-	local se_sucaNU`l' = _se[c.mean_app#c.sd_app]
+	local se_nuNU`l' = _se[c.mean_app#c.sd_app]
+	local rhoNU`l' = _b[rho]
+	local sigmaNU`l' = _b[sigma]
+	local se_rhoNU`l' = _se[rho]
+	local se_sigmaNU`l' = _se[sigma]
 	
 	qui tab id if e(sample)
 	local nobs_NU`l' = r(r)
@@ -226,7 +244,7 @@ foreach l of local levels {
 log using "Utility estimation\Output\Logs\uncertain_stata_COEFF_NU.log", replace
 
 foreach l of local levels {
-  di "`l' `basegammaNU`l'' `baseetaNU`l'' `gammaNU`l'' `etaNU`l'' `sucaNU`l''"
+  di "`l' `basedeltaNU`l'' `basegammaNU`l'' `baseetaNU`l'' `deltaNU`l'' `gammaNU`l'' `etaNU`l'' `nuNU`l'' `baserhoNU`l'' `basesigmaNU`l'' `rhoNU`l'' `sigmaNU`l''"
  }
 
 log close
@@ -236,7 +254,7 @@ log close
 log using "Utility estimation\Output\Logs\uncertain_stata_SE_NU.log", replace
 
 foreach l of local levels {
-  di "`l' `se_basegammaNU`l'' `se_baseetaNU`l'' `se_gammaNU`l'' `se_etaNU`l'' `se_sucaNU`l''"
+  di "`l' `se_basedeltaNU`l'' `se_basegammaNU`l'' `se_baseetaNU`l'' `se_deltaNU`l'' `se_gammaNU`l'' `se_etaNU`l'' `se_nuNU`l'' `se_baserhoNU`l'' `se_basesigmaNU`l'' `se_rhoNU`l'' `se_sigmaNU`l''"
  } 
 
 log close
@@ -255,7 +273,7 @@ log close
  
 *****************************************
 *****************************************
-** 2.2 Models for representative agent **
+**2 2.2 Models for representative agent **
 *****************************************
 *****************************************
 * overall model *
@@ -313,19 +331,16 @@ gen high = 0
 replace high = 1 if perc_e>0.5
 
 tobit perc_e mean_app, vce(cluster treatment_id ) ul(1) ll(0)
+tobit perc_e sd_app, vce(cluster treatment_id ) ul(1) ll(0)
+tobit perc_e mean_app sd_app if perc_e <=0.5, vce(cluster treatment_id ) ul(0.5) ll(0)
+tobit perc_e mean_app sd_app if perc_e >0.5, vce(cluster treatment_id ) ul(1) ll(0.5)
 
-tobit perc_e mean_app sd_app, vce(cluster treatment_id ) ul(1) ll(0)
-tobit perc_e mean_app sd_app if perc_e <=0.5, vce(cluster treatment_id ) ul(1) ll(0)
-tobit perc_e mean_app sd_app if perc_e >0.5, vce(cluster treatment_id ) ul(1) ll(0)
-
-tobit perc_e c.mean_app##c.sd_app, vce(cluster treatment_id ) ul(1) ll(0)
-
-tobit perc_e c.mean_app##c.sd_app if perc_e <=0.5, vce(cluster treatment_id ) ll(0) ul(0.5)
-tobit perc_e c.mean_app##c.sd_app if perc_e >0.5, vce(cluster treatment_id ) ll(0.5) ul(1)
-
-metobit perc_e mean_app if perc_e <=0.5 ||treatment_id:
-metobit perc_e mean_app sd_app if perc_e <=0.5 ||treatment_id:
-metobit perc_e c.mean_app##c.sd_app if perc_e <=0.5 ||treatment_id:, ul(0.5) ll(0)
+*tobit perc_e c.mean_app##c.sd_app, vce(cluster treatment_id ) ul(1) ll(0)
+*tobit perc_e c.mean_app##c.sd_app if perc_e <=0.5, vce(cluster treatment_id ) ll(0) ul(0.5)
+*tobit perc_e c.mean_app##c.sd_app if perc_e >0.5, vce(cluster treatment_id ) ll(0.5) ul(1)
+*metobit perc_e mean_app if perc_e <=0.5 ||treatment_id:
+*metobit perc_e mean_app sd_app if perc_e <=0.5 ||treatment_id:
+*metobit perc_e c.mean_app##c.sd_app if perc_e <=0.5 ||treatment_id:, ul(0.5) ll(0)
 
 
 gen zero=0
@@ -354,8 +369,7 @@ restore
 
 *restore
 
-/*
-quietly{
+
 ********* NOT SURE TO INCLUDE THIS **************
 preserve
 * ToG game *

@@ -99,7 +99,8 @@ df_coeff <- read_log(file=log_file,
                      n_max = 9,
                      col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
 
-colnames(df_coeff) <- c("treatment_id", "basegammaNU", "baseetaNU", "gammaNU", "etaNU", "sucaNU")
+#colnames(df_coeff) <- c("treatment_id", "basegammaNU", "baseetaNU", "gammaNU", "etaNU", "nuNU", "baserhoNU", "basesigmaNU", "rhoNU", "sigmaNU")
+colnames(df_coeff) <- c("treatment_id", "basedeltaNU", "basegammaNU", "baseetaNU", "deltaNU", "gammaNU", "etaNU", "nuNU", "baserhoNU", "basesigmaNU", "rhoNU", "sigmaNU")
 
 observation <- read.csv("../../new_data_utility.csv") %>% distinct(treatment_id,subject_id,Game_type) %>% group_by(treatment_id,Game_type) %>% tally()
 
@@ -120,7 +121,8 @@ df_se <- read_log(file=log_file,
                   n_max = 9,
                   col_types=cols("c","n","n","n","n","n","n","n","n","n","n","n","n"))
 
-colnames(df_se) <- c("treatment_id", "se_basegammaNU", "se_baseetaNU", "se_gammaNU", "se_etaNU", "se_sucaNU")
+#colnames(df_se) <- c("treatment_id", "se_basegammaNU", "se_baseetaNU", "se_gammaNU", "se_etaNU", "se_nuNU", )
+colnames(df_se) <- c("treatment_id", "se_basedeltaNU", "se_basegammaNU", "se_baseetaNU", "se_deltaNU", "se_gammaNU", "se_etaNU", "se_nuNU", "se_baserhoNU", "se_basesigmaNU", "se_rhoNU", "se_sigmaNU")
 
 #df_se <- df_se %>%
 #  merge.data.frame(observation, by = "treatment_id") %>%
@@ -134,8 +136,14 @@ colnames(df_se) <- c("treatment_id", "se_basegammaNU", "se_baseetaNU", "se_gamma
 
 # XXX CHECK ANDREA #################
 # avg coefficient with inverse variance
-num <- colSums(df_coeff[,2:6]/df_se[,2:6]^2)
-den <- colSums(1/df_se[,2:6]^2)
+## remove treatments with issues
+##treatment_removed = c("2023Eck169_1a")
+##df_coeff[c(which(df_coeff$treatment_id=="2023Eck169_1a")), c("nuNU", "etaNU", "gammaNU", "rhoNU", "sigmaNU")] = NA
+##df_se[c(which(df_se$treatment_id=="2023Eck169_1a")), c("se_nuNU", "se_etaNU", "se_gammaNU", "se_rhoNU", "se_sigmaNU")] = NA
+
+p = 11 + 1 # number of parameters plus 1
+num <- colSums(df_coeff[,2:p]/df_se[,2:p]^2, na.rm = T)
+den <- colSums(1/df_se[,2:p]^2, na.rm = T)
 ration <- data.frame(t(num/den))
 
 df_coeff <- df_coeff %>%
@@ -143,7 +151,7 @@ df_coeff <- df_coeff %>%
 
 # compute variance of coefficient (1/den)
 se_average <- data.frame(t(sqrt(1/den)))
-colnames(se_average) <- colnames(df_se)[2:6]
+colnames(se_average) <- colnames(df_se)[2:p]
 
 df_se <- df_se %>%
   add_row(treatment_id="Average", se_average)#, n=sum(df_se$n) Uncomment if using obs as weights, weight_SE=sum(df_se$weight_SE))
@@ -153,8 +161,8 @@ df_se <- df_se %>%
 
 # produce 95% CI of averages
 df_models <- merge.data.frame(df_coeff, df_se, by = "treatment_id")
-average_ci_u <- df_coeff[10,2:6] + 1.96*df_se[10,2:6]
-average_ci_l <- df_coeff[10,2:6] - 1.96*df_se[10,2:6]
+average_ci_u <- df_coeff[10,2:p] + 1.96*df_se[10,2:p]
+average_ci_l <- df_coeff[10,2:p] - 1.96*df_se[10,2:p]
 
-rbind.data.frame(average_ci_l, df_coeff[10,2:6], average_ci_u)
+rbind.data.frame(average_ci_l, df_coeff[10,2:p], average_ci_u)
 write.csv(df_models, "~/GitHub/Social_norm_meta_analysis/Analysis/Utility estimation/Output/Logs/uncertainty_MODEL_DG.csv", row.names = F)

@@ -18,8 +18,8 @@ model_df_generator <- function(file, uncertainty_model) {
 #    average_SE_stata <- df %>% summarise(across(se_deltaS:se_gammaFU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 #
 #  } else {
-#    average_coeff_stata <- df %>% summarise(across(basegammaNU:sucaNU, ~weighted.mean(., w = n.x, na.rm=T)))
-#    average_SE_stata <- df %>% summarise(across(se_basegammaNU:se_sucaNU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
+#    average_coeff_stata <- df %>% summarise(across(basegammaNU:nuNU, ~weighted.mean(., w = n.x, na.rm=T)))
+#    average_SE_stata <- df %>% summarise(across(se_basegammaNU:se_nuNU, ~weighted.mean(.^2, w = weight_SE, na.rm=T)))
 #    
 #  }
 #  df <- df %>%
@@ -172,20 +172,41 @@ plot_coeff_social_generator_uncertainty <- function(data){
           panel.grid.minor = element_blank()) +
     geom_vline(xintercept = 0)
 
-  plot_interaction <-  ggplot(data, aes(x=sucaNU,y=treatment_id)) + 
-    geom_pointrange(aes(xmin=sucaNU-1.96*se_sucaNU,xmax=sucaNU+1.96*se_sucaNU), shape=20, size=s) +
-    xlab("Interaction term") +
+  plot_interaction <-  ggplot(data, aes(x=nuNU,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=nuNU-1.96*se_nuNU,xmax=nuNU+1.96*se_nuNU), shape=20, size=s) +
+    xlab(expression(nu)) +
     theme_light() +
     theme(axis.text.y=element_blank(),
           axis.title.y=element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     geom_vline(xintercept = 0)
+
+  plot_sigma_i <- ggplot(data, aes(x=sigmaNU,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=sigmaNU-1.96*se_sigmaNU,xmax=sigmaNU+1.96*se_sigmaNU), shape=20, size=s) +
+    xlab(expression(sigma)) +
+    theme_light() +
+    ylab("Treatment ID") +
+    theme(axis.text.y=element_blank(),
+          axis.title.y=element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    geom_vline(xintercept = 0)
+  
+  plot_rho_i <- ggplot(data, aes(x=rhoNU,y=treatment_id)) + 
+    geom_pointrange(aes(xmin=rhoNU-1.96*se_rhoNU,xmax=rhoNU+1.96*se_rhoNU), shape=20, size=s) +
+    xlab(expression(rho)) +
+    theme_light() +
+    theme(#axis.text.y=element_blank(),
+      #axis.title.y=element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank())+
+    geom_vline(xintercept = 0)
   
   plot_nu <- ggarrange(plot_gamma, plot_eta, common.legend=T, legend="bottom", widths = c(8,6))
   plot_nu_i <- ggarrange(plot_gamma_i, plot_eta_i, plot_interaction, nrow=1, common.legend=T, legend="bottom", widths = c(8,6,6))
-  
-  return(list(plot_nu, plot_nu_i))
+  plot_nu_i_social <- ggarrange(plot_rho_i, plot_sigma_i, nrow=1, common.legend=T, legend="bottom", widths = c(8,6,6))
+  return(list(plot_nu, plot_nu_i, plot_nu_i_social))
 }
 
 ## Plot coefficients -----------
@@ -203,3 +224,4 @@ stata_output_model_u <- read.csv("Utility estimation/Output/Logs/uncertainty_MOD
 plots <- plot_coeff_social_generator_uncertainty(stata_output_model_u)
 ggsave(filename = "Utility estimation/Output/Figures/unc_model_social_norm.pdf", plot = plots[[1]], width = 800, height = 400, units = "px", dpi = 120)
 ggsave(filename = "Utility estimation/Output/Figures/unc_model_social_norm_interaction.pdf", plot=plots[[2]], width = 800, height = 400, units = "px", dpi = 120)
+ggsave(filename = "Utility estimation/Output/Figures/unc_model_social_norm_interaction_social_pref.pdf", plot=plots[[3]], width = 800, height = 400, units = "px", dpi = 120)
