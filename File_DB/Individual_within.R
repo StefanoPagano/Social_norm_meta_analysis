@@ -1,7 +1,7 @@
 
 csv_path_output <- "~/GitHub/Social_norm_meta_analysis/File_DB/"
-
-df_merge_game_type = read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+root <- "C:/Users/a.guido/Downloads/Meta-analysis beliefs-20250716T100749Z-1-001/Meta-analysis beliefs/"
+df_merge_game_type = read_xlsx(path = "C:/Users/a.guido/Downloads/Meta-analysis beliefs-20250716T100749Z-1-001/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 #### CHOICES DB ----
@@ -10,7 +10,7 @@ df_merge_game_type = read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social
 #### Paper: 2020Bas115 ----
 
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2020Bas115")
+setwd(paste(root, "Dati paper/2020Bas115", sep=""))
 
 # choice file
 Bas115=read.csv("Basic_Verrina_2021.csv", sep=",")
@@ -260,7 +260,7 @@ Bas115_choice <- Bas115_choice %>%
 #### Paper: 2017Del037 ----
  
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2017Del037")
+setwd(paste(root, "Dati paper/2017Del037", sep=""))
  
 # choice file
  Del037=read.csv("DATA_full.csv", sep=",") %>%
@@ -293,98 +293,132 @@ setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2017Del037")
  Del037_sub_1 <- Del037 %>%
    subset.data.frame(select = coldg, subset = Treatment == "BASE") %>%
    subset.data.frame(subset = Dictator == 1) %>%
-   mutate(endowment = earn_TOT) %>%
+   mutate(endowment = earn_TOT, 
+          p=row_number(),
+          Design="Within",
+          Game_Type="DG") %>%
    mutate(coop = DICT_oth/endowment) %>%
    mutate(subject_id = paste("2017Del037", "1", ID, sep = "_")) %>%
    mutate(treatment_id = paste("2017Del037", "1", sep = "_"), paper_id = "2017Del037")
  
- colnames(Del037_sub_1) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+ colnames(Del037_sub_1) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "female", "age", "endowment", "p", "Design", "Game_type", "cooperation", "subject_id", "treatment_id", "paper_id")
  
  Del037_sub_1 <- Del037_sub_1 %>%
    subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
+   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, female, age) 
  
- Choice_Within_DB <- Del037_sub_1 %>%
-   rbind.data.frame(Choice_Within_DB)
+ Del037_choices_BASE <- Del037_sub_1 %>% 
+   mutate(coop_matching_norm = case_when(
+     cooperation == 0 ~ 0,
+     cooperation > 0 & cooperation <= 0.17 ~ 0.17,
+     cooperation > 0.17 & cooperation <= 0.34 ~ 0.33,
+     cooperation > 0.34 & cooperation <= 0.50 ~ 0.50,
+     cooperation > 0.50 & cooperation <= 0.67 ~ 0.67,
+     cooperation > 0.67 & cooperation <= 0.84 ~ 0.83,
+     cooperation > 0.84 ~ 1
+   )) #%>% select(-c(p))
+ 
+ # Expanding rows
+ expanded_df <- Del037_choices_BASE %>%
+   rowwise() %>%
+   mutate(expanded = list(tibble(
+     scenarios = round(c(0:6/6), 2),
+     A = as.integer(round(c(0:6/6),2) == coop_matching_norm)
+   ))) %>%
+   unnest(expanded)
+ 
+ Del037_choices_BASE <- expanded_df %>% select(-c("cooperation", "coop_matching_norm"))
+# Choice_Within_DB <- Del037_sub_1 %>%
+#   rbind.data.frame(Choice_Within_DB)
  
  Del037_norms_BASE <- Del037_db_norms %>%
    subset.data.frame(subset = Treatment == "BASE") %>%
    subset.data.frame(subset = Dictator == 1) %>%
    mutate(subject_id = paste("2017Del037", "1", ID, sep = "_")) %>%
    mutate(treatment_id = paste("2017Del037", "1", sep = "_"), paper_id = "2017Del037") %>% 
-   relocate(paper_id) %>%
-   relocate(treatment_id) %>%
-   relocate(subject_id)
+   mutate(female = NA, 
+          age = NA,
+          Design="Within",
+          Game_type="DG",
+          KW_Personal=NA,
+          Bicchieri_Empirical=NA,
+          Bicchieri_Normative=NA,
+          Bicchieri_Personal=NA) %>% select(-c(ID, Treatment, Dictator))
  
- # treatment IN
- # n_progr_1 <- c(1:64)
- Del037_sub_2 <- Del037 %>%
-   subset.data.frame(select = coldg, subset = Treatment == "IN") %>%
-   subset.data.frame(subset = Dictator == 1) %>%
-   mutate(endowment = earn_TOT) %>%
-   mutate(coop = DICT_oth/endowment) %>%
-   mutate(subject_id = paste("2017Del037", "2", ID, sep = "_")) %>%
-   mutate(treatment_id = paste("2017Del037", "2", sep = "_"), paper_id = "2017Del037")
+ colnames(Del037_norms_BASE)[1:7] <- c(round(0:6/6,2))
  
- colnames(Del037_sub_2) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+ Del037_beliefs <- Del037_norms_BASE %>% pivot_longer(c(`0`:`1`), names_to = "scenarios", values_to = "KW_Normative")
  
- Del037_sub_2 <- Del037_sub_2 %>%
-   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age)
  
- Choice_Within_DB <- Del037_sub_2 %>%
-   rbind.data.frame(Choice_Within_DB)
- 
- Del037_norms_IN <- Del037_db_norms %>%
-   subset.data.frame(subset = Treatment == "IN") %>%
-   subset.data.frame(subset = Dictator == 1) %>%
-   mutate(subject_id = paste("2017Del037", "2", ID, sep = "_")) %>%
-   mutate(treatment_id = paste("2017Del037", "2", sep = "_"), paper_id = "2017Del037") %>% 
-   relocate(paper_id) %>%
-   relocate(treatment_id) %>%
-   relocate(subject_id)
- 
- # treatment OUT
- # n_progr_1 <- c(1:68)
- Del037_sub_3 <- Del037 %>%
-   subset.data.frame(select = coldg, subset = Treatment == "OUT") %>%
-   subset.data.frame(subset = Dictator == 1) %>%
-   mutate(endowment = earn_TOT) %>%
-   mutate(coop = DICT_oth/endowment) %>%
-   mutate(subject_id = paste("2017Del037", "3", ID, sep = "_")) %>%
-   mutate(treatment_id = paste("2017Del037", "3", sep = "_"), paper_id = "2017Del037")
- 
- colnames(Del037_sub_3) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
- 
- Del037_sub_3 <- Del037_sub_3 %>%
-   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
-   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
- 
- Choice_Within_DB <- Del037_sub_3 %>%
-   rbind.data.frame(Choice_Within_DB)
- 
- Del037_norms_OUT <- Del037_db_norms %>%
-   subset.data.frame(subset = Treatment == "OUT") %>%
-   subset.data.frame(subset = Dictator == 1) %>%
-   mutate(subject_id = paste("2017Del037", "3", ID, sep = "_")) %>%
-   mutate(treatment_id = paste("2017Del037", "3", sep = "_"), paper_id = "2017Del037") %>% 
-   relocate(paper_id) %>%
-   relocate(treatment_id) %>%
-   relocate(subject_id)
- 
- # PIVOT
- Del037_norms_all <- rbind.data.frame(Del037_norms_BASE, Del037_norms_IN, Del037_norms_OUT)
- 
- #da confermare ordine score kw
- Del037_norms_all <- Del037_norms_all %>%
-   pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_Normative") %>%
-   mutate(scenarios = as.numeric(dplyr::recode(scenarios, `KW1` = 6, `KW2` = 5, `KW3` = 4, `KW4` = 3, `KW5` = 2, `KW6` = 1, `KW7` = 0))) %>%
-   subset.data.frame(select = -c(ID, Treatment, Dictator))
+# # treatment IN -----------
+# # n_progr_1 <- c(1:64)
+# Del037_sub_2 <- Del037 %>%
+#   subset.data.frame(select = coldg, subset = Treatment == "IN") %>%
+#   subset.data.frame(subset = Dictator == 1) %>%
+#   mutate(endowment = earn_TOT) %>%
+#   mutate(coop = DICT_oth/endowment) %>%
+#   mutate(subject_id = paste("2017Del037", "2", ID, sep = "_")) %>%
+#   mutate(treatment_id = paste("2017Del037", "2", sep = "_"), paper_id = "2017Del037")
+# 
+# colnames(Del037_sub_2) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+# 
+# Del037_sub_2 <- Del037_sub_2 %>%
+#   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
+#   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age)
+# 
+## Choice_Within_DB <- Del037_sub_2 %>%
+##   rbind.data.frame(Choice_Within_DB)
+# 
+# Del037_norms_IN <- Del037_db_norms %>%
+#   subset.data.frame(subset = Treatment == "IN") %>%
+#   subset.data.frame(subset = Dictator == 1) %>%
+#   mutate(subject_id = paste("2017Del037", "2", ID, sep = "_")) %>%
+#   mutate(treatment_id = paste("2017Del037", "2", sep = "_"), paper_id = "2017Del037") %>% 
+#   relocate(paper_id) %>%
+#   relocate(treatment_id) %>%
+#   relocate(subject_id)
+# 
+# # treatment OUT
+# # n_progr_1 <- c(1:68)
+# Del037_sub_3 <- Del037 %>%
+#   subset.data.frame(select = coldg, subset = Treatment == "OUT") %>%
+#   subset.data.frame(subset = Dictator == 1) %>%
+#   mutate(endowment = earn_TOT) %>%
+#   mutate(coop = DICT_oth/endowment) %>%
+#   mutate(subject_id = paste("2017Del037", "3", ID, sep = "_")) %>%
+#   mutate(treatment_id = paste("2017Del037", "3", sep = "_"), paper_id = "2017Del037")
+# 
+# colnames(Del037_sub_3) <- c("ID", "Treatment", "Dictator", "earn_TOT", "choice", "gender", "age", "endowment", "cooperation", "subject_id", "treatment_id", "paper_id")
+# 
+# Del037_sub_3 <- Del037_sub_3 %>%
+#   subset.data.frame(select = -c(ID, Dictator, Treatment, earn_TOT)) %>% 
+#   relocate(subject_id, treatment_id, paper_id, choice, endowment, cooperation, gender, age) 
+# 
+## Choice_Within_DB <- Del037_sub_3 %>%
+##   rbind.data.frame(Choice_Within_DB)
+# 
+# Del037_norms_OUT <- Del037_db_norms %>%
+#   subset.data.frame(subset = Treatment == "OUT") %>%
+#   subset.data.frame(subset = Dictator == 1) %>%
+#   mutate(subject_id = paste("2017Del037", "3", ID, sep = "_")) %>%
+#   mutate(treatment_id = paste("2017Del037", "3", sep = "_"), paper_id = "2017Del037") %>% 
+#   relocate(paper_id) %>%
+#   relocate(treatment_id) %>%
+#   relocate(subject_id)
+# 
+# # PIVOT
+# Del037_norms_all <- rbind.data.frame(Del037_norms_BASE, Del037_norms_IN, Del037_norms_OUT)
+# 
+# #da confermare ordine score kw
+# Del037_norms_all <- Del037_norms_all %>%
+#   pivot_longer(!c(subject_id, treatment_id, paper_id, ID, Treatment, Dictator), names_to = "scenarios", values_to = "KW_Normative") %>%
+#   mutate(scenarios = as.numeric(dplyr::recode(scenarios, `KW1` = 6, `KW2` = 5, `KW3` = 4, `KW4` = 3, `KW5` = 2, `KW6` = 1, `KW7` = 0))) %>%
+#   subset.data.frame(select = -c(ID, Treatment, Dictator))
 
 #### Paper: 2023Eck169 -------
 # DG
 # set wd
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2023Eck169/")
+setwd(paste(root, "Dati paper/2023Eck169/", sep=""))
 
 kru_df <- haven::read_dta("data_stata.dta") %>% 
   filter((dict_game=="class" & dict_order==2)|(dict_game=="freshmen"&dict_order==1))%>%
@@ -442,3 +476,136 @@ Eck169_beliefs <- temp_beliefs %>% rename(KW_Normative=norm_give,scenarios=amoun
 # produce final datasets
 #finaldf <- kru_class %>% rbind.data.frame(kru_freshmen) %>%
 #  merge.data.frame(kru_choices[,-c(3)], by = c("dict_game", "id")) %>%
+
+## 2017Tho028 -----------
+
+## choices ##
+# set wd 
+setwd(paste(root, "Dati paper/2017Tho028", sep=""))
+
+csv_path_output <- "~/GitHub/Social_norm_meta_analysis/Paper_csv/"
+
+dg=read_excel("libcons_alldata.xlsx", sheet = "alldata") %>% 
+  mutate(base0 = dplyr::recode(base0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         base1 = dplyr::recode(base1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         base2 = dplyr::recode(base2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         base3 = dplyr::recode(base3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         base4 = dplyr::recode(base4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         base5 = dplyr::recode(base5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_0 = dplyr::recode(asym1_0, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_1 = dplyr::recode(asym1_1, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_2 = dplyr::recode(asym1_2, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_3 = dplyr::recode(asym1_3, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_4 = dplyr::recode(asym1_4, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1),
+         asym1_5 = dplyr::recode(asym1_5, `1` = -1, `2` = -1/3, `3` = 1/3, `4` = 1))
+
+# meta-information dataset
+#meta_dataset <- read_xlsx(path = paste(root, "Social Norms meta.xlsx", sep=""), sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2017Tho028", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
+
+# DG Base-----------------
+# get information on treatment
+
+# cleaning DG
+## exp_id		ztree timestamp of the session
+## exp_num		unique number of the session
+## Subject		session specific subject number
+## subj		unique subject number
+## treat   1: BASE treatment (standard DG, with constraint to offer no more than half pie)
+##         2: ASYM1 treatment (same as 1, 	computer allocates with prob 1/3 instead of Dictator,
+##                    Receiver does not know who proposed)
+##         3: ASYM2 treatment (same as ASYM1, Dictator can propose any amount)
+## sent		>=0: the amount sent to the receiver
+## role : 1 proposer; 0 responder
+## decider		-1: Receiver; 0: Dictator who does not choose; 1: Dictator who chooses
+
+coldg = c("exp_id","exp_num","Subject","subj", "treat", "role", "decider", "sent", "age", "gender")
+
+# 1. Choice dataframe
+## Base treatment ##
+dgb_dta_coop <- dg %>% subset.data.frame(select = coldg, subset = role == 1) %>%
+  subset.data.frame(subset = decider == 1) %>%
+  subset.data.frame(subset = treat == 1) %>%
+  mutate(endowment = 20, 
+         paper_id = "2017Tho028",
+         treatment_id = paste(paper_id, "1", sep="_"),
+         subject_id = paste(treatment_id, subj, sep="_"),
+         Game_type = "DG",
+         female = 1-gender,
+         Design="Within",
+         p=NA
+         ) %>% select(!c(exp_id, exp_num, Subject, subj, treat, role, decider, gender))
+
+colnames(dgb_dta_coop)[1] <- "choice"
+
+# Expanding rows
+expanded_df <- dgb_dta_coop %>%
+  rowwise() %>%
+  mutate(expanded = list(tibble(
+    scenarios = 0:(endowment-10),
+    A = as.integer(0:(endowment-10) == choice)
+  ))) %>%
+  unnest(expanded)
+
+Tho028_choices <- expanded_df
+
+# 2. Norms
+## base[0-5] : kw appropriateness
+## actions: send 0,2,4,6,8,10
+## exp_id
+## session
+## subject
+## KW scale: 1: VI; 2: I; 3: A; 4: VA
+
+label_col = as.character(seq(0,10,2))
+dg_columns <- c(1:10, 28, 33, 34)
+
+## compute norm 
+dgb_appropriateness_sum <- dg %>% subset.data.frame(select = dg_columns) %>%
+  subset.data.frame(subset = treat == 1) %>%
+  subset.data.frame(subset = role == 1) %>%
+  select(-c(treat, role, decider, exp_id, exp_num, Subject)) %>%
+  mutate(paper_id = "2017Tho028",
+         treatment_id = paste(paper_id, "1", sep="_"),
+         subject_id = paste(treatment_id, subj, sep="_"),
+         Game_type = "DG",
+         female = NA,
+         age = NA,
+         Design="Within"
+  ) %>% rename(`0`=base0, `2`=base1,
+               `4`=base2, `6`=base3,
+               `8`=base4, `10`=base5) %>% pivot_longer(c(`0`:`10`), 
+                                                       names_to = "scenarios",
+                                                       values_to = "KW_Normative") %>%
+  mutate(scenarios= as.integer(scenarios))
+  
+## Interpolation for norms ##
+# Step 1: Generate full sequence of scenarios (even and odd) per subject
+full_data <- dgb_appropriateness_sum %>%
+  group_by(subject_id) %>%
+  complete(scenarios = full_seq(scenarios, 1))  # fill in all integers
+
+# Step 2: Fill forward all identifying variables (if needed)
+full_data <- full_data %>%
+  group_by(subject_id) %>%
+  fill(subj, paper_id, treatment_id, Game_type, Design, .direction = "downup")
+
+# Step 3: Interpolate missing KW_Normative values
+full_data <- full_data %>%
+  arrange(subject_id, scenarios) %>%
+  group_by(subject_id) %>%
+  mutate(KW_Normative_interp = zoo:::na.approx(KW_Normative, scenarios, na.rm = FALSE))
+
+# Step 4: Replace missing values in KW_Normative with interpolated ones
+Tho028_beliefs <- full_data %>%
+  mutate(KW_Normative = ifelse(is.na(KW_Normative), KW_Normative_interp, KW_Normative)) %>%
+  select(-KW_Normative_interp) %>% select(-c(subj)) %>%
+  mutate(
+    Game_type="DG",
+    KW_Personal=NA,
+    Bicchieri_Empirical=NA,
+    Bicchieri_Normative=NA,
+    Bicchieri_Personal=NA,
+    #female=NA,
+    #age=NA,
+    Design="Within"
+  )

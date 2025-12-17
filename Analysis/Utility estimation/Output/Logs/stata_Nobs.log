@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_Nobs.log
   log type:  text
- opened on:   2 Jul 2025, 12:57:14
+ opened on:  23 Jul 2025, 09:23:27
 
 .  
 . foreach l of local levels {
@@ -12,6 +12,11 @@
 2012Laz164_3 135
 2013Kru001_1a 52
 2016Kim003_7 66
+2017Del037_1 29
+2017Fro073_1 126
+2017Gac013_2 71
+2017Gac013_4 71
+2017Tho028_1 53
 2018Her061_9 38
 2019Cha026_1 56
 2020Bas115_2a 127
@@ -23,5 +28,5 @@
       name:  <unnamed>
        log:  C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation\Output\Logs\stata_Nobs.log
   log type:  text
- closed on:   2 Jul 2025, 12:57:14
+ closed on:  23 Jul 2025, 09:23:27
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

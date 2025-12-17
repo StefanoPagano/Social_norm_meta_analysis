@@ -9,7 +9,7 @@ clear all
 
 ** Import data
 cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation"
-import delimited "Data\new_data_utility.csv", clear
+import delimited "Data\new_data_utility2025-07-23.csv", clear
 
 * DG *
 drop if game_type != "DG"
@@ -34,7 +34,19 @@ restore
 
 preserve
 tempfile temp
+
+** adjust for those papers with action space as subset of total endowment **
+** 2017Gac013 **
+replace endowment = 4 if paper_id == "2017Gac013"
+drop if paper_id=="2017Gac013" & scenarios > 4
+** 2017Del037 **
+replace scenarios = round(scenarios*endowment, 1) if paper_id == "2017Del037"
+
 gen coop = scenarios/endowment
+
+** smooth **
+replace coop = round(coop,1) if paper_id == "2017Del037"
+
 summ sd_app
 local sd_max = r(max)
 gen sd_app_norm = 2*(sd_app/`sd_max') - 1
@@ -46,21 +58,32 @@ restore
 
 * generate db variable for graph *
 gen db = 1
+
+** adjust for those papers with action space as subset of total endowment **
+replace endowment = 4 if paper_id == "2017Gac013"
+drop if paper_id=="2017Gac013" & scenarios > 4
+
+** 2017Del037 **
+replace scenarios = round(scenarios*endowment, 1) if paper_id == "2017Del037"
+
 * generate cooperation variable *
 gen coop = scenarios/endowment
+
+** smooth **
+replace coop = round(coop,1) if paper_id == "2017Del037"
 
 append using `temp'
 twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
 (line mean_app coop if db==2, yaxis(1)) ///
 (line sd_app_norm coop if db==2, yaxis(1)), ///
-xtitle("% Endowment") ///
-ytitle("Mean Appropriateness / Norm Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Mean Appropriateness") label( 3 "Norm Uncertainty") rows(1))
-graph export "Utility estimation\Output\Figures\hist_coop_mean_app.pdf", replace
+	xtitle("% Endowment") ///
+ytitle("Appropriateness / Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Uncertainty") rows(1))
+graph export "Output\Figures\hist_coop_mean_app.pdf", replace
 
-twoway (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(1))) ///
+/*twoway (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(1))) ///
 (line sd_app coop if db==2, yaxis(2) ytitle("Norm Uncertainty", axis(2))), ///
 legend( pos(12) label (1 "Mean Appropriateness") label (2 "Norm Uncertainty") rows(1))
-graph export "Utility estimation\Output\Figures\norm_uncertainty.pdf", replace
+graph export "Output\Figures\norm_uncertainty.pdf", replace */
 
 * Table 1
 tab treatment_id if a==1
@@ -71,8 +94,8 @@ tab treatment_id if a==1
 ***************************
 
 clear all
-cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis"
-import delimited "new_data_utility.csv", clear
+cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\"
+import delimited "Utility estimation\Data\new_data_utility2025-07-23.csv", clear
 
 * DG *
 drop if game_type != "DG"
@@ -85,12 +108,18 @@ constraint 4 sigma = 0
 
 levelsof treatment_id, local(levels)
 
+** adjust for specific papers **
+replace payoff = endowment - round(endowment*scenario,1) if paper_id=="2017Del037"
+
 * Charness Rabin 2002 *
 gen r = payoff > endowment/2
 gen s = payoff < endowment/2
 gen rho = endowment*r-2*payoff*r
 gen sigma = endowment*s-2*payoff*s
 gen alpha = endowment - 2*payoff
+
+** Adjustments for specific papers **
+drop if paper_id == "2017Gac013" & scenarios >4
 
 *******************************
 *******************************
@@ -118,7 +147,7 @@ foreach l of local levels {
 	local se_gammaN`l' = _se[mean_app]
 	
 	/* DA - Difference averse */
-	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
+	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store DA`l'
 	local rhoDA`l' = _b[rho]
 	local sigmaDA`l' = _b[sigma]
@@ -126,7 +155,7 @@ foreach l of local levels {
 	local se_sigmaDA`l' = _se[sigma]
 	
 	/* FU - Full model (social norms and social preferences)*/
-	clogit a payoff rho sigma mean_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
+	clogit a payoff rho sigma mean_app if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store FU`l'
 	local rhoFU`l' = _b[rho]
 	local sigmaFU`l' = _b[sigma]
@@ -199,7 +228,7 @@ foreach l of local levels {
 
 	/* NU - social norms and uncertainty */
 	*clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
-	clogit a payoff mean_app sd_app rho sigma if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear constraint(1)
+	clogit a payoff mean_app sd_app rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store NU`l'
 	local basedeltaNU`l' = _b[payoff]
 	local basegammaNU`l' = _b[mean_app]
@@ -214,7 +243,7 @@ foreach l of local levels {
 	
 	/* NU - social norms and uncertainty w/ interaction */
 	*clogit a payoff c.mean_app##c.sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
-	clogit a payoff c.mean_app##c.sd_app rho sigma if treatment_id == "`l'", group(id) iter(100) vce(rob) collinear constraint(1)
+	clogit a payoff c.mean_app##c.sd_app rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store NU`l'
 	local deltaNU`l' = _b[payoff]
 	local gammaNU`l' = _b[mean_app]

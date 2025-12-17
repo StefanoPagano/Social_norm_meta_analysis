@@ -2,6 +2,8 @@ library(tidyverse)
 library(readxl)
 rm(list = ls())
 
+root <- "C:/Users/a.guido/Downloads/Meta-analysis beliefs-20250716T100749Z-1-001/Meta-analysis beliefs/"
+
 # Run paper script
 setwd("~/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2013Kru001.R")
@@ -18,7 +20,7 @@ source("2017Tho028.R")
 setwd("~/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2015Ves034.R")
 
-#problema paper... forse la task iniziale influenza molto la norma... non è 50% ma 83%
+#problema paper... forse la task iniziale influenza molto la norma... non ? 50% ma 83%
 setwd("~/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2017Del037.R")
 
@@ -64,6 +66,9 @@ source("2021Sze167.R")
 
 setwd("~/GitHub/Social_norm_meta_analysis/Paper_script/")
 source("2022Tve168.R")
+
+# setwd("~/GitHub/Social_norm_meta_analysis/Paper_script/")
+# source("2017Gac013.R")
 
 rm(list = ls())
 
@@ -146,9 +151,13 @@ Paper_168=read.csv("2022Tve168_finaldf.csv", sep=",")
 master <- Paper_168 %>% 
   rbind.data.frame(master)
 
-# XXX Paper_169=read.csv()
+# XXX to do Paper_13=read.csv("2022Tve168_finaldf.csv", sep=",")
+# master <- Paper_168 %>% 
+#  rbind.data.frame(master)
+
+# XXX to do Paper_169=read.csv()
 
 # save master file as csv
 setwd("~/GitHub/Social_norm_meta_analysis/File_DB/Output/")
 
-write.csv(master, file = "Treatment.csv", row.names = F)
+write.csv(master, file = paste("Treatment_", today(), ".csv", sep=""), row.names = F)

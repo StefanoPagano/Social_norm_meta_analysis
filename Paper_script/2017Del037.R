@@ -1,6 +1,5 @@
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2017Del037")
-
+setwd(paste(root, "Dati paper/2017Del037", sep=""))
 csv_path_output <- "~/GitHub/Social_norm_meta_analysis/Paper_csv/"
 
 dg=read.csv("DATA_full.csv", sep=",")
@@ -25,7 +24,7 @@ norms <- dg %>%
   #subset.data.frame(subset = endowment == 10)
 
 # meta-information dataset
-meta_dataset <- read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2017Del037", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
+meta_dataset <- read_xlsx(path = paste(root, "Social Norms meta.xlsx", sep=""), sheet = "ALL") %>% subset.data.frame(subset = PaperID == "2017Del037", select = c(n_Paper, PaperID, TreatmentCode, TreatmentName_paper, Year, Outlet, Published, FirstTask, between_vs_within, Game_type, Standard_game, Baseline, Group_size, One_Shot_Repeated, Choice_Method, Matching, Rounds, Punishment, Rewards, Monetary_Incentivized_experiment, Environment, Method_elicitation, Separate_sample_beliefs, Belief_repeated, Before_after_main_decisions, KW_Normative, KW_Personal, Bicchieri_Empirical, Bicchieri_Normative, Bicchieri_Personal_Beliefs, Bicchieri_between, Incentives_beliefs, StatusTreatment_Roma)) %>% mutate(TreatmentCode = as.numeric(TreatmentCode))
 
 # DG BASE ---------------
 # get information on treatment

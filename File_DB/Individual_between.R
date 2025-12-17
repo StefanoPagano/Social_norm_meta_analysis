@@ -1,13 +1,13 @@
 
 csv_path_output <- "~/GitHub/Social_norm_meta_analysis/File_DB"
-
-df_merge_game_type = read_xlsx(path = "G:/Mon Drive/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
+root <- "C:/Users/a.guido/Downloads/Meta-analysis beliefs-20250716T100749Z-1-001/Meta-analysis beliefs/"
+df_merge_game_type = read_xlsx(path = "C:/Users/a.guido/Downloads/Meta-analysis beliefs-20250716T100749Z-1-001/Meta-analysis beliefs/Social Norms meta.xlsx", sheet = "ALL") %>% 
   subset.data.frame(select = c(treatment_id, Game_type, Separate_sample_beliefs))
 
 # Paper: 2018Her061 ----
 
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2018Her061")
+setwd(paste(root, "Dati paper/2018Her061", sep=""))
 
 # choice file
 Her061=read_excel("meta.xlsx", sheet = "behavior")
@@ -98,7 +98,7 @@ Her061_choice <- Her061_choice %>%
 # Paper: 2019Cha026 ----
 
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2019Cha026")
+setwd(paste(root, "Dati paper/2019Cha026", sep=""))
 
 # choice file
 Cha026=read_excel("data.xls", sheet = "Sheet1", 
@@ -367,7 +367,7 @@ Cha026_choice_3 <- Cha026_choice_3 %>%
 # Paper: 2016Kim003 ----
 
 # set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2016Kim003")
+setwd(paste(root, "Dati paper/2016Kim003", sep=""))
 
 # choice file
 Kim003_dg=read.csv("DG_Data.csv", sep="\t") %>%
@@ -606,10 +606,10 @@ Kim003_choice_ug <- Kim003_choice_ug %>%
 
 # Paper: 2013Kru001 ----
 ### set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd(paste(root, "Dati paper/2013Kru001", sep=""))
 df <- read_excel("behavior_bully_standard_data_2009_05_18.xlsx")
 
-## standard ----
+## standard 
 
 ### choices
 kru_std_choice <- df %>%
@@ -671,7 +671,7 @@ Kru001_std_beliefs <- Kru001_std_beliefs %>%
   subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
   arrange(subject_id)
 
-## bully ----
+## bully
 
 #### choices
 kru_bully_choice <- df %>%
@@ -736,10 +736,10 @@ Kru001_bully_beliefs <- Kru001_bully_beliefs %>%
 
 # Paper: 2013Kru001-Lazear ----
 
-## aggragate data ----
+## aggragate data
 
 ### set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd(paste(root, "Dati paper/2013Kru001", sep=""))
 
 ### choices
 lazear_choice <- read_excel("Lazear_combined_kru.xlsx") %>%
@@ -807,10 +807,10 @@ Laz164_beliefs <- Laz164_beliefs %>%
 
 df <- read_excel("list_data.xlsx")
 
-## baseline ----
+## baseline 
 
 ### set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd(paste(root, "/Dati paper/2013Kru001", sep=""))
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_base_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -874,10 +874,10 @@ Lis165_base_beliefs <- Lis165_base_beliefs %>%
   subset.data.frame(select = -c(Separate_sample_beliefs)) %>%
   arrange(subject_id)
 
-## Take1 ----
+## Take1 
 
 ## set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2013Kru001")
+setwd(paste(root, "Dati paper/2013Kru001", sep=""))
 
 ### choices (df file has summarized data: n= subjects that choose an action)
 list_take1_choice <- as.data.frame(lapply(df, rep, df$n)) %>%
@@ -942,7 +942,7 @@ Lis165_take1_beliefs <- Lis165_take1_beliefs %>%
 
 # Paper: 2020And089 ----
 ### set wd 
-setwd("G:/Mon Drive/Meta-analysis beliefs/Dati paper/2020And089")
+setwd(paste(root, "Dati paper/2020And089", sep=""))
 
 df_choice <- read_excel("2020And089_data.xlsx") %>%
   subset.data.frame(select = c(1,4,19,20))
@@ -966,7 +966,7 @@ df_norm <- df_norm %>% mutate(id = c(1:190)) %>%
          female= ifelse(female==1, 1, 0)) %>%
   select(id, Condition, KW00:KW50, female, Age)
 
-## private ----
+## private
 
 ### choices
 and_private_choice <- df_choice %>%
@@ -1011,7 +1011,7 @@ and089_pvt_beliefs <- df_norm %>%
          Design = ifelse(Separate_sample_beliefs == "Y", "Between", "Within")) %>%
   subset.data.frame(select = -c(Separate_sample_beliefs, Age))
 
-## public ----
+## public
 
 ### choices
 and_pub_choice <- df_choice %>%
@@ -1057,34 +1057,154 @@ and089_pub_beliefs <- df_norm %>%
   subset.data.frame(select = -c(Separate_sample_beliefs, Age))
 
 
-# Drop ---- 
-rm(list = ls()[!(ls() %in% c("Kim003_choice_ug",
-                             "Kim003_choice_dg", 
-                             "Kim003_beliefs_ug",
-                             "Kim003_beliefs_dg",
-                             "Cha026_choice_1",
-                             "Cha026_beliefs_1",
-                             "Cha026_choice_2",
-                             "Cha026_beliefs_2",
-                             "Cha026_choice_3",
-                             "Cha026_beliefs_3",
-                             "Her061_choice",
-                             "Her061_beliefs",
-                             "Bas115_beliefs",
-                             "Bas115_choice",
-                             "Laz164_choices",
-                             "Laz164_beliefs",
-                             "Lis165_base_choices",
-                             "Lis165_base_beliefs",
-                             "Lis165_take1_choices",
-                             "Lis165_take1_beliefs",
-                             "Kru001_std_beliefs",
-                             "Kru001_std_choices",
-                             "Kru001_bully_choices",
-                             "Kru001_bully_beliefs",
-                             "and089_pvt_choices",
-                             "and089_pvt_beliefs",
-                             "and089_pub_choices",
-                             "and089_pub_beliefs",
-                             "Eck169_choices",
-                             "Eck169_beliefs"))])
+# Paper 2017Gac013 ---------
+setwd(paste(root, "Dati paper/2017Gac013/2017Gac013_data", sep=""))
+
+## DG (treatment NO PEER)
+## B_session_id : date and time of experiment of behavior
+## B_take : dummy variable; 1 if take or give game, 0 if give only game (DG)
+## B_studentid : id of student
+## B_treatment : Peer or not peer
+## B_D2_sharingX : amount sent (from 0 to 4) by Dictator number 2, conditional on dictator number 1 giving X
+## in the case of no peer, it should be the amount nature gave to receiver. hence, we consider in this case only sharing0
+## Computed --> sharing0 is the amount given
+## endowment : actual endowment is 12 but we use 4 for comparability reasons.
+
+### choices
+dg <- read_xls("data_all.xls") %>% subset.data.frame(subset = B_take == 0, select = 3:5) %>%
+  filter(B_treatment == "NoPEER") %>% 
+  mutate(
+    paper_id = "2017Gac013", 
+          treatment_id="2017Gac013_2", 
+          Game_type="DG",
+          endowment=12,
+          female=NA,
+          age=NA,
+          Design="Between",
+          p=row_number(),
+          subject_id=paste(treatment_id, p, sep="_")
+    ) %>% 
+  select(!c(B_treatment, B_studentid))
+colnames(dg)[1] <- c("choice")
+
+Gac013_choice_dg <- dg %>%
+  rowwise() %>%
+  mutate(expanded = list(tibble(
+    scenarios = 0:endowment,
+    A = as.integer(0:endowment == choice)
+  ))) %>%
+  unnest(expanded)
+
+
+### norms
+norms1_dg=read_xls("data_all.xls") %>% subset.data.frame(select = c(11:15, 36), subset = N_take == 0 & N_treatment == 0)
+colnames(norms1_dg) <- c(0, 1, 2, 3, 4, "subject_id")
+Gac013_norm_dg <- norms1_dg %>% pivot_longer(cols = c(`0`:`4`), names_to = "scenarios", values_to = "KW_Normative") %>% 
+  mutate(
+    paper_id = "2017Gac013", 
+    treatment_id="2017Gac013_2", 
+    Game_type="DG",
+    female=NA,
+    age=NA,
+    KW_Personal=NA,
+    Bicchieri_Empirical=NA,
+    Bicchieri_Normative=NA,
+    Bicchieri_Personal=NA,
+    Design="Between")
+
+## Take or Give game but we only take the situation that resembles a DG
+tog = read_xls("data_all.xls") %>% subset.data.frame(subset = B_take == 1, select = 3:5) %>%
+  filter(B_treatment == "NoPEER") %>% 
+  mutate(
+    paper_id = "2017Gac013", 
+    treatment_id="2017Gac013_4", 
+    Game_type="DG",
+    endowment=12,
+    female=NA,
+    age=NA,
+    Design="Between",
+    p=row_number(),
+    subject_id=paste(treatment_id, p, sep="_")
+    ) %>% 
+  select(!c(B_treatment, B_studentid))
+colnames(tog)[1] <- c("choice")
+
+Gac013_choice_tog <- tog %>%
+  rowwise() %>%
+  mutate(expanded = list(tibble(
+    scenarios = 0:endowment,
+    A = as.integer(0:endowment == choice)
+  ))) %>%
+  unnest(expanded)
+
+### norms
+norms1_tog=read_xls("data_all.xls") %>% subset.data.frame(select = c(11:15, 36), subset = N_take == 1)
+colnames(norms1_tog) <- c(0, 1, 2, 3, 4, "subject_id")
+Gac013_norm_tog <- norms1_tog %>% pivot_longer(cols = c(`0`:`4`), names_to = "scenarios", values_to = "KW_Normative") %>% 
+  mutate(
+    paper_id = "2017Gac013", 
+    treatment_id="2017Gac013_4", 
+    Game_type="DG",
+    female=NA,
+    age=NA,
+    KW_Personal=NA,
+    Bicchieri_Empirical=NA,
+    Bicchieri_Normative=NA,
+    Bicchieri_Personal=NA,
+    Design="Between")
+
+# Paper 2017Fro073 --------
+## in this paper there is a many to one matching between D and R.
+## consider only treatment in which only one dictator choice is implemented which resembles a typical DG
+setwd(paste(root, "Dati paper/2017Fro073/", sep=""))
+Fro073_db <- read_xlsx("data.xlsx")
+
+## choices in the DG
+Fro073_choices <- Fro073_db %>% subset.data.frame(subset = role == 2 & treatment %in% c("Direct", "Direct+ID"),
+                                                  select = c(amount)) %>%
+  mutate(
+    paper_id = "2017Fro073", 
+    treatment_id="2017Fro073_1", 
+    Game_type="DG",
+    female=NA,
+    age=NA,
+    Design="Between",
+    Game_type="DG",
+    p=row_number(),
+    subject_id=paste(treatment_id, p, sep="_"),
+    endowment = 10
+  ) %>% rename(choice=amount)
+
+# Expanding rows
+Fro073_choices <- Fro073_choices %>%
+  rowwise() %>%
+  mutate(expanded = list(tibble(
+    scenarios = 0:(endowment),
+    A = as.integer(0:(endowment) == choice)
+  ))) %>%
+  unnest(expanded)
+
+## Norms
+Fro073_norms <- Fro073_db %>% subset.data.frame(subset = treatment %in% c("NormDirect", "NormDirect+ID"), select = norm1:norm11) %>%
+  rename(
+    `0`=norm1, `1`=norm2, `2`=norm3, `3`=norm4, `4`=norm5, `5`=norm6, `6`=norm7, `7`=norm8, `8`=norm9, `9`=norm10, `10`=norm11
+  ) %>%
+  mutate(
+    p=row_number(),
+    paper_id = "2017Fro073", 
+    treatment_id="2017Fro073_1", 
+    subject_id=paste(treatment_id, p, sep="_"),
+    Game_type="DG",
+    female=NA,
+    age=NA,
+    Design="Between",
+    KW_Personal=NA,
+    Bicchieri_Empirical=NA,
+    Bicchieri_Normative=NA,
+    Bicchieri_Personal=NA
+  ) %>% select(-p) %>%
+  pivot_longer(
+    c(`0`:`10`),
+    names_to = "scenarios",
+    values_to = "KW_Normative"
+  )

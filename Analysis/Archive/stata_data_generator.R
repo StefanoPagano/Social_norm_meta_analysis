@@ -7,11 +7,23 @@ rm(list=ls())
 library(tidyverse)
 setwd("~/GitHub/Social_norm_meta_analysis")
 
-papers_included<-c("2007Lis165_1a","2007Lis165_1b","2012Laz164_3","2013Kru001_1a","2013Kru001_1b","2016Kim003_7","2018Her061_9","2019Cha026_1","2019Cha026_3","2020And089_1","2020And089_2","2020Bas115_2a","2023Eck169_1a","2023Eck169_1b")
+papers_included<-c("2007Lis165_1a","2007Lis165_1b",
+                   "2012Laz164_3",
+                   "2013Kru001_1a","2013Kru001_1b",
+                   "2016Kim003_7",
+                   "2018Her061_9",
+                   "2019Cha026_1","2019Cha026_3",
+                   "2020And089_1","2020And089_2",
+                   "2020Bas115_2a","2023Eck169_1a",
+                   "2023Eck169_1b",
+                   "2017Gac013_2","2017Gac013_4",
+                   "2017Del037_1",
+                   "2017Tho028_1",
+                   "2017Fro073_1")
 master <- read.csv("File_DB/Output/Treatment.csv") %>%
   mutate(treatment_id=paste(PaperID,TreatmentCode,sep="_"))
-beliefs <- read.csv("File_DB/Output/Subjects_beliefs.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
-choices <- read.csv("File_DB/Output/Subjects_choices.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
+beliefs <- read.csv("File_DB/Output/Subjects_beliefs_2025-07-23.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
+choices <- read.csv("File_DB/Output/Subjects_choices_2025-07-23.csv", sep = ",") %>% filter(treatment_id %in% papers_included)
 
 # interpolating beliefs for kim
 
@@ -75,7 +87,7 @@ final_data$other_payoff_ahead=ifelse(final_data$payoff-final_data$scenarios>0,fi
 final_data$other_payoff_behind=ifelse(final_data$scenarios-final_data$payoff>0,final_data$scenarios-final_data$payoff,0)
 final_data <- final_data %>% group_by(paper_id, treatment_id, subject_id) %>% mutate(id=group_indices())
 
-write.csv(file = "Analysis/new_data_utility.csv", x=final_data, row.names = F, na="")
+write.csv(file = paste("Analysis/new_data_utility", today(), ".csv", sep=""), x=final_data, row.names = F, na="")
 
 ## used for bootstrap
 #write.csv(file="prova/Subjects_beliefs.csv", x=beliefs_all, row.names = F)

@@ -119,7 +119,7 @@ plot_coeff_social_generator <- function(data) {
   plot_sn <- annotate_figure(plot_sn, top = text_grob("Social Norm model", face = "bold", size = 14))
   plot_da <- annotate_figure(plot_da, top = text_grob("Social Preferences model", face = "bold", size = 14))
   plot_fu <- ggarrange(plot_fu_rho, plot_fu_sigma, plot_fu_gamma, nrow = 1, common.legend=T, legend="bottom", widths = c(9,6,6))
-  plot_fu <- annotate_figure(plot_fu, top = text_grob("Full model", face = "bold", size = 14))
+  plot_fu <- annotate_figure(plot_fu, top = text_grob("Extended model", face = "bold", size = 14))
   #final_plot <- ggarrange(plot_sn, plot_da, plot_fu, ncol = 1)
 
   
@@ -210,7 +210,11 @@ plot_coeff_social_generator_uncertainty <- function(data){
 }
 
 ## Plot coefficients -----------
-stata_output_model <- read.csv("Utility estimation/Output/Logs/MODEL_DG.csv")
+stata_output_model <- read.csv("Utility estimation/Output/Logs/MODEL_DG.csv") #%>% mutate(
+#  labels = case_when(
+#    
+#  ))
+#)
 plots <- plot_coeff_social_generator(stata_output_model)
 
 plot_sn <- plots[[1]]
