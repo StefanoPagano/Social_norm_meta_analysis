@@ -98,7 +98,7 @@ tab treatment_id if a==1
 ***************************
 
 clear all
-cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\"
+cd "C:\Users\andrea\OneDrive\Documents\GitHub\Social_norm_meta_analysis\Analysis\"
 import delimited "Utility estimation\Data\new_data_utility2025-07-23.csv", clear
 
 * DG *
@@ -131,177 +131,143 @@ drop if paper_id == "2017Gac013" & scenarios >4
 *******************************
 *******************************
 
-log using "Utility estimation\Output\Logs\stata_MODELS_DG.log", replace
+capture mkdir "Utility estimation\Output\Data"
+
+postfile results ///
+	str40 treatment_id ///
+	deltaS se_deltaS ///
+	deltaN se_deltaN gammaN se_gammaN ///
+	rhoDA se_rhoDA sigmaDA se_sigmaDA ///
+	rhoFU se_rhoFU sigmaFU se_sigmaFU gammaFU se_gammaFU ///
+	S_AIC N_AIC DA_AIC FU_AIC nobs ///
+	using "Utility estimation\Output\Data\results_DG.dta", replace
 
 foreach l of local levels {
-	di "treatment -> `l' "
-	
+	di "treatment -> `l'"
+
 	/* S - Selfish */
 	clogit a payoff if treatment_id == "`l'", group(id) iter(50) vce(rob)
 	est store S`l'
-	local deltaS`l' = _b[payoff]
-	local se_deltaS`l' = _se[payoff]
-	
-	/* N - Social expectation - Norm */
+	local deltaS    = _b[payoff]
+	local se_deltaS = _se[payoff]
+
+	/* N - Social Norm */
 	clogit a payoff mean_app if treatment_id == "`l'", group(id) vce(rob)
 	est store N`l'
-	local deltaN`l' = _b[payoff]
-	local gammaN`l' = _b[mean_app]
-	local se_deltaN`l' = _se[payoff]
-	local se_gammaN`l' = _se[mean_app]
-	
-	/* DA - Difference averse */
+	local deltaN    = _b[payoff]
+	local gammaN    = _b[mean_app]
+	local se_deltaN = _se[payoff]
+	local se_gammaN = _se[mean_app]
+
+	/* DA - Difference Averse */
 	clogit a payoff rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store DA`l'
-	local rhoDA`l' = _b[rho]
-	local sigmaDA`l' = _b[sigma]
-	local se_rhoDA`l' = _se[rho]
-	local se_sigmaDA`l' = _se[sigma]
-	
-	/* FU - Full model (social norms and social preferences)*/
+	local rhoDA      = _b[rho]
+	local sigmaDA    = _b[sigma]
+	local se_rhoDA   = _se[rho]
+	local se_sigmaDA = _se[sigma]
+
+	/* FU - Full model */
 	clogit a payoff rho sigma mean_app if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store FU`l'
-	local rhoFU`l' = _b[rho]
-	local sigmaFU`l' = _b[sigma]
-	local gammaFU`l' = _b[mean_app]
-	local se_rhoFU`l' = _se[rho]
-	local se_sigmaFU`l' = _se[sigma]
-	local se_gammaFU`l' = _se[mean_app]
+	local rhoFU      = _b[rho]
+	local sigmaFU    = _b[sigma]
+	local gammaFU    = _b[mean_app]
+	local se_rhoFU   = _se[rho]
+	local se_sigmaFU = _se[sigma]
+	local se_gammaFU = _se[mean_app]
 
 	qui tab id if e(sample)
-	local nobs_FU`l' = r(r)
-	
+	local nobs = r(r)
+
+	estimates stats N`l' DA`l' S`l' FU`l'
+	matrix temp = r(S)
+	local N_AIC  = temp[1,5]
+	local DA_AIC = temp[2,5]
+	local S_AIC  = temp[3,5]
+	local FU_AIC = temp[4,5]
+
+	post results ("`l'") ///
+		(`deltaS') (`se_deltaS') ///
+		(`deltaN') (`se_deltaN') (`gammaN') (`se_gammaN') ///
+		(`rhoDA') (`se_rhoDA') (`sigmaDA') (`se_sigmaDA') ///
+		(`rhoFU') (`se_rhoFU') (`sigmaFU') (`se_sigmaFU') (`gammaFU') (`se_gammaFU') ///
+		(`S_AIC') (`N_AIC') (`DA_AIC') (`FU_AIC') (`nobs')
 }
 
-foreach l of local levels {
-estimates stats N`l' DA`l' S`l' FU`l'
-matrix temp = r(S)
-local N_AIC`l' = temp[1,5]
-local DA_AIC`l' = temp[2,5]
-local S_AIC`l' = temp[3,5]
-local FU_AIC`l' = temp[4,5]
-}
-
-log close
-
-
-/* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
-
-log using "Utility estimation\Output\Logs\stata_COEFF_ONG.log", replace
-
-foreach l of local levels {
-  di "`l' `deltaS`l'' `deltaN`l'' `gammaN`l'' `rhoDA`l'' `sigmaDA`l'' `rhoFU`l'' `sigmaFU`l'' `gammaFU`l''" 
- }
-
-log close
- 
- 
-  /* STAMPA TABELLA STD DEV IN FORMATO LOG */
-log using "Utility estimation\Output\Logs\stata_SE_ONG.log", replace
-
-foreach l of local levels {
-  di "`l' `se_deltaS`l'' `se_deltaN`l'' `se_gammaN`l'' `se_rhoDA`l'' `se_sigmaDA`l'' `se_rhoFU`l'' `se_sigmaFU`l'' `se_gammaFU`l''"
- } 
-
-log close
-
-
-/* STAMPA TABELLA AIC IN FORMATO LOG */ 
-
-log using "Utility estimation\Output\Logs\stata_AIC_ONG.log", replace
- 
-foreach l of local levels {
-  di "`l' `S_AIC`l'' `N_AIC`l'' `DA_AIC`l'' `FU_AIC`l''"
- }
-
- 
-log close
-
-log using "Utility estimation\Output\Logs\stata_Nobs.log", replace
- 
-foreach l of local levels {
-  di "`l' `nobs_FU`l''"
- }
-
-log close
+postclose results
+tempfile maindata
+save `maindata'
+use "Utility estimation\Output\Data\results_DG.dta", clear
+export delimited "Utility estimation\Output\Data\results_DG.csv", replace
+use `maindata', clear
 
 ** Norm uncertainty models **
 
-foreach l of local levels {
-	di "treatment -> `l' "
+postfile results_nu ///
+	str40 treatment_id ///
+	basedeltaNU se_basedeltaNU basegammaNU se_basegammaNU baseetaNU se_baseetaNU ///
+	baserhoNU se_baserhoNU basesigmaNU se_basesigmaNU ///
+	deltaNU se_deltaNU gammaNU se_gammaNU etaNU se_etaNU nuNU se_nuNU ///
+	rhoNU se_rhoNU sigmaNU se_sigmaNU ///
+	baseNU_AIC NU_AIC nobs_NU ///
+	using "Utility estimation\Output\Data\results_NU_DG.dta", replace
 
-	/* NU - social norms and uncertainty */
-	*clogit a payoff mean_app sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+foreach l of local levels {
+	di "treatment -> `l'"
+
+	/* NU base - without interaction */
 	clogit a payoff mean_app sd_app rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
-	est store NU`l'
-	local basedeltaNU`l' = _b[payoff]
-	local basegammaNU`l' = _b[mean_app]
-	local baseetaNU`l' = _b[sd_app]
-	local se_basedeltaNU`l' = _se[payoff]
-	local se_basegammaNU`l' = _se[mean_app]
-	local se_baseetaNU`l' = _se[sd_app]
-	local se_baserhoNU`l' = _se[rho]
-	local se_basesigmaNU`l' = _se[sigma]
-	local baserhoNU`l' = _b[rho]
-	local basesigmaNU`l' = _b[sigma]
-	
-	/* NU - social norms and uncertainty w/ interaction */
-	*clogit a payoff c.mean_app##c.sd_app if treatment_id == "`l'", group(id) iter(50) vce(rob) collinear
+	est store baseNU`l'
+	local basedeltaNU    = _b[payoff]
+	local basegammaNU    = _b[mean_app]
+	local baseetaNU      = _b[sd_app]
+	local se_basedeltaNU = _se[payoff]
+	local se_basegammaNU = _se[mean_app]
+	local se_baseetaNU   = _se[sd_app]
+	local baserhoNU      = _b[rho]
+	local basesigmaNU    = _b[sigma]
+	local se_baserhoNU   = _se[rho]
+	local se_basesigmaNU = _se[sigma]
+	estimates stats baseNU`l'
+	matrix tempB = r(S)
+	local baseNU_AIC = tempB[1,5]
+
+	/* NU - with interaction */
 	clogit a payoff c.mean_app##c.sd_app rho sigma if treatment_id == "`l'", group(id) iter(200) vce(rob) collinear constraint(1)
 	est store NU`l'
-	local deltaNU`l' = _b[payoff]
-	local gammaNU`l' = _b[mean_app]
-	local etaNU`l' = _b[sd_app]
-	local nuNU`l' = _b[c.mean_app#c.sd_app]
-	local se_deltaNU`l' = _se[payoff]
-	local se_gammaNU`l' = _se[mean_app]
-	local se_etaNU`l' = _se[sd_app]
-	local se_nuNU`l' = _se[c.mean_app#c.sd_app]
-	local rhoNU`l' = _b[rho]
-	local sigmaNU`l' = _b[sigma]
-	local se_rhoNU`l' = _se[rho]
-	local se_sigmaNU`l' = _se[sigma]
-	
-	qui tab id if e(sample)
-	local nobs_NU`l' = r(r)
-}
+	local deltaNU    = _b[payoff]
+	local gammaNU    = _b[mean_app]
+	local etaNU      = _b[sd_app]
+	local nuNU       = _b[c.mean_app#c.sd_app]
+	local se_deltaNU = _se[payoff]
+	local se_gammaNU = _se[mean_app]
+	local se_etaNU   = _se[sd_app]
+	local se_nuNU    = _se[c.mean_app#c.sd_app]
+	local rhoNU      = _b[rho]
+	local sigmaNU    = _b[sigma]
+	local se_rhoNU   = _se[rho]
+	local se_sigmaNU = _se[sigma]
 
-foreach l of local levels {
+	qui tab id if e(sample)
+	local nobs_NU = r(r)
+
 	estimates stats NU`l'
 	matrix temp = r(S)
-	local NU_AIC`l' = temp[1,5]
+	local NU_AIC = temp[1,5]
+
+	post results_nu ("`l'") ///
+		(`basedeltaNU') (`se_basedeltaNU') (`basegammaNU') (`se_basegammaNU') (`baseetaNU') (`se_baseetaNU') ///
+		(`baserhoNU') (`se_baserhoNU') (`basesigmaNU') (`se_basesigmaNU') ///
+		(`deltaNU') (`se_deltaNU') (`gammaNU') (`se_gammaNU') (`etaNU') (`se_etaNU') (`nuNU') (`se_nuNU') ///
+		(`rhoNU') (`se_rhoNU') (`sigmaNU') (`se_sigmaNU') ///
+		(`baseNU_AIC') (`NU_AIC') (`nobs_NU')
 }
 
-/* STAMPA TABELLA COEFFICIENTS IN FORMATO LOG */
-
-log using "Utility estimation\Output\Logs\uncertain_stata_COEFF_NU.log", replace
-
-foreach l of local levels {
-  di "`l' `basedeltaNU`l'' `basegammaNU`l'' `baseetaNU`l'' `deltaNU`l'' `gammaNU`l'' `etaNU`l'' `nuNU`l'' `baserhoNU`l'' `basesigmaNU`l'' `rhoNU`l'' `sigmaNU`l''"
- }
-
-log close
- 
- 
-  /* STAMPA TABELLA STD DEV IN FORMATO LOG */
-log using "Utility estimation\Output\Logs\uncertain_stata_SE_NU.log", replace
-
-foreach l of local levels {
-  di "`l' `se_basedeltaNU`l'' `se_basegammaNU`l'' `se_baseetaNU`l'' `se_deltaNU`l'' `se_gammaNU`l'' `se_etaNU`l'' `se_nuNU`l'' `se_baserhoNU`l'' `se_basesigmaNU`l'' `se_rhoNU`l'' `se_sigmaNU`l''"
- } 
-
-log close
-
-
-/* STAMPA TABELLA AIC IN FORMATO LOG */ 
-
-log using "Utility estimation\Output\Logs\uncertain_stata_AIC_NU.log", replace
- 
-foreach l of local levels {
-  di "`l' `NU_AIC`l''"
- }
-
-log close
+postclose results_nu
+use "Utility estimation\Output\Data\results_NU_DG.dta", clear
+export delimited "Utility estimation\Output\Data\results_NU_DG.csv", replace
+use `maindata', clear
 
  
 *****************************************

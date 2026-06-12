@@ -4,101 +4,116 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-This is a research pipeline estimating utility models for a social norm meta-analysis, using Dictator Game (DG) data. The pipeline runs in two stages: Stata estimation → R post-processing and plotting.
+This is a research pipeline estimating utility models for a social norm meta-analysis, using Dictator Game (DG) data. The pipeline runs in three stages: Stata estimation → R post-processing → R tables and plots.
 
 ## Running the analysis
 
-**Step 1 — Stata estimation** (run interactively in Stata or via `stata -b do`):
+**Step 1 — Stata estimation** (fix the `cd` on line 101 first if needed):
+```stata
+do "Utility_comparison.do"
 ```
-stata -b do "Utility_comparison.do"
-```
-Outputs log files to `Output/Logs/` and LaTeX tables to `Output/Tables/`.
+Outputs clean CSVs to `Output/Data/` and LaTeX tables to `Output/Tables/`.
 
-**Step 2 — Parse Stata logs and compute averages** (R):
+**Step 2 — Process results** (compute IVW averages):
 ```r
 source("Ancillary/convert_stata_output.R")
 ```
-Reads the `.log` files, computes inverse-variance weighted average coefficients, and writes CSVs to `Output/Logs/`.
 
-**Step 3 — Plot coefficients** (R):
+**Step 3a — Summary table**:
+```r
+source("Ancillary/make_tables.R")
+```
+Writes `Output/Tables/table_estimates.tex` — the main results table with coefficients and 95% CIs.
+
+**Step 3b — Coefficient plots**:
 ```r
 source("Ancillary/plot_coefficients.R")
 ```
-Reads the CSVs from Step 2 and saves PDF figures to `Output/Figures/`.
+Writes PDFs to `Output/Figures/`.
 
-## Known path issues
+## Known path issue
 
-`Utility_comparison.do` contains two hardcoded `cd` paths that differ between machines:
-- Section 1 (descriptive stats): `C:\Users\andrea\OneDrive\Documents\github\...`
-- Section 2 (estimation): `C:\Users\a.guido\Documents\GitHub\...`
+`Utility_comparison.do` has two hardcoded `cd` paths that may differ between machines:
+- Section 1 (line 11): `C:\Users\andrea\OneDrive\Documents\github\...`
+- Section 2 (line 101): `C:\Users\andrea\OneDrive\Documents\GitHub\...`
 
-Update both `cd` lines to match the local path before running.
+Update both `cd` lines and the `setwd()` in the R scripts to match the local path.
 
-Similarly, `convert_stata_output.R` uses `setwd("C:/Users/a.guido/...")` — update as needed.
+When loading a new data file, update the filename in both `import delimited` calls in the do file and the two `read.csv` calls in `convert_stata_output.R`.
 
-## Key parameter to update
+## Data flow
 
-In `Ancillary/convert_stata_output.R`, line 2:
-```r
-t = 14  # must equal the number of treatments in the data
-```
-Change `t` whenever the number of treatment IDs in `Data/new_data_utility*.csv` changes. It controls `n_max` when parsing log files.
-
-When loading a new data file, also update the filename in both `Utility_comparison.do` (two `import delimited` calls) and `convert_stata_output.R` (two `read.csv` calls referencing `new_data_utility*.csv`).
-
-## Architecture
-
-### Data flow
 ```
 Data/new_data_utility*.csv
         │
         ▼
 Utility_comparison.do  (Stata)
         │
-        ├── Output/Logs/stata_*.log          (raw coefficient/AIC/SE output)
-        ├── Output/Logs/uncertain_stata_*.log (norm uncertainty models)
-        └── Output/Tables/*.tex              (esttab regression tables)
+        ├── Output/Data/results_DG.csv       — one row per treatment: all S/N/DA/FU coefficients, SEs, AICs, nobs
+        ├── Output/Data/results_NU_DG.csv    — same for base-NU and full-NU models (incl. baseNU_AIC)
+        └── Output/Tables/overall_models.tex  — pooled esttab tables
         │
         ▼
 Ancillary/convert_stata_output.R  (R)
         │
-        ├── Output/Logs/MODEL_DG.csv
-        ├── Output/Logs/AIC_DG.csv
-        ├── Output/Logs/95CI_MODEL_DG.csv
-        ├── Output/Logs/uncertainty_MODEL_DG.csv
-        └── Output/Logs/uncertainty_AIC_DG.csv
+        ├── Output/Data/model_DG.csv          — per-treatment + IVW Average row
+        ├── Output/Data/model_NU_DG.csv
+        ├── Output/Data/AIC_DG.csv
+        └── Output/Data/95CI_model_DG.csv
         │
-        ▼
-Ancillary/plot_coefficients.R  (R)
-        └── Output/Figures/*.pdf
+        ┌──────────────────┴──────────────────┐
+        ▼                                     ▼
+Ancillary/make_tables.R            Ancillary/plot_coefficients.R
+Output/Tables/table_estimates.tex  Output/Figures/*.pdf
+```
+
+## Architecture
+
+### How Stata exports results
+
+Each model family uses `postfile`/`post`/`postclose` to write one row per treatment directly to a `.dta`, then exports to CSV via `export delimited`. This avoids fragile log-file parsing. The main data is saved to a Stata `tempfile` around each export so it is available for the next section:
+
+```stata
+postclose results
+tempfile maindata
+save `maindata'
+use "Utility estimation\Output\Data\results_DG.dta", clear
+export delimited "Utility estimation\Output\Data\results_DG.csv", replace
+use `maindata', clear
 ```
 
 ### Models estimated (all via `clogit`, grouped by subject `id`)
 
-| Code | Name | Variables |
-|------|------|-----------|
-| S | Selfish | `payoff` |
-| N | Social Norm | `payoff mean_app` |
-| DA | Difference Averse | `payoff rho sigma` (Charness-Rabin 2002, constraint: payoff=1) |
-| FU | Full | `payoff rho sigma mean_app` |
-| NU | Norm Uncertainty | `payoff mean_app sd_app [rho sigma]`, with and without `mean_app × sd_app` interaction |
+| Code | Name | Variables | Constraint |
+|------|------|-----------|-----------|
+| S | Selfish | `payoff` | none |
+| N | Social Norm | `payoff mean_app` | none |
+| DA | Difference Averse | `payoff rho sigma` | payoff=1 |
+| FU | Full | `payoff rho sigma mean_app` | payoff=1 |
+| baseNU | Norm Uncertainty (base) | `payoff mean_app sd_app rho sigma` | payoff=1 |
+| NU | Norm Uncertainty (full) | `payoff c.mean_app##c.sd_app rho sigma` | payoff=1 |
 
-`rho` and `sigma` are constructed from `payoff` and `endowment` following Charness-Rabin (2002): `r = payoff > endowment/2`, `rho = endowment*r - 2*payoff*r`, etc.
+`rho` and `sigma` follow Charness-Rabin (2002): `r = payoff > endowment/2`, `rho = endowment*r - 2*payoff*r`, etc.
+
+### Summary table (`make_tables.R`)
+
+Reads the "Average" row from `model_DG.csv` and `model_NU_DG.csv` (IVW-averaged coefficients across treatments) and produces `table_estimates.tex` matching the paper layout: one row per model, coefficients on line 1, `[95% CI]` on line 2, blank cells where a parameter is not in that model.
+
+### R averaging method
+
+`convert_stata_output.R` uses inverse-variance weighting: `Σ(coeff/se²) / Σ(1/se²)`. Constrained-to-zero coefficients (`sigmaDA`, `rhoFU`, `sigmaFU`) are set to `NA` before averaging.
 
 ### Data structure
 
-Each row in `new_data_utility*.csv` is a subject–scenario observation. Key columns:
+Each row in `new_data_utility*.csv` is a subject–scenario observation:
 - `paper_id`, `treatment_id` — study identifiers
-- `id` — subject identifier (used as `clogit` group)
-- `a` — binary choice indicator (1 = chosen)
-- `scenarios` — action/donation amount
-- `endowment` — total endowment
-- `payoff` — sender's payoff
-- `mean_app`, `sd_app` — mean and SD of appropriateness ratings for that scenario
-- `game_type` — "DG", "ToG", "Donation Game" (analysis currently filters to "DG")
+- `id` — subject identifier (clogit group variable)
+- `a` — binary choice indicator (1 = chosen action)
+- `scenarios` / `endowment` / `payoff` — action amounts
+- `mean_app`, `sd_app` — mean and SD of appropriateness ratings
+- `game_type` — analysis filters to "DG"
 
 ### Paper-specific data adjustments
 
-Two papers require pre-processing before constructing `coop = scenarios/endowment`:
 - `2017Gac013`: endowment reset to 4, scenarios > 4 dropped
-- `2017Del037`: scenarios rescaled (`scenarios * endowment`), then rounded
+- `2017Del037`: scenarios rescaled (`scenarios * endowment`), payoff recalculated

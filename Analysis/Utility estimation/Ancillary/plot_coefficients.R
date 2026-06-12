@@ -210,7 +210,7 @@ plot_coeff_social_generator_uncertainty <- function(data){
 }
 
 ## Plot coefficients -----------
-stata_output_model <- read.csv("Utility estimation/Output/Logs/MODEL_DG.csv") #%>% mutate(
+stata_output_model <- read.csv("Utility estimation/Output/Data/model_DG.csv") #%>% mutate(
 #  labels = case_when(
 #    
 #  ))
@@ -224,7 +224,7 @@ ggsave(filename = "Utility estimation/Output/Figures/model_social_norm.pdf", plo
 ggsave(filename = "Utility estimation/Output/Figures/model_social_preferences.pdf", plot=plot_da, width = 800, height = 400, units = "px", dpi = 120)
 ggsave(filename = "Utility estimation/Output/Figures/model_full.pdf", plot=plot_fu, width = 800, height = 400, units = "px", dpi = 120)
 
-stata_output_model_u <- read.csv("Utility estimation/Output/Logs/uncertainty_MODEL_DG.csv")
+stata_output_model_u <- read.csv("Utility estimation/Output/Data/model_NU_DG.csv")
 plots <- plot_coeff_social_generator_uncertainty(stata_output_model_u)
 ggsave(filename = "Utility estimation/Output/Figures/unc_model_social_norm.pdf", plot = plots[[1]], width = 800, height = 400, units = "px", dpi = 120)
 ggsave(filename = "Utility estimation/Output/Figures/unc_model_social_norm_interaction.pdf", plot=plots[[2]], width = 800, height = 400, units = "px", dpi = 120)
