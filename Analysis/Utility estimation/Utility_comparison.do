@@ -8,7 +8,7 @@ clear all
 *******************************
 
 ** Import data
-cd "C:\Users\a.guido\Documents\GitHub\Social_norm_meta_analysis\Analysis\Utility estimation"
+cd "C:\Users\andrea\OneDrive\Documents\github\Social_norm_meta_analysis\Analysis\Utility estimation"
 import delimited "Data\new_data_utility2025-07-23.csv", clear
 
 * DG *
@@ -47,11 +47,19 @@ gen coop = scenarios/endowment
 ** smooth **
 replace coop = round(coop,1) if paper_id == "2017Del037"
 
-summ sd_app
-local sd_max = r(max)
-gen sd_app_norm = 2*(sd_app/`sd_max') - 1
+** sd app (uncertainty) normalization **
+*summ sd_app
+*local sd_max = r(max)
+*gen sd_app_norm = 2*(sd_app/`sd_max') - 1
+
+** strength creation and normalization **
+gen st_app = 1/sd_app
+summ st_app
+local st_max = r(max)
+gen st_app_norm = 2*(st_app/`st_max') - 1
+
 set scheme lean1
-collapse (mean) mean_app sd_app_norm, by(coop)
+collapse (mean) mean_app st_app_norm, by(coop)
 gen db = 2
 save `temp' 
 restore
@@ -75,15 +83,11 @@ replace coop = round(coop,1) if paper_id == "2017Del037"
 append using `temp'
 twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
 (line mean_app coop if db==2, yaxis(1)) ///
-(line sd_app_norm coop if db==2, yaxis(1)), ///
+(line st_app_norm coop if db==2, yaxis(1)), ///
 	xtitle("% Endowment") ///
-ytitle("Appropriateness / Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Uncertainty") rows(1))
+ytitle("Appropriateness / Strength") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Strength") rows(1))
 graph export "Output\Figures\hist_coop_mean_app.pdf", replace
 
-/*twoway (line mean_app coop if db==2, xtitle("% Endowment") ytitle("Mean Appropriateness") yline(0) yaxis(1) yscale(range(0) axis(1))) ///
-(line sd_app coop if db==2, yaxis(2) ytitle("Norm Uncertainty", axis(2))), ///
-legend( pos(12) label (1 "Mean Appropriateness") label (2 "Norm Uncertainty") rows(1))
-graph export "Output\Figures\norm_uncertainty.pdf", replace */
 
 * Table 1
 tab treatment_id if a==1
