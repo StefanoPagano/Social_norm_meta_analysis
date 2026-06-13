@@ -14,24 +14,6 @@ import delimited "Data\new_data_utility2025-07-23.csv", clear
 * DG *
 drop if game_type != "DG"
 
-/*preserve
-drop if a!=1
-gen coop = scenarios/endowment
-set scheme lean1
-hist coop, percent xtitle("% Endowment")
-graph export hist_coop.pdf, replace
-tab treatment_id, sum(coop)
-restore
-
-preserve
-gen coop = scenarios/endowment
-set scheme lean1
-collapse (mean) mean_app, by(coop)
-twoway line mean_app coop , xtitle("% Endowment") ytitle("Average Appropriateness") yline(0)
-graph export hist_mean_app.pdf, replace
-restore
-*/
-
 preserve
 tempfile temp
 
@@ -48,18 +30,12 @@ gen coop = scenarios/endowment
 replace coop = round(coop,1) if paper_id == "2017Del037"
 
 ** sd app (uncertainty) normalization **
-*summ sd_app
-*local sd_max = r(max)
-*gen sd_app_norm = 2*(sd_app/`sd_max') - 1
-
-** strength creation and normalization **
-gen st_app = 1/sd_app
-summ st_app
-local st_max = r(max)
-gen st_app_norm = 2*(st_app/`st_max') - 1
+summ sd_app
+local sd_max = r(max)
+gen sd_app_norm = 2*(sd_app/`sd_max') - 1
 
 set scheme lean1
-collapse (mean) mean_app st_app_norm, by(coop)
+collapse (mean) mean_app sd_app_norm, by(coop)
 gen db = 2
 save `temp' 
 restore
@@ -83,9 +59,9 @@ replace coop = round(coop,1) if paper_id == "2017Del037"
 append using `temp'
 twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale(range(0) axis(1))) /// 
 (line mean_app coop if db==2, yaxis(1)) ///
-(line st_app_norm coop if db==2, yaxis(1)), ///
+(line sd_app_norm coop if db==2, yaxis(1)), ///
 	xtitle("% Endowment") ///
-ytitle("Appropriateness / Strength") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Strength") rows(1))
+ytitle("Appropriateness / Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Uncertainty") rows(1))
 graph export "Output\Figures\hist_coop_mean_app.pdf", replace
 
 
@@ -307,14 +283,14 @@ eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(rob) collinear
 eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
 eststo :clogit a payoff c.mean_app##c.sd_app, group(id) iter(50) vce(rob) collinear
 eststo :clogit a payoff rho sigma c.mean_app##c.sd_app, group(id) iter(50) vce(rob) collinear constraint(1)
-esttab using "Utility estimation\Output\Tables\uncertainty_models.tex", label replace aic bic se 
+esttab using "Utility estimation\Output\Tables\uncertainty_models.tex", label replace aic bic se
 
 eststo clear
 eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
 eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
 eststo :clogit a payoff c.mean_app##c.sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
 eststo :clogit a payoff rho sigma c.mean_app##c.sd_app, group(id) iter(50) vce(cluster treatment_id) collinear constraint(1)
-esttab using "Utility estimation\Output\Tables\uncertainty_models_cluster.tex", label replace aic bic se 
+esttab using "Utility estimation\Output\Tables\uncertainty_models_cluster.tex", label replace aic bic se
 
 preserve
 collapse (mean) mean_app (mean) sd_app, by(treatment_id scenarios)
@@ -334,12 +310,12 @@ tobit perc_e sd_app, vce(cluster treatment_id ) ul(1) ll(0)
 tobit perc_e mean_app sd_app if perc_e <=0.5, vce(cluster treatment_id ) ul(0.5) ll(0)
 tobit perc_e mean_app sd_app if perc_e >0.5, vce(cluster treatment_id ) ul(1) ll(0.5)
 
-*tobit perc_e c.mean_app##c.sd_app, vce(cluster treatment_id ) ul(1) ll(0)
-*tobit perc_e c.mean_app##c.sd_app if perc_e <=0.5, vce(cluster treatment_id ) ll(0) ul(0.5)
-*tobit perc_e c.mean_app##c.sd_app if perc_e >0.5, vce(cluster treatment_id ) ll(0.5) ul(1)
+*tobit perc_e c.mean_app##c.st_app, vce(cluster treatment_id ) ul(1) ll(0)
+*tobit perc_e c.mean_app##c.st_app if perc_e <=0.5, vce(cluster treatment_id ) ll(0) ul(0.5)
+*tobit perc_e c.mean_app##c.st_app if perc_e >0.5, vce(cluster treatment_id ) ll(0.5) ul(1)
 *metobit perc_e mean_app if perc_e <=0.5 ||treatment_id:
-*metobit perc_e mean_app sd_app if perc_e <=0.5 ||treatment_id:
-*metobit perc_e c.mean_app##c.sd_app if perc_e <=0.5 ||treatment_id:, ul(0.5) ll(0)
+*metobit perc_e mean_app st_app if perc_e <=0.5 ||treatment_id:
+*metobit perc_e c.mean_app##c.st_app if perc_e <=0.5 ||treatment_id:, ul(0.5) ll(0)
 
 
 gen zero=0
@@ -357,8 +333,8 @@ logit half c.mean_app##c.sd_app, vce(cluster treatment_id)
 restore
 *eststo clear
 *eststo :clogit a payoff mean_app, group(id) vce(bootstrap, strata(treatment_id))
-*eststo :clogit a payoff mean_app sd_app, group(id) iter(50) vce(cluster treatment_id) collinear
-*eststo :clogit a payoff rho sigma mean_app sd_app, group(id) iter(50) vce(bootstrap, strata(treatment_id)) collinear constraint(1)
+*eststo :clogit a payoff mean_app st_app, group(id) iter(50) vce(cluster treatment_id) collinear
+*eststo :clogit a payoff rho sigma mean_app st_app, group(id) iter(50) vce(bootstrap, strata(treatment_id)) collinear constraint(1)
 *esttab using uncertainty_models.tex, label replace aic bic se 
 
 *eststo :clogit a payoff mean_app, group(id) iter(50) collinear constraint(1)

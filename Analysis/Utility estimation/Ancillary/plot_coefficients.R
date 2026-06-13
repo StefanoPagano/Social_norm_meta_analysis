@@ -1,9 +1,6 @@
-rm(list=ls())
 library(ggplot2)
 library(tidyverse)
 library(ggpubr)
-library(ggbreak)
-library(patchwork)
 
 setwd("~/GitHub/Social_norm_meta_analysis/Analysis/")
 
@@ -22,7 +19,8 @@ label_map <- c(
   "2020Bas115_2a" = "Basic et al. (2021)",
   "2023Eck169_1a" = "Eckel & Grossman (2023) - Class",
   "2023Eck169_1b" = "Eckel & Grossman (2023) - Fresh.",
-  "Average"       = "Average"
+  "Average"       = "Average",
+  "Average (RE)"  = "Average"
 )
 
 label_order <- c(
@@ -49,7 +47,7 @@ apply_labels <- function(df) {
 
 # Single-coefficient forest plot.
 # Hollow circle = n.s., filled circle = p<0.05; diamond shape for Average row.
-cp <- function(data, coeff, se, xlabel, show_y = TRUE) {
+cp <- function(data, coeff, se, xlabel, show_y = TRUE, show_legend = FALSE) {
   d <- data %>%
     mutate(
       sig = factor(
@@ -78,7 +76,8 @@ cp <- function(data, coeff, se, xlabel, show_y = TRUE) {
     ) +
     scale_fill_manual(
       values = c("n.s." = "white", "p < 0.05" = "#2C3E50"),
-      name = NULL, drop = FALSE
+      name = NULL, drop = FALSE,
+      guide = if (show_legend) "legend" else "none"
     ) +
     labs(x = xlabel, y = NULL) +
     theme_classic(base_size = 10) +
@@ -86,7 +85,7 @@ cp <- function(data, coeff, se, xlabel, show_y = TRUE) {
       axis.text.y        = if (show_y) element_text(size = 8) else element_blank(),
       axis.ticks.y       = if (show_y) element_line() else element_blank(),
       panel.grid.major.x = element_line(color = "gray93", linewidth = 0.3),
-      legend.position    = "bottom",
+      legend.position    = if (show_legend) "bottom" else "none",
       legend.key.size    = unit(0.4, "cm")
     )
 }
@@ -100,14 +99,14 @@ plot_coeff_social_generator <- function(data) {
   plot_da <- ggarrange(
     cp(data, "rhoDA",   "se_rhoDA",   expression(rho),   show_y = TRUE),
     cp(data, "sigmaDA", "se_sigmaDA", expression(sigma), show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(8, 6)
+    widths = c(8, 6)
   )
   plot_da <- annotate_figure(plot_da, top = text_grob("Outcome Based (Eq. 2)", face = "bold", size = 14))
 
   plot_sn <- ggarrange(
     cp(data, "deltaN", "se_deltaN", expression(delta), show_y = TRUE),
     cp(data, "gammaN", "se_gammaN", expression(gamma), show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(8, 6)
+    widths = c(8, 6)
   )
   plot_sn <- annotate_figure(plot_sn, top = text_grob("Social Norm Content (Eq. 3)", face = "bold", size = 14))
 
@@ -115,7 +114,7 @@ plot_coeff_social_generator <- function(data) {
     cp(data, "rhoFU",   "se_rhoFU",   expression(rho),   show_y = TRUE),
     cp(data, "sigmaFU", "se_sigmaFU", expression(sigma), show_y = FALSE),
     cp(data, "gammaFU", "se_gammaFU", expression(gamma), show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(9, 6, 6)
+    ncol = 3, nrow = 1, widths = c(13, 6, 6)
   )
   plot_fu <- annotate_figure(plot_fu, top = text_grob("Combined Model (Eq. 4)", face = "bold", size = 14))
 
@@ -126,20 +125,20 @@ plot_coeff_social_generator_uncertainty <- function(data) {
   plot_nu <- ggarrange(
     cp(data, "basegammaNU", "se_basegammaNU", expression(gamma), show_y = TRUE),
     cp(data, "baseetaNU",   "se_baseetaNU",   expression(eta),   show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(8, 6)
+    widths = c(8, 6)
   )
 
   plot_nu_i <- ggarrange(
     cp(data, "gammaNU", "se_gammaNU", expression(gamma), show_y = TRUE),
     cp(data, "etaNU",   "se_etaNU",   expression(eta),   show_y = FALSE),
     cp(data, "nuNU",    "se_nuNU",    expression(nu),    show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(8, 6, 6)
+    ncol = 3, nrow = 1, widths = c(13, 6, 6)
   )
 
   plot_nu_i_social <- ggarrange(
     cp(data, "rhoNU",   "se_rhoNU",   expression(rho),   show_y = TRUE),
     cp(data, "sigmaNU", "se_sigmaNU", expression(sigma), show_y = FALSE),
-    common.legend = TRUE, legend = "bottom", widths = c(8, 6)
+    widths = c(8, 6)
   )
 
   return(list(plot_nu, plot_nu_i, plot_nu_i_social))
@@ -153,7 +152,7 @@ plots <- plot_coeff_social_generator(stata_output_model)
 ggsave("Utility estimation/Output/Figures/model_selfish.pdf",           plots[[1]], width = 500, height = 400, units = "px", dpi = 120)
 ggsave("Utility estimation/Output/Figures/model_social_norm.pdf",       plots[[2]], width = 800, height = 400, units = "px", dpi = 120)
 ggsave("Utility estimation/Output/Figures/model_social_preferences.pdf",plots[[3]], width = 800, height = 400, units = "px", dpi = 120)
-ggsave("Utility estimation/Output/Figures/model_full.pdf",              plots[[4]], width = 800, height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/model_full.pdf",              plots[[4]], width = 1100, height = 400, units = "px", dpi = 120)
 
 ## ---- Norm uncertainty models ------------------------------------------------
 
@@ -161,10 +160,106 @@ stata_output_model_u <- read.csv("Utility estimation/Output/Data/model_NU_DG.csv
 plots_u <- plot_coeff_social_generator_uncertainty(stata_output_model_u)
 
 ggsave("Utility estimation/Output/Figures/unc_model_social_norm.pdf",                         plots_u[[1]], width = 800, height = 400, units = "px", dpi = 120)
-ggsave("Utility estimation/Output/Figures/unc_model_social_norm_interaction.pdf",             plots_u[[2]], width = 800, height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/unc_model_social_norm_interaction.pdf",             plots_u[[2]], width = 1100, height = 400, units = "px", dpi = 120)
 ggsave("Utility estimation/Output/Figures/unc_model_social_norm_interaction_social_pref.pdf", plots_u[[3]], width = 800, height = 400, units = "px", dpi = 120)
 
 plot_nu_labeled   <- annotate_figure(plots_u[[1]], top = text_grob("Social Norm Strength (Eq. 5)", face = "bold", size = 14))
 plot_nu_i_labeled <- annotate_figure(plots_u[[2]], top = text_grob("Full (Eq. 6)",                 face = "bold", size = 14))
-plot_nu_combined  <- ggarrange(plot_nu_labeled, plot_nu_i_labeled, nrow = 2)
-ggsave("Utility estimation/Output/Figures/unc_model_combined.pdf", plot_nu_combined, width = 900, height = 800, units = "px", dpi = 120)
+
+shared_legend  <- get_legend(cp(stata_output_model_u, "basegammaNU", "se_basegammaNU",
+                                expression(gamma), show_y = FALSE, show_legend = TRUE))
+plot_nu_combined <- ggarrange(
+  ggarrange(plot_nu_labeled, plot_nu_i_labeled, nrow = 2),
+  as_ggplot(shared_legend),
+  nrow = 2, heights = c(20, 1)
+)
+ggsave("Utility estimation/Output/Figures/unc_model_combined.pdf", plot_nu_combined, width = 1100, height = 820, units = "px", dpi = 120)
+
+## ---- Heterogeneity (I²) chart -----------------------------------------------
+
+tau2_main <- read.csv("Utility estimation/Output/Data/tau2_DG.csv")
+tau2_nu   <- read.csv("Utility estimation/Output/Data/tau2_NU_DG.csv")
+
+het_tiers <- c("Low (<25%)" = "#27AE60", "Moderate (25–50%)" = "#F39C12",
+               "Substantial (50–75%)" = "#E74C3C", "Considerable (>75%)" = "#8E44AD")
+
+make_I2_df <- function(tau2_row, param_levels, param_labels) {
+  tau2_row %>%
+    select(starts_with("I2_")) %>%
+    pivot_longer(everything(), names_to = "param", values_to = "I2") %>%
+    mutate(
+      param = sub("^I2_", "", param),
+      label = factor(param, levels = rev(param_levels), labels = rev(param_labels)),
+      tier  = cut(I2, c(-Inf, 25, 50, 75, Inf),
+                  labels = names(het_tiers), right = FALSE)
+    ) %>%
+    filter(!is.na(I2))
+}
+
+plot_I2 <- function(df) {
+  ggplot(df, aes(x = I2, y = label, fill = tier)) +
+    geom_col(width = 0.55) +
+    geom_vline(xintercept = c(25, 50, 75), linetype = "dashed",
+               color = "gray55", linewidth = 0.35) +
+    scale_fill_manual(values = het_tiers, name = NULL, drop = FALSE) +
+    scale_x_continuous(limits = c(0, 100), labels = \(x) paste0(x, "%")) +
+    labs(x = expression(I^2), y = NULL) +
+    theme_classic(base_size = 10) +
+    theme(legend.position = "bottom", legend.key.size = unit(0.35, "cm"))
+}
+
+main_levels <- c("deltaS", "deltaN", "gammaN", "rhoDA", "sigmaDA", "rhoFU", "sigmaFU", "gammaFU")
+main_labels <- c("δ (Eq.1)", "δ (Eq.3)", "γ (Eq.3)",
+                 "ρ (Eq.2)", "σ (Eq.2)",
+                 "ρ (Eq.4)", "σ (Eq.4)", "γ (Eq.4)")
+
+nu_levels <- c("basegammaNU", "baseetaNU", "baserhoNU", "basesigmaNU",
+               "gammaNU", "etaNU", "nuNU", "rhoNU", "sigmaNU")
+nu_labels <- c("γ (Eq.5)", "η (Eq.5)", "ρ (Eq.5)", "σ (Eq.5)",
+               "γ (Eq.6)", "η (Eq.6)", "ν (Eq.6)", "ρ (Eq.6)", "σ (Eq.6)")
+
+I2_main_df <- make_I2_df(tau2_main, main_levels, main_labels)
+I2_nu_df   <- make_I2_df(tau2_nu,   nu_levels,   nu_labels)
+
+p_het_main <- annotate_figure(plot_I2(I2_main_df),
+                               top = text_grob("Main models", face = "bold", size = 12))
+p_het_nu   <- annotate_figure(plot_I2(I2_nu_df),
+                               top = text_grob("Norm uncertainty models", face = "bold", size = 12))
+
+p_het_combined <- ggarrange(p_het_main, p_het_nu, ncol = 2,
+                             common.legend = TRUE, legend = "bottom")
+
+ggsave("Utility estimation/Output/Figures/heterogeneity_I2.pdf",
+       p_het_combined, width = 900, height = 400, units = "px", dpi = 120)
+
+## ---- Main models (RE) -------------------------------------------------------
+
+stata_output_model_re <- read.csv("Utility estimation/Output/Data/model_RE_DG.csv") %>% apply_labels()
+plots_re <- plot_coeff_social_generator(stata_output_model_re)
+
+ggsave("Utility estimation/Output/Figures/model_selfish_RE.pdf",            plots_re[[1]], width = 500,  height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/model_social_norm_RE.pdf",        plots_re[[2]], width = 800,  height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/model_social_preferences_RE.pdf", plots_re[[3]], width = 800,  height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/model_full_RE.pdf",               plots_re[[4]], width = 1100, height = 400, units = "px", dpi = 120)
+
+## ---- Norm uncertainty models (RE) -------------------------------------------
+
+stata_output_model_u_re <- read.csv("Utility estimation/Output/Data/model_RE_NU_DG.csv") %>% apply_labels()
+plots_u_re <- plot_coeff_social_generator_uncertainty(stata_output_model_u_re)
+
+ggsave("Utility estimation/Output/Figures/unc_model_social_norm_RE.pdf",                         plots_u_re[[1]], width = 800,  height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/unc_model_social_norm_interaction_RE.pdf",             plots_u_re[[2]], width = 1100, height = 400, units = "px", dpi = 120)
+ggsave("Utility estimation/Output/Figures/unc_model_social_norm_interaction_social_pref_RE.pdf", plots_u_re[[3]], width = 800,  height = 400, units = "px", dpi = 120)
+
+plot_nu_labeled_re   <- annotate_figure(plots_u_re[[1]], top = text_grob("Social Norm Strength (Eq. 5)", face = "bold", size = 14))
+plot_nu_i_labeled_re <- annotate_figure(plots_u_re[[2]], top = text_grob("Full (Eq. 6)",                 face = "bold", size = 14))
+
+shared_legend_re <- get_legend(cp(stata_output_model_u_re, "basegammaNU", "se_basegammaNU",
+                                  expression(gamma), show_y = FALSE, show_legend = TRUE))
+plot_nu_combined_re <- ggarrange(
+  ggarrange(plot_nu_labeled_re, plot_nu_i_labeled_re, nrow = 2),
+  as_ggplot(shared_legend_re),
+  nrow = 2, heights = c(20, 1)
+)
+ggsave("Utility estimation/Output/Figures/unc_model_combined_RE.pdf",
+       plot_nu_combined_re, width = 1100, height = 820, units = "px", dpi = 120)

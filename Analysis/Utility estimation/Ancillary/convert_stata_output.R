@@ -81,3 +81,66 @@ avg_row_nu <- bind_cols(
 
 df_nu_out <- bind_rows(df_nu, avg_row_nu)
 write.csv(df_nu_out, "Utility estimation/Output/Data/model_NU_DG.csv", row.names = FALSE)
+
+# --- Random-effects (DerSimonian-Laird) meta-analysis ------------------------
+# Produces separate model_RE_*.csv and tau2_*.csv files; existing outputs unchanged.
+
+dl_re <- function(theta, se) {
+  keep  <- !is.na(theta) & !is.na(se) & is.finite(se) & se > 0
+  theta <- theta[keep];  se <- se[keep];  k <- length(theta)
+  if (k < 2) return(c(est = NA_real_, se = NA_real_, tau2 = NA_real_, I2 = NA_real_, k = as.numeric(k)))
+  w        <- 1 / se^2
+  theta_fe <- sum(w * theta) / sum(w)
+  Q        <- sum(w * (theta - theta_fe)^2)
+  tau2     <- max(0, (Q - (k - 1)) / (sum(w) - sum(w^2) / sum(w)))
+  I2       <- if (Q > 0) max(0, (Q - (k - 1)) / Q * 100) else 0
+  w_re     <- 1 / (se^2 + tau2)
+  c(est  = sum(w_re * theta) / sum(w_re),
+    se   = sqrt(1 / sum(w_re)),
+    tau2 = tau2,
+    I2   = I2,
+    k    = as.numeric(k))
+}
+
+re_average <- function(df, coeff_cols, se_cols) {
+  res      <- mapply(function(cc, sc) dl_re(df[[cc]], df[[sc]]),
+                     coeff_cols, se_cols, SIMPLIFY = FALSE)
+  est_vec  <- sapply(res, `[`, "est")
+  se_vec   <- sapply(res, `[`, "se")
+  tau2_vec <- sapply(res, `[`, "tau2")
+  I2_vec   <- sapply(res, `[`, "I2")
+  k_vec    <- sapply(res, `[`, "k")
+  list(
+    coeff = setNames(as.data.frame(t(est_vec)),  coeff_cols),
+    se    = setNames(as.data.frame(t(se_vec)),   se_cols),
+    tau2  = setNames(as.data.frame(t(tau2_vec)), paste0("tau2_", coeff_cols)),
+    I2    = setNames(as.data.frame(t(I2_vec)),   paste0("I2_", coeff_cols)),
+    k     = k_vec
+  )
+}
+
+# Main models RE
+re_main     <- re_average(df, coeff_cols, se_cols)
+avg_re_row  <- bind_cols(
+  data.frame(treatment_id = "Average (RE)"),
+  re_main$coeff, re_main$se, avg_aic,
+  data.frame(nobs = sum(df$nobs))
+)
+write.csv(bind_rows(df, avg_re_row),
+          "Utility estimation/Output/Data/model_RE_DG.csv",  row.names = FALSE)
+write.csv(bind_cols(data.frame(treatment_id = "Average (RE)"), re_main$tau2, re_main$I2),
+          "Utility estimation/Output/Data/tau2_DG.csv",      row.names = FALSE)
+
+# NU models RE
+re_nu       <- re_average(df_nu, coeff_cols_nu, se_cols_nu)
+avg_re_row_nu <- bind_cols(
+  data.frame(treatment_id = "Average (RE)"),
+  re_nu$coeff, re_nu$se,
+  data.frame(baseNU_AIC = mean(df_nu$baseNU_AIC, na.rm = TRUE),
+             NU_AIC     = mean(df_nu$NU_AIC,     na.rm = TRUE),
+             nobs_NU    = sum(df_nu$nobs_NU))
+)
+write.csv(bind_rows(df_nu, avg_re_row_nu),
+          "Utility estimation/Output/Data/model_RE_NU_DG.csv", row.names = FALSE)
+write.csv(bind_cols(data.frame(treatment_id = "Average (RE)"), re_nu$tau2, re_nu$I2),
+          "Utility estimation/Output/Data/tau2_NU_DG.csv",     row.names = FALSE)
