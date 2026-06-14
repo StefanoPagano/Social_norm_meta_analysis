@@ -14,9 +14,9 @@ do "Utility_comparison.do"
 ```
 Outputs clean CSVs to `Output/Data/` and LaTeX tables to `Output/Tables/`.
 
-**Step 2 — Process results** (compute IVW averages):
+**Step 2 — Process results** (compute IVW and RE averages):
 ```r
-source("Ancillary/convert_stata_output.R")
+Rscript "Ancillary/_run_convert.R"
 ```
 
 **Step 3a — Summary table**:
@@ -27,9 +27,9 @@ Writes `Output/Tables/table_estimates.tex` — the main results table with coeff
 
 **Step 3b — Coefficient plots**:
 ```r
-source("Ancillary/plot_coefficients.R")
+Rscript "Ancillary/_run_plots.R"
 ```
-Writes PDFs to `Output/Figures/`.
+Writes FE and RE coefficient plots + I² heterogeneity chart to `Output/Figures/`.
 
 ## Known path issue
 
@@ -37,7 +37,7 @@ Writes PDFs to `Output/Figures/`.
 - Section 1 (line 11): `C:\Users\andrea\OneDrive\Documents\github\...`
 - Section 2 (line 101): `C:\Users\andrea\OneDrive\Documents\GitHub\...`
 
-Update both `cd` lines and the `setwd()` in the R scripts to match the local path.
+The R scripts use `setwd("~/GitHub/...")` which does not resolve on this machine. The wrapper scripts `_run_convert.R` and `_run_plots.R` intercept `setwd` and redirect to the correct path — always use these wrappers instead of sourcing the scripts directly.
 
 When loading a new data file, update the filename in both `import delimited` calls in the do file and the two `read.csv` calls in `convert_stata_output.R`.
 
@@ -59,7 +59,11 @@ Ancillary/convert_stata_output.R  (R)
         ├── Output/Data/model_DG.csv          — per-treatment + IVW Average row
         ├── Output/Data/model_NU_DG.csv
         ├── Output/Data/AIC_DG.csv
-        └── Output/Data/95CI_model_DG.csv
+        ├── Output/Data/95CI_model_DG.csv
+        ├── Output/Data/model_RE_DG.csv       — per-treatment + DL Random-Effects Average row
+        ├── Output/Data/model_RE_NU_DG.csv
+        ├── Output/Data/tau2_DG.csv           — τ² and I² per coefficient (main models)
+        └── Output/Data/tau2_NU_DG.csv        — τ² and I² per coefficient (NU models)
         │
         ┌──────────────────┴──────────────────┐
         ▼                                     ▼
@@ -101,7 +105,9 @@ Reads the "Average" row from `model_DG.csv` and `model_NU_DG.csv` (IVW-averaged 
 
 ### R averaging method
 
-`convert_stata_output.R` uses inverse-variance weighting: `Σ(coeff/se²) / Σ(1/se²)`. Constrained-to-zero coefficients (`sigmaDA`, `rhoFU`, `sigmaFU`) are set to `NA` before averaging.
+`convert_stata_output.R` computes two averages:
+- **Fixed-effects (IVW)**: `Σ(coeff/se²) / Σ(1/se²)`. Constrained-to-zero coefficients (`sigmaDA`, `rhoFU`, `sigmaFU`) are set to `NA` before averaging.
+- **Random-effects (DerSimonian-Laird)**: adds between-study variance τ² to each study's sampling variance before weighting. Also outputs I² (% of total variance due to true heterogeneity) per coefficient.
 
 ### Data structure
 
