@@ -1,0 +1,35 @@
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}{ll|c|cc|ccc|c}
+  & & & \multicolumn{2}{c|}{Social preferences} & \multicolumn{3}{c|}{Social Norms} & \\
+\toprule
+Model & Belief sample & $\delta$ & $\rho$ & $\sigma$ & $\gamma$ & $\eta$ & $\nu$ & AIC \\
+\midrule
+Social Norm Content (Eq. 3) & Within ($k=5$) & 0.37 &  &  & 3.49 &  &  & 695.22 \\
+ &  & [0.29, 0.44] &  &  & [2.90, 4.08] &  &  &  \\
+\midrule
+Social Norm Content (Eq. 3) & Between ($k=9$) & 0.86 &  &  & 2.77 &  &  & 254.43 \\
+ &  & [0.70, 1.01] &  &  & [2.17, 3.36] &  &  &  \\
+\midrule
+Combined Model (Eq. 4) & Within ($k=5$) &  & 0.06 & 0.53 & 6.82 &  &  & 661.46 \\
+ &  &  & [0.00, 0.12] & [0.48, 0.57] & [6.02, 7.62] &  &  &  \\
+\midrule
+Combined Model (Eq. 4) & Between ($k=9$) &  & 0.04 & -3.50 & 3.06 &  &  & 251.02 \\
+ &  &  & [-0.08, 0.16] & [-3.62, -3.37] & [2.27, 3.86] &  &  &  \\
+\midrule
+Social Norm Strength (Eq. 5) & Within ($k=5$) &  &  &  & 6.21 & 2.11 &  & 640.89 \\
+ &  &  &  &  & [5.24, 7.19] & [0.66, 3.56] &  &  \\
+\midrule
+Social Norm Strength (Eq. 5) & Between ($k=9$) &  &  &  & 4.93 & 3.94 &  & 244.99 \\
+ &  &  &  &  & [3.74, 6.12] & [1.63, 6.25] &  &  \\
+\midrule
+\textbf{Full (Eq. 6)} & Within ($k=5$) &  &  &  & 3.92 & 4.96 & 3.90 & 639.80 \\
+ &  &  &  &  & [1.08, 6.76] & [2.58, 7.33] & [0.29, 7.50] &  \\
+\midrule
+\textbf{Full (Eq. 6)} & Between ($k=9$) &  &  &  & 3.36 & 1.98 & 3.90 & 245.14 \\
+ &  &  &  &  & [0.95, 5.77] & [-1.11, 5.07] & [1.22, 6.58] &  \\
+\bottomrule
+\end{tabular}}
+\caption{Pooled (IVW) coefficient estimates split by whether the appropriateness ratings used to construct $N_k$/$S_k$ came from the same sample as the dictator-game choices (Within, $k=5$ treatments) or an independent sample (Between, $k=9$ treatments). Only models involving $N_k$/$S_k$ are shown; Eq.~1--2 do not depend on these measures.}
+\label{tab:design_comparison}
+\end{table}
