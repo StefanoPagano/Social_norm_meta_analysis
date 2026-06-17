@@ -32,7 +32,8 @@ replace coop = round(coop,1) if paper_id == "2017Del037"
 ** sd app (uncertainty) normalization **
 summ sd_app
 local sd_max = r(max)
-gen sd_app_norm = 2*(sd_app/`sd_max') - 1
+gen sd_app_norm = 1 - 2*(sd_app/`sd_max')
+
 
 set scheme lean1
 collapse (mean) mean_app sd_app_norm, by(coop)
@@ -61,7 +62,7 @@ twoway (hist coop if a==1 & db==1, percent xtitle("% Endowment") yaxis(2) yscale
 (line mean_app coop if db==2, yaxis(1)) ///
 (line sd_app_norm coop if db==2, yaxis(1)), ///
 	xtitle("% Endowment") ///
-ytitle("Appropriateness / Uncertainty") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Uncertainty") rows(1))
+ytitle("Appropriateness / Strength") yline(0) yscale(range(0) axis(2)) legend( pos(12) label (1 "Choices") label (2 "Appropriateness") label( 3 "Strength") rows(1))
 graph export "Output\Figures\hist_coop_mean_app.pdf", replace
 
 
@@ -79,6 +80,12 @@ import delimited "Utility estimation\Data\new_data_utility2025-07-23.csv", clear
 
 * DG *
 drop if game_type != "DG"
+
+** sd_app uncertainty normalization (global max, rescaled to [-1,1]) **
+summ sd_app
+gen sd_app_norm = 2*(sd_app/r(max))
+replace sd_app = 1 - sd_app_norm
+drop sd_app_norm
 
 * set constraint for social preferences models *
 constraint 1 payoff = 1

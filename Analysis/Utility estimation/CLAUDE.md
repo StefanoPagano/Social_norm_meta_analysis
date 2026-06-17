@@ -94,8 +94,8 @@ use `maindata', clear
 | N | Social Norm | `payoff mean_app` | none |
 | DA | Difference Averse | `payoff rho sigma` | payoff=1 |
 | FU | Full | `payoff rho sigma mean_app` | payoff=1 |
-| baseNU | Norm Uncertainty (base) | `payoff mean_app sd_app rho sigma` | payoff=1 |
-| NU | Norm Uncertainty (full) | `payoff c.mean_app##c.sd_app rho sigma` | payoff=1 |
+| baseNU | Norm Strength (base) | `payoff mean_app sd_app rho sigma` | payoff=1 |
+| NU | Norm Strength (full) | `payoff c.mean_app##c.sd_app rho sigma` | payoff=1 |
 
 `rho` and `sigma` follow Charness-Rabin (2002): `r = payoff > endowment/2`, `rho = endowment*r - 2*payoff*r`, etc.
 

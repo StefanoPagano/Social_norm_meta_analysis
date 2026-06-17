@@ -52,7 +52,7 @@ write.csv(
   row.names = FALSE
 )
 
-# --- Norm uncertainty models (NU) ----------------------------------------
+# --- Norm strength models (NU) ----------------------------------------
 
 df_nu <- read.csv("Utility estimation/Output/Data/results_NU_DG.csv")
 

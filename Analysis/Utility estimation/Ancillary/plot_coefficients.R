@@ -154,7 +154,7 @@ ggsave("Utility estimation/Output/Figures/model_social_norm.pdf",       plots[[2
 ggsave("Utility estimation/Output/Figures/model_social_preferences.pdf",plots[[3]], width = 800, height = 400, units = "px", dpi = 120)
 ggsave("Utility estimation/Output/Figures/model_full.pdf",              plots[[4]], width = 1100, height = 400, units = "px", dpi = 120)
 
-## ---- Norm uncertainty models ------------------------------------------------
+## ---- Norm strength models ------------------------------------------------
 
 stata_output_model_u <- read.csv("Utility estimation/Output/Data/model_NU_DG.csv") %>% apply_labels()
 plots_u <- plot_coeff_social_generator_uncertainty(stata_output_model_u)
@@ -224,7 +224,7 @@ I2_nu_df   <- make_I2_df(tau2_nu,   nu_levels,   nu_labels)
 p_het_main <- annotate_figure(plot_I2(I2_main_df),
                                top = text_grob("Main models", face = "bold", size = 12))
 p_het_nu   <- annotate_figure(plot_I2(I2_nu_df),
-                               top = text_grob("Norm uncertainty models", face = "bold", size = 12))
+                               top = text_grob("Norm strength models", face = "bold", size = 12))
 
 p_het_combined <- ggarrange(p_het_main, p_het_nu, ncol = 2,
                              common.legend = TRUE, legend = "bottom")
@@ -242,7 +242,7 @@ ggsave("Utility estimation/Output/Figures/model_social_norm_RE.pdf",        plot
 ggsave("Utility estimation/Output/Figures/model_social_preferences_RE.pdf", plots_re[[3]], width = 800,  height = 400, units = "px", dpi = 120)
 ggsave("Utility estimation/Output/Figures/model_full_RE.pdf",               plots_re[[4]], width = 1100, height = 400, units = "px", dpi = 120)
 
-## ---- Norm uncertainty models (RE) -------------------------------------------
+## ---- Norm strength models (RE) -------------------------------------------
 
 stata_output_model_u_re <- read.csv("Utility estimation/Output/Data/model_RE_NU_DG.csv") %>% apply_labels()
 plots_u_re <- plot_coeff_social_generator_uncertainty(stata_output_model_u_re)
