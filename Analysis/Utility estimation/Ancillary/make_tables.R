@@ -96,7 +96,7 @@ lines <- c(
        eta   = bnu_eta,
        aic   = fmt_aic(avg_nu$baseNU_AIC)),
   "\\midrule",
-  row2("Full (Eq. 6)", bold = TRUE,
+  row2("Full (Eq. 6)",
        rho   = nu_rho,
        sigma = nu_sig,
        gamma = nu_gam,
