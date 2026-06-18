@@ -31,6 +31,12 @@ Rscript "Ancillary/_run_plots.R"
 ```
 Writes FE and RE coefficient plots + I² heterogeneity chart to `Output/Figures/`.
 
+**Step 3c — LaTeX macros for the paper's prose**:
+```r
+Rscript "Ancillary/_run_macros.R"
+```
+Writes `Output/Tables/estimates_macros.tex` — one `\newcommand` per coefficient/CI bound/AIC/derived ratio quoted in the paper text (e.g. `\deltaEqOne`, `\gammaEqThreeLo`, `\mrsEqFour`). Copy this file into the paper repo alongside `table_estimates.tex` and `\input` it near `\begin{document}`; the Results/Implications prose references these macros instead of hardcoded numbers, so re-running the pipeline and recopying this one file keeps the prose in sync — no manual transcription.
+
 ## Known path issue
 
 `Utility_comparison.do` has two hardcoded `cd` paths that may differ between machines:
@@ -65,10 +71,11 @@ Ancillary/convert_stata_output.R  (R)
         ├── Output/Data/tau2_DG.csv           — τ² and I² per coefficient (main models)
         └── Output/Data/tau2_NU_DG.csv        — τ² and I² per coefficient (NU models)
         │
-        ┌──────────────────┴──────────────────┐
-        ▼                                     ▼
-Ancillary/make_tables.R            Ancillary/plot_coefficients.R
-Output/Tables/table_estimates.tex  Output/Figures/*.pdf
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+Ancillary/make_tables.R  Ancillary/make_macros.R  Ancillary/plot_coefficients.R
+table_estimates.tex      estimates_macros.tex     Output/Figures/*.pdf
+(Output/Tables/)         (Output/Tables/)
 ```
 
 ## Architecture
